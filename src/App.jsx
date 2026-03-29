@@ -42,6 +42,7 @@ import TermsOfService from './pages/legal/TermsOfService.jsx';
 import CookiePolicy from './pages/legal/CookiePolicy.jsx';
 import RefundPolicy from './pages/legal/RefundPolicy.jsx';
 import ContactUs from './pages/help/ContactUs.jsx';
+import SetupPortal from './pages/SetupPortal.jsx';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -106,6 +107,7 @@ const AuthenticatedApp = () => {
       <Route path="/cookie-policy" element={<CookiePolicy />} />
       <Route path="/refund-policy" element={<RefundPolicy />} />
       <Route path="/contact" element={<ContactUs />} />
+      <Route path="/setup" element={<SetupPortal />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
