@@ -14,10 +14,10 @@ const orbitIcons = [
 
 function ShieldViz() {
   return (
-    <div className="relative flex items-center justify-center w-[320px] h-[320px] sm:w-[420px] sm:h-[420px]">
+    <div className="relative flex items-center justify-center w-[510px] h-[510px] sm:w-[670px] sm:h-[670px]">
 
       {/* Galaxy rings */}
-      {[160, 132, 104].map((r, i) => (
+      {[256, 211, 166].map((r, i) => (
         <motion.div
           key={i}
           className="absolute rounded-full border border-cyan-400/15"
@@ -40,22 +40,22 @@ function ShieldViz() {
       >
         {orbitIcons.map(({ Icon, angle, color }, idx) => {
           const rad = (angle * Math.PI) / 180;
-          const r = 145;
+          const r = 232;
           const x = r * Math.cos(rad);
           const y = r * Math.sin(rad);
           return (
             <motion.div
               key={idx}
-              className="absolute flex items-center justify-center w-10 h-10 rounded-xl bg-[#0a0f1e] border border-white/10"
+              className="absolute flex items-center justify-center w-14 h-14 rounded-xl bg-[#0a0f1e] border border-white/10"
               style={{
-                left: `calc(50% + ${x}px - 20px)`,
-                top: `calc(50% + ${y}px - 20px)`,
+                left: `calc(50% + ${x}px - 28px)`,
+                top: `calc(50% + ${y}px - 28px)`,
                 boxShadow: `0 0 12px ${color}55`,
               }}
               animate={{ rotate: -360 }}
               transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
             >
-              <Icon size={17} color={color} />
+              <Icon size={24} color={color} />
             </motion.div>
           );
         })}
@@ -66,7 +66,7 @@ function ShieldViz() {
         <motion.div
           key={i}
           className="absolute rounded-full border border-cyan-400/40"
-          style={{ width: 90, height: 90 }}
+          style={{ width: 144, height: 144 }}
           animate={{ scale: [1, 3.2], opacity: [0.7, 0] }}
           transition={{ duration: 2.8, repeat: Infinity, ease: 'easeOut', delay: i * 0.9 }}
         />
@@ -75,7 +75,7 @@ function ShieldViz() {
       {/* Shield glow blob */}
       <motion.div
         className="absolute rounded-full blur-3xl"
-        style={{ width: 180, height: 180, background: 'radial-gradient(circle, rgba(34,211,238,0.35) 0%, transparent 70%)' }}
+        style={{ width: 288, height: 288, background: 'radial-gradient(circle, rgba(34,211,238,0.35) 0%, transparent 70%)' }}
         animate={{ scale: [1, 1.6, 1], opacity: [0.6, 1, 0.6] }}
         transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
       />
@@ -93,7 +93,7 @@ function ShieldViz() {
         }}
         transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
       >
-        <svg width="130" height="148" viewBox="0 0 88 100" fill="none">
+        <svg width="208" height="237" viewBox="0 0 88 100" fill="none">
           <path
             d="M44 2L6 16V46C6 68 24 88 44 98C64 88 82 68 82 46V16L44 2Z"
             fill="url(#shieldGrad)"
