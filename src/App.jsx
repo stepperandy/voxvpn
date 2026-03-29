@@ -45,6 +45,9 @@ import ContactUs from './pages/help/ContactUs.jsx';
 import StatusPage from './pages/help/StatusPage.jsx';
 import BugBounty from './pages/help/BugBounty.jsx';
 import SetupPortal from './pages/SetupPortal.jsx';
+import FeaturesMobile from './pages/FeaturesMobile.jsx';
+import PricingMobile from './pages/PricingMobile.jsx';
+import AccountMobile from './pages/AccountMobile.jsx';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -112,6 +115,9 @@ const AuthenticatedApp = () => {
       <Route path="/status" element={<StatusPage />} />
       <Route path="/bug-bounty" element={<BugBounty />} />
       <Route path="/setup" element={<SetupPortal />} />
+      <Route path="/features-mobile" element={<FeaturesMobile />} />
+      <Route path="/pricing-mobile" element={<PricingMobile />} />
+      <Route path="/account-mobile" element={<AccountMobile />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

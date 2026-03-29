@@ -85,4 +85,20 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Mobile safeguards */
+  button, a, [role="button"] {
+    @apply select-none;
+  }
+
+  /* Touch targets - min 44x44px */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Scrollable containers */
+  .overscroll-none {
+    overscroll-behavior: none;
+  }
 }
