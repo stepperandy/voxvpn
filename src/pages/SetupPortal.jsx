@@ -39,7 +39,7 @@ const osIcon = (os) => {
 };
 
 const demoProfiles = [
-  { os: 'windows', fileName: 'VoxVPN-Windows-Setup.bat',      downloadUrl: '#', qrUrl: '', serverName: 'VoxVPN New York 01' },
+  { os: 'windows', fileName: 'VoxVPN-Windows-Setup.nsi',      downloadUrl: '#', qrUrl: '', serverName: 'VoxVPN New York 01' },
   { os: 'macos',   fileName: 'VoxVPN-macOS-Setup.conf',       downloadUrl: '#', qrUrl: '', serverName: 'VoxVPN London 01' },
   { os: 'linux',   fileName: 'VoxVPN-Linux-Setup.conf',       downloadUrl: '#', qrUrl: '', serverName: 'VoxVPN Frankfurt 01' },
   { os: 'android', fileName: 'VoxVPN-Android-Setup.conf',     downloadUrl: '#', qrUrl: '', serverName: 'VoxVPN Toronto 01' },
@@ -103,7 +103,7 @@ function ProfileCard({ profile, liveMode }) {
 
       <p className="text-[#a9b7c9] text-sm leading-relaxed m-0">
         {profile.os === 'windows' 
-          ? 'Download and run the VoxVPN Windows installer (.bat file) with administrator privileges. The installer will automatically configure your VPN connection and create a Start Menu shortcut for quick access.'
+          ? 'Download the NSIS installer script, compile it with NSIS (free tool), and run the resulting .exe with administrator privileges. The installer automatically installs WireGuard, configures your VPN, and creates shortcuts.'
           : guideText[profile.os]
         }
       </p>

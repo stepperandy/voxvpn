@@ -1,132 +1,108 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.23';
 
 const setupTemplates = {
-  windows: `# VoxVPN WireGuard Setup Installer for Windows
-# This PowerShell script downloads and configures WireGuard VPN
-# Run as Administrator
+  windows: `; VoxVPN WireGuard Installer for Windows
+; Built with NSIS - Compile to EXE
+; Download NSIS from https://nsis.sourceforge.io/
 
-#Requires -RunAsAdministrator
+!include "MUI2.nsh"
+!include "x64.nsh"
 
-param(
-    [string]$ConfigUrl = "https://app.example.com/config.conf"
-)
+; Configuration
+Name "VoxVPN"
+OutFile "VoxVPN-Installer.exe"
+InstallDir "$PROGRAMFILES\\VoxVPN"
+InstallDirRegKey HKLM "Software\\VoxVPN" "InstallDir"
 
-function Write-Status {
-    param([string]$Message, [string]$Status = "INFO")
-    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    Write-Host "[$timestamp] [$Status] $Message"
-}
+; Branding
+!define MUI_ICON "icon.ico"
+!define MUI_UNICON "icon.ico"
+!define MUI_WELCOMEFINISHPAGE_BITMAP "banner.bmp"
+!define MUI_HEADERIMAGE
+!define MUI_HEADERIMAGE_BITMAP "header.bmp"
+!define MUI_INSTFILESDIR "Installation Progress"
 
-Write-Status "VoxVPN WireGuard Installation Starting..."
+; Variables
+Var WireGuardPath
+Var ConfigPath
 
-# Check admin privileges
-if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    Write-Status "This script requires Administrator privileges. Please run as Administrator." "ERROR"
-    exit 1
-}
+; Pages
+!insertmacro MUI_PAGE_WELCOME
+!insertmacro MUI_PAGE_DIRECTORY
+!insertmacro MUI_PAGE_INSTFILES
+!insertmacro MUI_PAGE_FINISH
+!insertmacro MUI_LANGUAGE "English"
 
-# Define paths
-$WireGuardPath = "C:\\Program Files\\WireGuard"
-$ConfigPath = "$env:APPDATA\\WireGuard\\Configurations\\VoxVPN.conf"
-$ConfigDir = "$env:APPDATA\\WireGuard\\Configurations"
+; Installer Functions
+Function .onInit
+  $\{If} $\{RunningX64}
+    Set $WireGuardPath "$PROGRAMFILES64\\\\WireGuard"
+  $\{Else}
+    Set $WireGuardPath "$PROGRAMFILES\\\\WireGuard"
+  $\{EndIf}
+  Set $ConfigPath "$APPDATA\\\\WireGuard\\\\Configurations"
+FunctionEnd
 
-# Create config directory
-if (-NOT (Test-Path $ConfigDir)) {
-    New-Item -ItemType Directory -Path $ConfigDir -Force | Out-Null
-    Write-Status "Created WireGuard configuration directory"
-}
+; Install Sections
+Section "Install WireGuard"
+  SetOutPath "$TEMP"
+  
+  ; Download WireGuard if not installed
+  $\{If} $\{FileExists} "$WireGuardPath\\\\wireguard.exe"
+    DetailPrint "WireGuard already installed"
+  $\{Else}
+    DetailPrint "Downloading WireGuard..."
+    inetc::get /POPUP "Downloading WireGuard..." /END "https://download.wireguard.com/windows-client/wireguard-amd64-0.5.3.msi" "$TEMP\\\\wireguard.msi"
+    DetailPrint "Installing WireGuard..."
+    ExecWait 'msiexec.exe /i "$TEMP\\\\wireguard.msi" /quiet /norestart'
+    Delete "$TEMP\\\\wireguard.msi"
+  $\{EndIf}
+SectionEnd
 
-# Check if WireGuard is installed
-if (-NOT (Test-Path "$WireGuardPath\\wg-quick.exe")) {
-    Write-Status "WireGuard not found. Downloading installer..."
-    
-    try {
-        $DownloadUrl = "https://download.wireguard.com/windows-client/wireguard-amd64-0.5.3.msi"
-        $InstallerPath = "$env:TEMP\\wireguard-installer.msi"
-        
-        # Download WireGuard
-        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-        Invoke-WebRequest -Uri $DownloadUrl -OutFile $InstallerPath -ErrorAction Stop
-        Write-Status "Downloaded WireGuard installer"
-        
-        # Install WireGuard
-        Write-Status "Installing WireGuard..."
-        msiexec.exe /i $InstallerPath /quiet /norestart
-        Start-Sleep -Seconds 10
-        
-        # Cleanup
-        Remove-Item $InstallerPath -Force -ErrorAction SilentlyContinue
-        Write-Status "WireGuard installed successfully"
-    }
-    catch {
-        Write-Status "Failed to download/install WireGuard: $_" "ERROR"
-        Write-Status "Please visit https://www.wireguard.com/install/ and install manually" "INFO"
-        exit 1
-    }
-} else {
-    Write-Status "WireGuard is already installed"
-}
+Section "Install VoxVPN Configuration"
+  CreateDirectory "$ConfigPath"
+  
+  ; Create VPN config
+  FileOpen $9 "$ConfigPath\\\\VoxVPN.conf" w
+  FileWrite $9 "[Interface]$\\\\r$\\\\n"
+  FileWrite $9 "Address = 10.0.0.2/32$\\\\r$\\\\n"
+  FileWrite $9 "DNS = 8.8.8.8, 8.8.4.4$\\\\r$\\\\n"
+  FileWrite $9 "PrivateKey = REPLACE_WITH_PRIVATE_KEY$\\\\r$\\\\n"
+  FileWrite $9 "$\\\\r$\\\\n"
+  FileWrite $9 "[Peer]$\\\\r$\\\\n"
+  FileWrite $9 "PublicKey = REPLACE_WITH_PUBLIC_KEY$\\\\r$\\\\n"
+  FileWrite $9 "AllowedIPs = 0.0.0.0/0$\\\\r$\\\\n"
+  FileWrite $9 "Endpoint = vpn.voxvpn.com:51820$\\\\r$\\\\n"
+  FileWrite $9 "PersistentKeepalive = 25$\\\\r$\\\\n"
+  FileClose $9
+  
+  DetailPrint "VPN configuration installed"
+SectionEnd
 
-# Create VPN configuration file
-$VpnConfig = @"
-[Interface]
-Address = 10.0.0.2/32
-DNS = 8.8.8.8, 8.8.4.4
-PrivateKey = REPLACE_WITH_PRIVATE_KEY
+Section "Create Shortcuts"
+  CreateDirectory "$SMPROGRAMS\\\\VoxVPN"
+  CreateShortCut "$SMPROGRAMS\\\\VoxVPN\\\\WireGuard.lnk" "$WireGuardPath\\\\wireguard.exe"
+  CreateShortCut "$SMPROGRAMS\\\\VoxVPN\\\\Uninstall.lnk" "$INSTDIR\\\\uninstall.exe"
+  CreateShortCut "$DESKTOP\\\\WireGuard VPN.lnk" "$WireGuardPath\\\\wireguard.exe"
+SectionEnd
 
-[Peer]
-PublicKey = REPLACE_WITH_PUBLIC_KEY
-AllowedIPs = 0.0.0.0/0
-Endpoint = vpn.voxvpn.com:51820
-PersistentKeepalive = 25
-"@
+Section "Write Uninstaller"
+  WriteRegStr HKLM "Software\\\\VoxVPN" "InstallDir" "$INSTDIR"
+  WriteRegStr HKLM "Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Uninstall\\\\VoxVPN" "DisplayName" "VoxVPN"
+  WriteRegStr HKLM "Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Uninstall\\\\VoxVPN" "UninstallString" "$INSTDIR\\\\uninstall.exe"
+  WriteUninstaller "$INSTDIR\\\\uninstall.exe"
+SectionEnd
 
-try {
-    Set-Content -Path $ConfigPath -Value $VpnConfig -Force
-    Write-Status "VPN configuration installed to: $ConfigPath"
-}
-catch {
-    Write-Status "Failed to create VPN configuration: $_" "ERROR"
-    exit 1
-}
+; Uninstaller
+Section "Uninstall"
+  RMDir /r "$SMPROGRAMS\\\\VoxVPN"
+  Delete "$DESKTOP\\\\WireGuard VPN.lnk"
+  Delete "$APPDATA\\\\WireGuard\\\\Configurations\\\\VoxVPN.conf"
+  DeleteRegKey HKLM "Software\\\\VoxVPN"
+  DeleteRegKey HKLM "Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Uninstall\\\\VoxVPN"
+SectionEnd`,
 
-# Import VPN configuration into WireGuard
-Write-Status "Importing VPN configuration into WireGuard..."
-try {
-    & "$WireGuardPath\\wg-quick.exe" add VoxVPN "$ConfigPath" 2>&1 | Out-Null
-    Write-Status "VPN configuration imported successfully"
-}
-catch {
-    Write-Status "Note: Configuration imported but auto-connect may require manual setup" "WARN"
-}
-
-Write-Status "==============================================="
-Write-Status "Installation Complete!"
-Write-Status "==============================================="
-Write-Status "Next Steps:"
-Write-Status "1. Open WireGuard from Start Menu"
-Write-Status "2. You should see 'VoxVPN' in your tunnel list"
-Write-Status "3. Click 'Activate' to connect"
-Write-Status "4. For support: support@voxvpn.net"
-Write-Status "==============================================="
-
-# Optional: Create desktop shortcut
-$DesktopPath = [Environment]::GetFolderPath("Desktop")
-$ShortcutPath = "$DesktopPath\\WireGuard.lnk"
-
-if (-NOT (Test-Path $ShortcutPath)) {
-    $WshShell = New-Object -ComObject WScript.Shell
-    $Shortcut = $WshShell.CreateShortcut($ShortcutPath)
-    $Shortcut.TargetPath = "$WireGuardPath\\wireguard.exe"
-    $Shortcut.Description = "WireGuard VPN Client"
-    $Shortcut.Save()
-    Write-Status "Desktop shortcut created"
-}
-
-exit 0`,
-
-  macos: `# VoxVPN macOS Configuration
-[Interface]
+  macos: `[Interface]
 Address = 10.0.0.2/32
 DNS = 8.8.8.8, 8.8.4.4
 PrivateKey = REPLACE_WITH_PRIVATE_KEY
@@ -137,8 +113,7 @@ AllowedIPs = 0.0.0.0/0
 Endpoint = vpn.voxvpn.com:51820
 PersistentKeepalive = 25`,
 
-  linux: `# VoxVPN Linux Configuration
-[Interface]
+  linux: `[Interface]
 Address = 10.0.0.2/32
 DNS = 8.8.8.8, 8.8.4.4
 PrivateKey = REPLACE_WITH_PRIVATE_KEY
@@ -149,8 +124,7 @@ AllowedIPs = 0.0.0.0/0
 Endpoint = vpn.voxvpn.com:51820
 PersistentKeepalive = 25`,
 
-  ios: `# VoxVPN iOS Configuration
-[Interface]
+  ios: `[Interface]
 Address = 10.0.0.2/32
 DNS = 8.8.8.8, 8.8.4.4
 PrivateKey = REPLACE_WITH_PRIVATE_KEY
@@ -161,8 +135,7 @@ AllowedIPs = 0.0.0.0/0
 Endpoint = vpn.voxvpn.com:51820
 PersistentKeepalive = 25`,
 
-  android: `# VoxVPN Android Configuration
-[Interface]
+  android: `[Interface]
 Address = 10.0.0.2/32
 DNS = 8.8.8.8, 8.8.4.4
 PrivateKey = REPLACE_WITH_PRIVATE_KEY
@@ -173,8 +146,7 @@ AllowedIPs = 0.0.0.0/0
 Endpoint = vpn.voxvpn.com:51820
 PersistentKeepalive = 25`,
 
-  router: `# VoxVPN Router Configuration
-[Interface]
+  router: `[Interface]
 Address = 10.0.0.1/32
 DNS = 8.8.8.8, 8.8.4.4
 PrivateKey = REPLACE_WITH_PRIVATE_KEY
@@ -204,14 +176,15 @@ Deno.serve(async (req) => {
     }
 
     const content = setupTemplates[platform];
-    const ext = platform === 'windows' ? 'ps1' : 'conf';
+    const ext = platform === 'windows' ? 'nsi' : 'conf';
     const fileName = `VoxVPN-${platform.charAt(0).toUpperCase() + platform.slice(1)}-Setup.${ext}`;
+    const mimeType = platform === 'windows' ? 'text/plain' : 'text/plain';
 
     return Response.json({
       success: true,
       content,
       fileName,
-      mimeType: platform === 'windows' ? 'application/x-batch' : 'text/plain',
+      mimeType,
     });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
