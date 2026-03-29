@@ -194,10 +194,11 @@ export default function SetupPortal() {
         style={{ background: 'radial-gradient(circle at top right, rgba(79,209,255,.15), transparent 30%), radial-gradient(circle at top left, rgba(14,165,255,.18), transparent 24%)' }}>
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center gap-4 mb-5">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-[#00101f] font-black text-xl shadow-lg"
-              style={{ background: 'linear-gradient(135deg,#0ea5ff,#4fd1ff)', boxShadow: '0 10px 25px rgba(14,165,255,.25)' }}>
-              V
-            </div>
+            <img
+              src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/4c008ebc8_image.png"
+              alt="VoxVPN"
+              className="h-14 w-14 rounded-2xl"
+            />
             <div>
               <p className="text-[#4fd1ff] text-sm font-bold uppercase tracking-[1.8px] m-0">VoxVPN Secure Network</p>
               <p className="text-[#a9b7c9] text-sm m-0">Powered by VoxVPN private infrastructure</p>
