@@ -164,7 +164,7 @@ export default function Hero() {
               </span>
             </h1>
 
-            <p className="text-slate-400 text-lg leading-relaxed max-w-2xl">
+            <p className="text-slate-400 text-sm leading-relaxed max-w-2xl">
               Launch your own premium VPN brand with private infrastructure, full customer control, and white-label capabilities. Deploy enterprise-grade security across Windows, macOS, Linux, iOS, Android, and router platforms. Our platform provides everything you need: branded setup portal, automated profile delivery, customer dashboard with server selection, comprehensive admin controls, and Vultr integration for global server management. Protect millions of devices with military-grade AES-256 encryption, zero-knowledge architecture, and blazing-fast performance. Scale from startup to enterprise with built-in payment processing, user analytics, and dedicated support.
             </p>
 
