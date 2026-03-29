@@ -23,18 +23,11 @@ Deno.serve(async (req) => {
       const session = event.data.object;
       const { plan, user_id, email } = session.metadata || {};
 
-      // Generate a secure setup token (in production, store in DB)
-      const setupToken = crypto.randomUUID();
-
-      // Send welcome email with setup link
-      await base44.functions.invoke('sendWelcomeEmail', {
+      // Send setup files to buyer
+      await base44.functions.invoke('sendBuyerSetups', {
         email: email || session.customer_email,
         orderId: session.id,
-        setupToken: setupToken,
       });
-
-      // In production: Create Download records in Base44 for this user
-      // and store the setupToken mapping for later retrieval
     }
 
     return Response.json({ received: true });
