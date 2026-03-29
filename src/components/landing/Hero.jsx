@@ -30,7 +30,18 @@ export default function Hero() {
             {/* Headline */}
             <h1 className="text-5xl sm:text-6xl font-bold text-white leading-tight">
               Your Privacy, <br />
-              <span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">Our Priority</span>.
+              <span className="relative inline-block">
+                <span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">Our Priority</span>
+                <svg className="absolute -bottom-3 left-0 w-full" viewBox="0 0 300 12" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                  <path d="M2 8 Q75 2 150 8 Q225 14 298 6" stroke="url(#curveGrad)" strokeWidth="3" strokeLinecap="round" fill="none"/>
+                  <defs>
+                    <linearGradient id="curveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#a78bfa"/>
+                      <stop offset="100%" stopColor="#22d3ee"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </span>
             </h1>
 
             {/* Description */}
