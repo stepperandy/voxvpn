@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Server, LogOut, Menu, X, Shield, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, Users, Server, LogOut, Menu, X, Shield, ChevronRight, Home } from 'lucide-react';
 import { useState } from 'react';
 
 const navItems = [
@@ -71,7 +71,16 @@ export default function AdminSidebar({ activePage, onNavigate, onLogout }) {
         </nav>
 
         {/* Bottom */}
-        <div className="p-3 border-t border-white/5">
+        <div className="p-3 border-t border-white/5 space-y-1">
+          <a
+            href="/"
+            className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-slate-500 hover:text-cyan-400 hover:bg-cyan-500/5 transition-all text-sm font-medium group border border-transparent hover:border-cyan-500/10"
+          >
+            <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-cyan-500/10 flex items-center justify-center transition-colors">
+              <Home size={16} />
+            </div>
+            Back to Homepage
+          </a>
           <button
             onClick={onLogout}
             className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-slate-500 hover:text-rose-400 hover:bg-rose-500/5 transition-all text-sm font-medium group border border-transparent hover:border-rose-500/10"

@@ -1,4 +1,4 @@
-import { Menu, X } from 'lucide-react';
+import { Menu, X, LogOut, Home } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
@@ -10,7 +10,6 @@ const navLinks = [
   { label: 'Pricing', href: '#pricing' },
   { label: 'eSIM', href: 'https://voxdigits.com', external: true },
   { label: 'Virtual Numbers', href: 'https://voxdigits.com', external: true },
-  { label: 'Admin', href: '/admin' },
 ];
 
 export default function Navbar() {
@@ -46,18 +45,20 @@ export default function Navbar() {
     }
   };
 
+  const isAdmin = user?.role === 'admin';
+
   return (
     <header className="fixed top-0 w-full z-50">
       {/* Main nav */}
       <nav className="bg-[#080c18]/95 backdrop-blur-md border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center h-14 gap-4">
-            {/* Logo */}
+          <div className="flex items-center h-[72px] gap-4">
+            {/* Logo — 100% bigger */}
             <Link to="/" className="flex-shrink-0">
               <img
                 src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/b08aa6159_image.png"
                 alt="VoxVPN"
-                className="h-9 w-auto"
+                className="h-[72px] w-auto py-2"
               />
             </Link>
 
@@ -84,24 +85,46 @@ export default function Navbar() {
                   </a>
                 );
               })}
+              {/* Admin link — only for admins */}
+              {isAdmin && (
+                <Link to="/admin" className={`px-3 py-1.5 text-sm font-medium transition-all ${isActive('/admin') ? 'text-cyan-400' : 'text-violet-400 hover:text-violet-300'}`}>
+                  Admin
+                </Link>
+              )}
             </div>
 
-            {/* CTA */}
-            <div className="hidden md:flex items-center gap-3 ml-auto">
+            {/* CTA buttons */}
+            <div className="hidden md:flex items-center gap-2 ml-auto">
               {user ? (
-                <span className="text-slate-300 text-sm">{user.full_name}</span>
+                <>
+                  <span className="text-slate-400 text-sm">{user.full_name}</span>
+                  <button
+                    onClick={() => base44.auth.logout('/')}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-slate-400 hover:text-white text-sm transition-colors"
+                  >
+                    <LogOut size={14} /> Log Out
+                  </button>
+                </>
               ) : (
-                <button
-                  onClick={() => base44.auth.redirectToLogin()}
-                  className="text-slate-300 hover:text-white text-sm transition-colors"
-                >
-                  Log In
-                </button>
+                <>
+                  <button
+                    onClick={() => base44.auth.redirectToLogin()}
+                    className="px-4 py-2 text-slate-300 hover:text-white text-sm font-medium transition-colors border border-white/10 hover:border-white/20 rounded-full"
+                  >
+                    Log In
+                  </button>
+                  <button
+                    onClick={() => base44.auth.redirectToLogin()}
+                    className="px-4 py-2 bg-white/10 hover:bg-white/15 text-white text-sm font-semibold rounded-full transition-all border border-white/10"
+                  >
+                    Sign Up
+                  </button>
+                </>
               )}
               <a
                 href="#pricing"
                 onClick={() => handleNavClick('#pricing')}
-                className="px-5 py-2 bg-cyan-400 hover:bg-cyan-300 text-black text-sm font-bold rounded-full transition-all"
+                className="px-5 py-2 bg-cyan-400 hover:bg-cyan-300 text-black text-sm font-bold rounded-full transition-all shadow-lg shadow-cyan-500/20"
               >
                 Get Protected
               </a>
@@ -127,7 +150,22 @@ export default function Navbar() {
                 }
                 return <a key={link.label} href={link.href} onClick={() => handleNavClick(link.href)} className={cls}>{link.label}</a>;
               })}
-              <a href="#pricing" onClick={() => handleNavClick('#pricing')} className="block mt-2 py-2 text-center bg-cyan-400 text-black text-sm font-bold rounded-full">
+              {isAdmin && (
+                <Link to="/admin" onClick={() => setMobileOpen(false)} className="block px-3 py-2 rounded text-sm font-medium text-violet-400 hover:text-violet-300 transition-colors">
+                  Admin Panel
+                </Link>
+              )}
+              <div className="flex gap-2 pt-2">
+                {user ? (
+                  <button onClick={() => base44.auth.logout('/')} className="flex-1 py-2 border border-white/10 text-slate-300 text-sm font-medium rounded-full">Log Out</button>
+                ) : (
+                  <>
+                    <button onClick={() => base44.auth.redirectToLogin()} className="flex-1 py-2 border border-white/10 text-slate-300 text-sm font-medium rounded-full">Log In</button>
+                    <button onClick={() => base44.auth.redirectToLogin()} className="flex-1 py-2 bg-white/10 text-white text-sm font-semibold rounded-full">Sign Up</button>
+                  </>
+                )}
+              </div>
+              <a href="#pricing" onClick={() => handleNavClick('#pricing')} className="block mt-1 py-2 text-center bg-cyan-400 text-black text-sm font-bold rounded-full">
                 Get Protected
               </a>
             </div>
