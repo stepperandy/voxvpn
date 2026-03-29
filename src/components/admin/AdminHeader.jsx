@@ -6,6 +6,7 @@ const pageMeta = {
   dashboard: { title: 'Dashboard', sub: 'Overview of your VPN infrastructure', breadcrumb: 'Home / Dashboard' },
   users: { title: 'User Management', sub: 'View, invite and manage registered users', breadcrumb: 'Home / Users' },
   servers: { title: 'Server Infrastructure', sub: 'Live Vultr server status & configuration', breadcrumb: 'Home / Servers' },
+  setups: { title: 'Setup Portals', sub: 'Manage customer setup portal entries', breadcrumb: 'Home / Setups' },
   downloads: { title: 'Downloads & Payments', sub: 'Manage VPN setup files with pricing', breadcrumb: 'Home / Downloads' },
 };
 

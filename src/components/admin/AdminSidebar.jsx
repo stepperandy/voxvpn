@@ -1,10 +1,11 @@
-import { LayoutDashboard, Users, Server, LogOut, Menu, X, Shield, ChevronRight, Home, Download } from 'lucide-react';
+import { LayoutDashboard, Users, Server, LogOut, Menu, X, Shield, ChevronRight, Home, Download, Link } from 'lucide-react';
 import { useState } from 'react';
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', id: 'dashboard', desc: 'Overview & metrics' },
   { icon: Users, label: 'Users', id: 'users', desc: 'Manage accounts' },
   { icon: Server, label: 'Servers', id: 'servers', desc: 'Live infrastructure' },
+  { icon: Link, label: 'Setups', id: 'setups', desc: 'Setup portals' },
   { icon: Download, label: 'Downloads', id: 'downloads', desc: 'Setup files & payments' },
 ];
 
