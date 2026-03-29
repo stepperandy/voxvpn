@@ -26,7 +26,7 @@ export default function AndroidVPN() {
         </div>
         <div className="rounded-2xl border border-cyan-500/20 bg-[#0d1a20] p-8 text-center">
           <h2 className="text-2xl font-bold text-white mb-3">Download VoxVPN for Android</h2>
-          <a href="/#pricing" className="inline-block px-8 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-full transition-all">Get on Google Play</a>
+          <a href="/setup?os=android" className="inline-block px-8 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-full transition-all">Get on Google Play</a>
         </div>
       </div>
       <Footer />

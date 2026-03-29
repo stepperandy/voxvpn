@@ -26,7 +26,7 @@ export default function LinuxVPN() {
         </div>
         <div className="rounded-2xl border border-cyan-500/20 bg-[#0d1a20] p-8 text-center">
           <h2 className="text-2xl font-bold text-white mb-3">Get VoxVPN for Linux</h2>
-          <a href="/#pricing" className="inline-block px-8 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-full transition-all">Download Now</a>
+          <a href="/setup?os=linux" className="inline-block px-8 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-full transition-all">Download Now</a>
         </div>
       </div>
       <Footer />

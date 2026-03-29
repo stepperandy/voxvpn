@@ -26,7 +26,7 @@ export default function RouterVPN() {
         </div>
         <div className="rounded-2xl border border-cyan-500/20 bg-[#0d1a20] p-8 text-center">
           <h2 className="text-2xl font-bold text-white mb-3">Set Up VoxVPN on Your Router</h2>
-          <a href="/#pricing" className="inline-block px-8 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-full transition-all">Get Started</a>
+          <a href="/setup?os=router" className="inline-block px-8 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-full transition-all">Get Started</a>
         </div>
       </div>
       <Footer />
