@@ -1,23 +1,19 @@
-import { LayoutDashboard, Users, Server, LogOut, Menu, X, Shield } from 'lucide-react';
+import { LayoutDashboard, Users, Server, LogOut, Menu, X, Shield, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 
 const navItems = [
-  { icon: LayoutDashboard, label: 'Dashboard', id: 'dashboard' },
-  { icon: Users, label: 'Users', id: 'users' },
-  { icon: Server, label: 'Servers', id: 'servers' },
+  { icon: LayoutDashboard, label: 'Dashboard', id: 'dashboard', desc: 'Overview & metrics' },
+  { icon: Users, label: 'Users', id: 'users', desc: 'Manage accounts' },
+  { icon: Server, label: 'Servers', id: 'servers', desc: 'Live infrastructure' },
 ];
 
 export default function AdminSidebar({ activePage, onNavigate, onLogout }) {
   const [open, setOpen] = useState(false);
 
-  const handleNav = (id) => {
-    onNavigate(id);
-    setOpen(false);
-  };
+  const handleNav = (id) => { onNavigate(id); setOpen(false); };
 
   return (
     <>
-      {/* Mobile toggle */}
       <button
         onClick={() => setOpen(!open)}
         className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-[#0d1120] border border-white/10 text-white"
@@ -25,21 +21,27 @@ export default function AdminSidebar({ activePage, onNavigate, onLogout }) {
         {open ? <X size={20} /> : <Menu size={20} />}
       </button>
 
-      {/* Sidebar */}
-      <aside className={`fixed left-0 top-0 h-screen w-64 bg-[#080c18] border-r border-white/5 transition-transform duration-300 z-40 flex flex-col ${open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+      <aside className={`fixed left-0 top-0 h-screen w-64 bg-[#060910] border-r border-white/5 transition-transform duration-300 z-40 flex flex-col ${open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         {/* Logo */}
-        <div className="p-6 border-b border-white/5">
+        <div className="p-5 border-b border-white/5">
           <div className="flex items-center gap-3">
-            <img src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/60e9935e0_b1efe46e-2927-4692-89eb-53a6f756c8a6.png" alt="VoxVPN" className="h-8 w-auto" />
+            <div className="w-9 h-9 rounded-xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center">
+              <Shield size={18} className="text-cyan-400" />
+            </div>
             <div>
               <div className="text-white font-bold text-sm">VoxVPN</div>
-              <div className="text-cyan-400 text-xs">Admin Panel</div>
+              <div className="text-cyan-400/70 text-xs tracking-wide">Control Panel</div>
             </div>
           </div>
         </div>
 
+        {/* Section label */}
+        <div className="px-5 pt-5 pb-2">
+          <span className="text-slate-600 text-[10px] font-semibold uppercase tracking-widest">Navigation</span>
+        </div>
+
         {/* Nav */}
-        <nav className="flex-1 p-4 space-y-1">
+        <nav className="flex-1 px-3 space-y-0.5">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activePage === item.id;
@@ -47,26 +49,36 @@ export default function AdminSidebar({ activePage, onNavigate, onLogout }) {
               <button
                 key={item.id}
                 onClick={() => handleNav(item.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-sm font-medium ${
+                className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all text-left group ${
                   isActive
-                    ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/30'
-                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                    ? 'bg-cyan-500/10 border border-cyan-500/20 text-white'
+                    : 'text-slate-500 hover:text-slate-200 hover:bg-white/4 border border-transparent'
                 }`}
               >
-                <Icon size={18} />
-                {item.label}
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors ${
+                  isActive ? 'bg-cyan-500/20' : 'bg-white/5 group-hover:bg-white/10'
+                }`}>
+                  <Icon size={16} className={isActive ? 'text-cyan-400' : 'text-slate-400'} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className={`text-sm font-medium ${isActive ? 'text-white' : ''}`}>{item.label}</p>
+                  <p className="text-slate-600 text-[10px] truncate">{item.desc}</p>
+                </div>
+                {isActive && <ChevronRight size={14} className="text-cyan-500 flex-shrink-0" />}
               </button>
             );
           })}
         </nav>
 
         {/* Bottom */}
-        <div className="p-4 border-t border-white/5">
+        <div className="p-3 border-t border-white/5">
           <button
             onClick={onLogout}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:text-rose-400 hover:bg-rose-500/5 transition-all text-sm font-medium"
+            className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-slate-500 hover:text-rose-400 hover:bg-rose-500/5 transition-all text-sm font-medium group border border-transparent hover:border-rose-500/10"
           >
-            <LogOut size={18} />
+            <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-rose-500/10 flex items-center justify-center transition-colors">
+              <LogOut size={16} />
+            </div>
             Logout
           </button>
         </div>
