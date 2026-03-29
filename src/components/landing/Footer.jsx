@@ -170,10 +170,10 @@ export default function Footer() {
         <div className="border-t border-white/5 pt-8 flex flex-col sm:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-3">
             <a href="#" className="hover:opacity-90 transition-opacity">
-              <img src="https://developer.apple.com/app-store/marketing/guidelines/images/badge-example-preferred_ko.png" alt="Apple App Store" className="h-10 w-auto" />
+              <img src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/500ebc6c2_generated_image.png" alt="Apple App Store" className="h-10 w-auto" />
             </a>
             <a href="#" className="hover:opacity-90 transition-opacity">
-              <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Google Play Store" className="h-10 w-auto" />
+              <img src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/04eefca08_generated_image.png" alt="Google Play Store" className="h-10 w-auto" />
             </a>
           </div>
 
