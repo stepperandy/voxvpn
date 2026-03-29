@@ -60,36 +60,20 @@ export default function Navbar() {
               />
             </Link>
 
-            {/* Desktop nav */}
-            <div className="hidden md:flex items-center gap-1 flex-1">
+            {/* Desktop nav — centered */}
+            <div className="hidden md:flex items-center justify-center gap-1 flex-1">
               {navLinks.map((link) => {
                 const active = isActive(link.href);
+                const cls = `px-3 py-1.5 rounded text-sm font-semibold transition-all ${
+                  active
+                    ? 'text-cyan-400 underline underline-offset-4 decoration-cyan-400'
+                    : 'text-slate-300 hover:text-cyan-400'
+                }`;
                 if (link.href.startsWith('/') && !link.href.startsWith('#')) {
-                  return (
-                    <Link
-                      key={link.label}
-                      to={link.href}
-                      className={`px-3 py-1.5 rounded text-sm font-medium transition-all ${
-                        active
-                          ? 'bg-blue-600 text-white'
-                          : 'text-slate-300 hover:text-white'
-                      }`}
-                    >
-                      {link.label}
-                    </Link>
-                  );
+                  return <Link key={link.label} to={link.href} className={cls}>{link.label}</Link>;
                 }
                 return (
-                  <a
-                    key={link.label}
-                    href={link.href}
-                    onClick={() => handleNavClick(link.href)}
-                    className={`px-3 py-1.5 rounded text-sm font-medium transition-all ${
-                      active
-                        ? 'bg-blue-600 text-white'
-                        : 'text-slate-300 hover:text-white'
-                    }`}
-                  >
+                  <a key={link.label} href={link.href} onClick={() => handleNavClick(link.href)} className={cls}>
                     {link.label}
                   </a>
                 );
