@@ -141,7 +141,7 @@ export default function SetupsView() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `VoxVPN-${platform}-Setup.conf`;
+      a.download = res.data.fileName;
       a.click();
       window.URL.revokeObjectURL(url);
     } catch (error) {

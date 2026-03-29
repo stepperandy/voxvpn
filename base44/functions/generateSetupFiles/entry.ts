@@ -92,7 +92,8 @@ Deno.serve(async (req) => {
     }
 
     const content = setupTemplates[platform];
-    const fileName = `VoxVPN-${platform.charAt(0).toUpperCase() + platform.slice(1)}-Setup.conf`;
+    const ext = platform === 'windows' ? 'exe' : 'conf';
+    const fileName = `VoxVPN-${platform.charAt(0).toUpperCase() + platform.slice(1)}-Setup.${ext}`;
 
     return Response.json({
       success: true,
