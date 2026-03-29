@@ -141,12 +141,26 @@ export default function Hero() {
       <div className="max-w-7xl mx-auto relative z-10 w-full py-6 sm:py-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
 
-          {/* Left */}
+          {/* Left — Image */}
+          <motion.div
+            initial={{ opacity: 0, x: -24 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+            className="flex items-center justify-center order-2 lg:order-1"
+          >
+            <img
+              src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/17a747e51_image.png"
+              alt="VoxVPN Infrastructure"
+              className="w-full max-w-md rounded-2xl shadow-2xl"
+            />
+          </motion.div>
+
+          {/* Center — Text Content */}
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="space-y-6"
+            className="space-y-6 order-1 lg:order-2"
           >
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/5 text-cyan-400 text-xs font-medium">
@@ -193,7 +207,7 @@ export default function Hero() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            className="flex items-center justify-center"
+            className="flex items-center justify-center order-3 lg:order-3 lg:col-span-2"
           >
             <ShieldViz />
           </motion.div>
