@@ -165,8 +165,8 @@ export default function Hero() {
               </span>
             </h1>
 
-            <p className="text-slate-400 text-base leading-relaxed max-w-md">
-              Launch a premium VPN brand with your own servers, branded setup flow, customer dashboard, and admin controls. Built for speed, privacy, and global reach.
+            <p className="text-slate-400 text-base leading-relaxed max-w-lg">
+              Launch a premium VPN brand with your own private servers, fully branded setup flow, customer dashboard, and comprehensive admin controls. Built for speed, privacy, and global reach. Protect every device on the planet with enterprise-grade encryption, no-logs architecture, and seamless cross-platform support. Deploy your own VPN infrastructure in minutes and scale to thousands of users worldwide.
             </p>
 
             <div className="flex flex-wrap gap-3 pt-1">
