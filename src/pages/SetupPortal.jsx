@@ -3,12 +3,25 @@ import { base44 } from '@/api/base44Client';
 import { Download, QrCode, Monitor, Terminal, Smartphone, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 
 const guideText = {
-  windows: 'Download your VoxVPN Windows profile, install the required client, import setup, and connect to your assigned VoxVPN server.',
-  macos: 'Use the branded guide, import your VoxVPN macOS profile, and activate your secure connection.',
-  linux: 'Import your VoxVPN Linux configuration and connect to your assigned private server location.',
-  android: 'Download the VoxVPN Android profile on your device or scan the QR code for instant import.',
-  ios: 'Open this setup center on your iPhone or iPad, or scan the QR code using the VPN app\'s import feature.',
+  windows: 'Download your VoxVPN setup file for Windows, open the recommended VPN client, import your profile, and connect to your selected VoxVPN server in seconds.',
+  macos: 'Download your VoxVPN macOS setup, import the profile into the supported client, and connect securely to your selected VoxVPN server.',
+  linux: 'Download your VoxVPN Linux profile, import it into your preferred Linux VPN client or supported command-line environment, and connect securely.',
+  android: 'Download your VoxVPN Android setup on your phone or scan the mobile QR code for quick import, then connect to your selected VoxVPN server.',
+  ios: 'Open this setup page on your iPhone or iPad or scan the QR code, import your VoxVPN profile, and connect securely to your selected server.',
 };
+
+const extraServers = [
+  'VoxVPN Paris 01',
+  'VoxVPN Madrid 01',
+  'VoxVPN Milan 01',
+  'VoxVPN Zurich 01',
+  'VoxVPN Stockholm 01',
+  'VoxVPN Dublin 01',
+  'VoxVPN Singapore 01',
+  'VoxVPN Tokyo 01',
+  'VoxVPN Sydney 01',
+  'VoxVPN Johannesburg 01',
+];
 
 const osLabel = (os) => {
   if (os === 'ios') return 'iPhone / iPad';
@@ -297,17 +310,26 @@ export default function SetupPortal() {
             style={{ background: 'linear-gradient(180deg,#101d31,#13243d)', boxShadow: '0 20px 50px rgba(0,0,0,.35)' }}>
             <h3 className="text-white font-bold m-0">VoxVPN Installation Interfaces</h3>
             {[
-              { label: 'VoxVPN for Windows', desc: 'Download your VoxVPN Windows profile, install the required client, import setup, and connect to your assigned VoxVPN server.' },
-              { label: 'VoxVPN for macOS', desc: 'Use the branded guide, import your VoxVPN macOS profile, and activate your secure connection.' },
-              { label: 'VoxVPN for Linux', desc: 'Import your VoxVPN Linux configuration and connect to your assigned private server location.' },
-              { label: 'VoxVPN for Android', desc: 'Download the VoxVPN Android profile or scan the QR code for instant import.' },
-              { label: 'VoxVPN for iPhone / iPad', desc: 'Open this setup center on your device or scan the QR code using the VPN app\'s import feature.' },
+              { label: 'VoxVPN for Windows', desc: guideText.windows },
+              { label: 'VoxVPN for macOS', desc: guideText.macos },
+              { label: 'VoxVPN for Linux', desc: guideText.linux },
+              { label: 'VoxVPN for Android', desc: guideText.android },
+              { label: 'VoxVPN for iPhone / iPad', desc: guideText.ios },
             ].map(({ label, desc }) => (
               <div key={label} className="rounded-[14px] border border-[#223654] p-4 bg-[rgba(7,15,28,0.55)]">
                 <p className="text-white text-sm font-bold mb-1 m-0">{label}</p>
                 <p className="text-[#a9b7c9] text-xs leading-relaxed m-0">{desc}</p>
               </div>
             ))}
+            <div className="rounded-[14px] border border-[#223654] p-4 bg-[rgba(7,15,28,0.55)]">
+              <p className="text-white text-sm font-bold mb-3 m-0">Additional Server Locations</p>
+              <div className="flex flex-wrap gap-1.5">
+                {extraServers.map((s) => (
+                  <span key={s} className="text-[10px] px-2 py-1 rounded-full bg-[#0b1a2c] border border-[#24415f] text-[#4fd1ff] font-semibold">{s}</span>
+                ))}
+              </div>
+            </div>
+
             <div className="rounded-[14px] border border-[#234a69] p-4 bg-[#0d2638]">
               <p className="text-[#4fd1ff] text-sm font-bold mb-1 m-0">Support</p>
               <a href="mailto:support@voxdigits.com" className="text-[#a9b7c9] text-xs hover:text-[#4fd1ff] transition-colors">support@voxdigits.com</a>
