@@ -66,7 +66,35 @@ function ProfileCard({ profile, liveMode }) {
       {profile.serverName && (
         <p className="text-[#4fd1ff] text-xs font-semibold m-0">📡 {profile.serverName}</p>
       )}
+
+      {/* Server location selector */}
+      <div>
+        <label className="text-[#a9b7c9] text-xs font-semibold block mb-1.5">More Server Locations</label>
+        <select className="w-full px-3 py-2 rounded-xl bg-[#0b1a2c] border border-[#24415f] text-[#f4f8fc] text-sm focus:outline-none focus:border-[#0ea5ff]">
+          <option value="">{profile.serverName || 'Select a server'}</option>
+          {extraServers.map(s => <option key={s} value={s}>{s}</option>)}
+        </select>
+      </div>
+
       <p className="text-[#a9b7c9] text-sm leading-relaxed m-0">{guideText[profile.os]}</p>
+
+      {/* Benefits */}
+      <div className="rounded-xl bg-[#0b1a2c] border border-[#24415f] px-4 py-3">
+        <p className="text-[#4fd1ff] text-xs font-bold mb-2">Best for customers</p>
+        <ul className="space-y-1">
+          {[
+            'Fast setup in minutes',
+            'Secure connection on your own VoxVPN servers',
+            'Quick download for the correct operating system',
+            'Mobile QR import for faster activation',
+            'Multiple server locations for better speed and flexibility',
+          ].map(b => (
+            <li key={b} className="flex items-center gap-2 text-[#a9b7c9] text-xs">
+              <span className="w-1 h-1 bg-[#4fd1ff] rounded-full flex-shrink-0" />{b}
+            </li>
+          ))}
+        </ul>
+      </div>
 
       <div className="flex flex-wrap gap-2 mt-1">
         <a
