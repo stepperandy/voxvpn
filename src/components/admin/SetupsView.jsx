@@ -137,7 +137,7 @@ export default function SetupsView() {
     try {
       const res = await base44.functions.invoke('generateSetupFiles', { platform: platform.toLowerCase() });
       // Create a blob and trigger download
-      const blob = new Blob([res.data], { type: 'text/plain' });
+      const blob = new Blob([res.data.content], { type: 'text/plain' });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
