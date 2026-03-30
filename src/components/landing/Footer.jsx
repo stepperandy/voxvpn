@@ -118,7 +118,7 @@ export default function Footer() {
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-slate-500 text-xs">
                 <Mail size={13} className="text-cyan-500" />
-                <a href="mailto:support@voxvpn.net" className="hover:text-cyan-400 transition-colors">support@voxvpn.net</a>
+                <a href="mailto:support@voxdigits.com" className="hover:text-cyan-400 transition-colors">support@voxdigits.com</a>
               </div>
               <div className="flex items-center gap-2 text-slate-500 text-xs">
                 <Phone size={13} className="text-cyan-500" />
@@ -187,7 +187,7 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="mt-6 text-center text-slate-600 text-xs flex flex-col sm:flex-row justify-between">
-          <span>© 2024 VoxVPN. All rights reserved.</span>
+          <span>© 2026 VoxVPN. All rights reserved. A VoxDigits Company.</span>
           <div className="flex gap-4 justify-center mt-2 sm:mt-0">
             <Link to="/privacy-policy" className="hover:text-cyan-400 transition-colors">Privacy Policy</Link>
             <Link to="/terms-of-service" className="hover:text-cyan-400 transition-colors">Terms of Service</Link>
