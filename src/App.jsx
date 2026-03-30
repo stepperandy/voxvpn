@@ -55,6 +55,7 @@ const SetupPortal = lazy(() => import('./pages/SetupPortal.jsx'));
 const FeaturesMobile = lazy(() => import('./pages/FeaturesMobile.jsx'));
 const PricingMobile = lazy(() => import('./pages/PricingMobile.jsx'));
 const AccountMobile = lazy(() => import('./pages/AccountMobile.jsx'));
+const DeleteAccount = lazy(() => import('./pages/DeleteAccount.jsx'));
 
 const PageTransition = ({ children }) => (
   <motion.div
@@ -139,6 +140,7 @@ const AuthenticatedApp = ({ isMobileDevice }) => {
           <Route path="/features-mobile" element={<PageTransition><FeaturesMobile /></PageTransition>} />
           <Route path="/pricing-mobile" element={<PageTransition><PricingMobile /></PageTransition>} />
           <Route path="/account-mobile" element={<PageTransition><AccountMobile /></PageTransition>} />
+          <Route path="/delete-account" element={<PageTransition><DeleteAccount /></PageTransition>} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </Suspense>
