@@ -7,57 +7,66 @@ import { base44 } from '@/api/base44Client';
 
 const plans = [
   {
+    name: 'Monthly',
+    price: 8.99,
+    billingLabel: 'billed monthly',
+    priceId: 'price_1TDvPiAj5jZA8C2y4aS6FXt1',
+    features: ['5 Devices', '50+ Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', 'No-Log Policy'],
+  },
+  {
     name: 'Basic',
     price: 9.99,
-    yearly: 5.0,
-    priceIdMonthly: 'price_1QsgL0EiNNFb5ydcXxxxx',
-    priceIdYearly: 'price_1QsgL0EiNNFb5ydcYyyyy',
-    features: ['2 Devices', 'Unlimited Bandwidth', 'AES-256'],
+    billingLabel: 'billed monthly',
+    priceId: 'price_1TFwCxAj5jZA8C2ywLEfaNXR',
+    trial: true,
+    features: ['5 Devices', '50+ Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', '3-Day Free Trial'],
   },
   {
-    name: 'Premium',
-    price: 19.99,
-    yearly: 14.99,
-    priceIdMonthly: 'price_1QsgL0EiNNFb5ydcBbbbb',
-    priceIdYearly: 'price_1QsgL0EiNNFb5ydcCcccc',
+    name: 'Annual',
+    price: 4.99,
+    billingLabel: '$59.88/year',
+    priceId: 'price_1TDvPjAj5jZA8C2yKmoBiYce',
     popular: true,
-    features: ['5 Devices', 'All Locations', 'Priority Support', 'Split Tunnel'],
+    savings: 'Save 44%',
+    features: ['5 Devices', 'All Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', 'Priority Support', 'Kill Switch'],
   },
   {
-    name: 'Enterprise',
-    price: 39.99,
-    yearly: 18.0,
-    priceIdMonthly: 'price_1QsgL0EiNNFb5ydcFffff',
-    priceIdYearly: 'price_1QsgL0EiNNFb5ydcGgggg',
-    features: ['10 Devices', 'All Servers', '24/7 Support', 'Dedicated IP'],
+    name: '2-Year',
+    price: 2.99,
+    billingLabel: '$71.76 every 2 years',
+    priceId: 'price_1TDvPjAj5jZA8C2yrapCxQbT',
+    savings: 'Best Value',
+    features: ['5 Devices', 'All Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', '24/7 Support', 'Dedicated IP'],
   },
 ];
 
-function PlanCard({ plan, yearly, onCheckout, isLoading }) {
+function PlanCard({ plan, onCheckout, isLoading }) {
   return (
     <div
-      className={`p-4 rounded-xl border transition-all ${
+      className={`relative p-4 rounded-xl border transition-all ${
         plan.popular
           ? 'border-cyan-500 bg-[#0d1a20] ring-1 ring-cyan-500/20'
           : 'border-white/5 bg-[#0d1120]'
       }`}
     >
       {plan.popular && (
-        <div className="mb-3 text-xs font-bold text-cyan-400">⭐ POPULAR</div>
+        <div className="mb-2 text-xs font-bold text-cyan-400">⭐ MOST POPULAR</div>
+      )}
+      {plan.savings && !plan.popular && (
+        <div className="mb-2 text-xs font-bold text-emerald-400">🏆 {plan.savings}</div>
       )}
       <h3 className="text-white font-bold text-lg">{plan.name}</h3>
-      <div className="text-2xl font-black text-white mt-2">
-        ${yearly ? plan.yearly : plan.price}
-        <span className="text-xs text-slate-400">/mo</span>
+      <div className="text-2xl font-black text-white mt-1">
+        ${plan.price}<span className="text-xs text-slate-400">/mo</span>
       </div>
+      <p className="text-slate-500 text-xs mb-1">{plan.billingLabel}</p>
+      {plan.trial && <p className="text-cyan-400 text-xs font-semibold mb-2">✓ 3-day free trial</p>}
       <button
-        onClick={() => onCheckout(plan, yearly)}
+        onClick={() => onCheckout(plan)}
         disabled={isLoading}
-        className="w-full mt-4 py-3 rounded-lg font-bold text-sm transition-all select-none touch-target active:scale-95 disabled:opacity-60"
+        className="w-full mt-3 py-3 rounded-lg font-bold text-sm transition-all select-none touch-target active:scale-95 disabled:opacity-60"
         style={{
-          background: plan.popular
-            ? 'linear-gradient(135deg, #0ea5ff, #4fd1ff)'
-            : 'transparent',
+          background: plan.popular ? 'linear-gradient(135deg, #0ea5ff, #4fd1ff)' : 'transparent',
           color: plan.popular ? '#000' : '#fff',
           border: plan.popular ? 'none' : '1px solid #223654',
         }}
@@ -77,18 +86,16 @@ function PlanCard({ plan, yearly, onCheckout, isLoading }) {
 }
 
 export default function PricingMobile() {
-  const [yearly, setYearly] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingPlan, setLoadingPlan] = useState(null);
 
-  const handleCheckout = async (plan, isYearly) => {
+  const handleCheckout = async (plan) => {
     setLoadingPlan(plan.name);
     setLoading(true);
     try {
-      const priceId = isYearly ? plan.priceIdYearly : plan.priceIdMonthly;
       const res = await base44.functions.invoke('createStripeCheckout', {
         plan: plan.name,
-        priceId,
+        priceId: plan.priceId,
       });
       if (res.data?.url) {
         window.location.href = res.data.url;
@@ -108,39 +115,13 @@ export default function PricingMobile() {
     <MobileLayout headerTitle="Pricing" rootPath="/pricing-mobile">
       <PullToRefresh onRefresh={handleRefresh}>
         <div className="pb-24 px-4 pt-6">
-          <h1 className="text-white text-2xl font-black mb-2">Choose Your Plan</h1>
-
-          {/* Toggle */}
-          <div className="flex items-center gap-3 my-6 p-3 bg-[#0d1120] rounded-lg">
-                 <button
-                   onClick={() => setYearly(false)}
-                   className={`flex-1 py-2 rounded transition-colors font-bold text-sm select-none touch-target active:scale-95 ${
-                     !yearly
-                       ? 'bg-cyan-400 text-black'
-                       : 'text-slate-400'
-                   }`}
-                 >
-                   Monthly
-                 </button>
-                 <button
-                   onClick={() => setYearly(true)}
-                   className={`flex-1 py-2 rounded transition-colors font-bold text-sm select-none touch-target active:scale-95 ${
-                     yearly
-                       ? 'bg-cyan-400 text-black'
-                       : 'text-slate-400'
-                   }`}
-                 >
-                   Yearly
-                 </button>
-               </div>
-
-          {/* Plans */}
+          <h1 className="text-white text-2xl font-black mb-1">Choose Your Plan</h1>
+          <p className="text-slate-500 text-sm mb-6">All plans include AES-256 encryption & no-log policy</p>
           <div className="space-y-4">
             {plans.map((plan) => (
               <PlanCard
                 key={plan.name}
                 plan={plan}
-                yearly={yearly}
                 onCheckout={handleCheckout}
                 isLoading={loading && loadingPlan === plan.name}
               />
