@@ -3,7 +3,7 @@ import { Home, Zap, DollarSign, User } from 'lucide-react';
 import { useTabContext } from '@/mobile/MobileTabContext';
 
 const tabs = [
-  { id: 'home', label: 'Home', icon: Home, path: '/features-mobile' },
+  { id: 'home', label: 'Home', icon: Home, path: '/' },
   { id: 'features', label: 'Features', icon: Zap, path: '/features-mobile' },
   { id: 'pricing', label: 'Pricing', icon: DollarSign, path: '/pricing-mobile' },
   { id: 'account', label: 'Account', icon: User, path: '/account-mobile' },
