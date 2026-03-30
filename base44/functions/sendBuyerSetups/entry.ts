@@ -108,11 +108,15 @@ Deno.serve(async (req) => {
 </html>
     `.trim();
 
-    await base44.asServiceRole.integrations.Core.SendEmail({
+    // Use Resend for external customer emails (not app users)
+    const resend = await import('npm:resend@3.0.0');
+    const resendClient = new resend.default(Deno.env.get('RESEND_API_KEY'));
+    
+    await resendClient.emails.send({
+      from: 'VoxVPN <noreply@voxvpn.com>',
       to: email,
       subject: '✅ Your VoxVPN is Ready — Connect Now',
-      body: emailBody,
-      from_name: 'VoxVPN',
+      html: emailBody,
     });
 
     return Response.json({
