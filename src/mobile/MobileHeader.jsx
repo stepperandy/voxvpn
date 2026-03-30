@@ -25,10 +25,11 @@ export default function MobileHeader({ title, showBack = true, rootPath = '/' })
 
       {isRoot && (
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center">
-            <span className="text-white font-bold text-xs">V</span>
-          </div>
-          <span className="text-white font-bold text-sm">VoxVPN</span>
+          <img
+            src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/e4e826602_f43645b8-7e9b-46cb-9b95-1fc45590f65b.png"
+            alt="VoxVPN"
+            className="h-8 w-auto"
+          />
         </div>
       )}
 

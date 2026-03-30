@@ -29,7 +29,7 @@ export default function DeleteAccount() {
         {/* Logo */}
         <div className="text-center mb-8">
           <img
-            src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/2372c7923_image.png"
+            src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/e4e826602_f43645b8-7e9b-46cb-9b95-1fc45590f65b.png"
             alt="VoxVPN"
             className="h-10 w-auto mx-auto mb-6"
           />
