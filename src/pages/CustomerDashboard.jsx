@@ -64,12 +64,28 @@ export default function CustomerDashboard() {
 
 
 
-  const downloadFile = async (platform, fileUrl) => {
+  const downloadConfig = async (platform, fileUrl) => {
     setDownloading(platform);
     try {
-      window.open(fileUrl, '_blank');
+      // If there's a direct file_url from the Download entity, use it
+      if (fileUrl) {
+        window.open(fileUrl, '_blank');
+        return;
+      }
+      // Otherwise generate a user-specific config on the fly
+      const res = await base44.functions.invoke('downloadVpnConfig', { platform });
+      // The response is a file blob — trigger browser download
+      const blob = new Blob([res.data], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `VoxVPN-${platform.charAt(0).toUpperCase() + platform.slice(1)}.conf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     } catch (error) {
-      alert('Failed to download: ' + error.message);
+      alert('Failed to download config: ' + error.message);
     } finally {
       setDownloading(null);
     }
@@ -222,7 +238,7 @@ export default function CustomerDashboard() {
                     key={dl.id}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => downloadFile(dl.id, dl.file_url)}
+                    onClick={() => downloadConfig(dl.platform?.toLowerCase() || 'windows', dl.file_url)}
                     disabled={downloading === dl.id || !dl.file_url}
                     className={`p-4 rounded-xl border hover:opacity-80 transition-all flex items-center gap-3 disabled:opacity-50 ${colorClass}`}
                   >
@@ -240,6 +256,54 @@ export default function CustomerDashboard() {
                 );
               })
             )}
+          </div>
+        </motion.div>
+
+        {/* Windows Setup Guide */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="rounded-2xl border border-cyan-500/10 bg-[#0d1120] p-6 md:p-8"
+        >
+          <h3 className="text-xl font-bold text-white mb-2">Windows Setup Guide</h3>
+          <p className="text-slate-400 text-sm mb-6">Follow these 3 steps to get connected on Windows in under 2 minutes.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {[
+              {
+                step: '1',
+                title: 'Install WireGuard',
+                desc: 'Download and install the free WireGuard client for Windows.',
+                action: 'Download WireGuard',
+                href: 'https://www.wireguard.com/install/',
+              },
+              {
+                step: '2',
+                title: 'Download Your VoxVPN Config',
+                desc: 'Click "Download VPN for Your Device" above and select Windows to get your personal .conf file.',
+                action: null,
+              },
+              {
+                step: '3',
+                title: 'Import & Connect',
+                desc: 'Open WireGuard → "Import tunnel(s) from file" → select VoxVPN-Windows.conf → click Activate.',
+                action: null,
+              },
+            ].map((s) => (
+              <div key={s.step} className="bg-[#0a1020] rounded-xl p-4 border border-white/5">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-black font-black text-sm mb-3">
+                  {s.step}
+                </div>
+                <p className="text-white font-bold text-sm mb-1">{s.title}</p>
+                <p className="text-slate-500 text-xs leading-relaxed mb-3">{s.desc}</p>
+                {s.action && s.href && (
+                  <a href={s.href} target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs text-cyan-400 font-semibold hover:text-cyan-300 transition-colors">
+                    {s.action} →
+                  </a>
+                )}
+              </div>
+            ))}
           </div>
         </motion.div>
 
