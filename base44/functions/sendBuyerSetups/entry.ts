@@ -109,15 +109,25 @@ Deno.serve(async (req) => {
     `.trim();
 
     // Use Resend for external customer emails (not app users)
-    const resend = await import('npm:resend@3.0.0');
-    const resendClient = new resend.default(Deno.env.get('RESEND_API_KEY'));
-    
-    await resendClient.emails.send({
-      from: 'VoxVPN <noreply@voxvpn.com>',
-      to: email,
-      subject: '✅ Your VoxVPN is Ready — Connect Now',
-      html: emailBody,
+    const resendApiKey = Deno.env.get('RESEND_API_KEY');
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${resendApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: 'VoxVPN <noreply@voxvpn.com>',
+        to: email,
+        subject: '✅ Your VoxVPN is Ready — Connect Now',
+        html: emailBody,
+      }),
     });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(`Resend error: ${error.message}`);
+    }
 
     return Response.json({
       success: true,
