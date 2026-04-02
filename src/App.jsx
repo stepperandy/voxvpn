@@ -9,6 +9,7 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import ThemeProvider from '@/lib/ThemeProvider';
 import { TabProvider } from '@/mobile/MobileTabContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
+import FloatingAssistant from '@/components/FloatingAssistant';
 
 // Lazy-loaded pages
 const Home = lazy(() => import('./pages/Home'));
@@ -172,6 +173,7 @@ function App() {
             <Router>
               <AuthenticatedAppWrapper isMobileDevice={isMobileDevice} />
             </Router>
+            <FloatingAssistant />
             <Toaster />
           </QueryClientProvider>
         </AuthProvider>
