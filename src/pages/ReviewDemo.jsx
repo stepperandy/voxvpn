@@ -1,8 +1,8 @@
 import { useState } from 'react';
 
-const REVIEW_ACCOUNT = { email: 'review@voxvpn.com', password: 'VoxVPN@2026' };
+const REVIEW_ACCOUNT = { email: 'review@voxvpn.net', password: 'VoxVPN@2026' };
 
-const reviewEmails = ['review@voxdigits.com'];
+const reviewEmails = ['review@voxvpn.net', 'review@voxdigits.com'];
 function isReviewAccount(email) {
   return reviewEmails.includes((email || '').toLowerCase());
 }
@@ -55,6 +55,17 @@ export default function ReviewDemo() {
       {!loggedIn ? (
         <>
           <h2>Login to VoxVPN</h2>
+          <div style={{ background: '#f0f7ff', border: '1px solid #c0d8f0', borderRadius: 8, padding: '12px 16px', marginBottom: 16, fontSize: 13, color: '#333' }}>
+            <strong>Review Instructions:</strong>
+            <ol style={{ marginTop: 8, marginBottom: 0, paddingLeft: 18 }}>
+              <li>Enter the provided credentials below, or tap <strong>"Use Demo Access."</strong></li>
+              <li>Select any server from the server list.</li>
+              <li>Tap <strong>"Connect"</strong> to access the core VPN functionality.</li>
+            </ol>
+            <p style={{ marginTop: 8, marginBottom: 0, color: '#555' }}>
+              ✅ No OTP or email verification required. This account has full access for app review.
+            </p>
+          </div>
           <p style={{ color: error ? 'red' : '#666' }}>{error || 'Sign in to continue.'}</p>
           <input
             type="email"
