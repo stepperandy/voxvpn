@@ -45,8 +45,8 @@ export const AuthProvider = ({ children }) => {
     base44.auth.logout('/');
   };
 
-  const navigateToLogin = () => {
-    base44.auth.redirectToLogin(window.location.href);
+  const navigateToLogin = (nextUrl) => {
+    base44.auth.redirectToLogin(nextUrl || window.location.href);
   };
 
   return (
