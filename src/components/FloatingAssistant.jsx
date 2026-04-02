@@ -36,6 +36,13 @@ export default function FloatingAssistant() {
     setInitializing(true);
     setError(null);
     try {
+      // Ensure user is authenticated before creating a conversation
+      const isAuthed = await base44.auth.isAuthenticated();
+      if (!isAuthed) {
+        // For unauthenticated users, log in first then return
+        base44.auth.redirectToLogin(window.location.href);
+        return;
+      }
       const convo = await base44.agents.createConversation({
         agent_name: AGENT_NAME,
         metadata: { name: 'VoxVPN Chat' },
