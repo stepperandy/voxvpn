@@ -7,6 +7,14 @@ function isReviewAccount(email) {
   return reviewEmails.includes((email || '').toLowerCase());
 }
 
+const reviewAccountFlags = {
+  otpRequired: false,
+  emailVerificationRequired: false,
+  captchaRequired: false,
+  subscriptionRequired: false,
+  accountLocked: false,
+};
+
 const servers = [
   'VoxVPN New York 01',
   'VoxVPN London 01',
