@@ -10,6 +10,7 @@ const navLinks = [
   { label: 'Pricing', href: '#pricing' },
   { label: 'eSIM', href: 'https://voxdigits.com', external: true },
   { label: 'Virtual Numbers', href: 'https://voxdigits.com', external: true },
+  { label: 'Support', href: '/support' },
 ];
 
 export default function Navbar() {
