@@ -34,22 +34,29 @@ export default function VpnDashboard() {
     setError('');
     setLoading(true);
     setVpnData(null);
+    const url = `${API_BASE}/api/vpn/provision`;
     try {
-      const res = await fetch(`${API_BASE}/api/vpn/provision`, {
+      const res = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
       });
-      const data = await res.json();
-      if (!res.ok || !data.ok) {
-        setError(data.message || 'Failed to provision VPN. Please try again.');
+      const rawText = await res.text();
+      let data;
+      try { data = JSON.parse(rawText); } catch { data = null; }
+      if (!res.ok) {
+        setError(`URL: ${url}\nStatus: ${res.status}\nResponse: ${rawText}`);
+        return;
+      }
+      if (!data || !data.ok) {
+        setError(`URL: ${url}\nStatus: ${res.status}\nResponse: ${rawText}`);
         return;
       }
       setVpnData(data);
-    } catch {
-      setError('Could not reach VoxVPN server. Please try again.');
+    } catch (err) {
+      setError(`URL: ${url}\nError: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -100,7 +107,7 @@ export default function VpnDashboard() {
               </div>
 
               {error && (
-                <div className="w-full px-4 py-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm text-center">
+                <div className="w-full px-4 py-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs text-left whitespace-pre-wrap font-mono break-all">
                   {error}
                 </div>
               )}
