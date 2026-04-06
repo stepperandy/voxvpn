@@ -4,7 +4,7 @@ import { Shield, Loader2, Eye, EyeOff } from 'lucide-react';
 
 const API_BASE = 'https://package-manager-setup.replit.app';
 
-export default function VpnLogin() {
+export default function VpnSignup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -12,19 +12,19 @@ export default function VpnLogin() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/api/auth/login`, {
+      const res = await fetch(`${API_BASE}/api/auth/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
       if (!res.ok || !data.token) {
-        setError(data.message || 'Invalid credentials. Please try again.');
+        setError(data.message || 'Signup failed. Please try again.');
         return;
       }
       localStorage.setItem('auth_token', data.token);
@@ -45,11 +45,11 @@ export default function VpnLogin() {
             <Shield size={32} className="text-cyan-400" />
           </div>
           <h1 className="text-2xl font-black text-white">VoxVPN</h1>
-          <p className="text-slate-500 text-sm mt-1">Sign in to your account</p>
+          <p className="text-slate-500 text-sm mt-1">Create your account</p>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleSignup} className="space-y-4">
           <div>
             <label className="text-slate-400 text-xs uppercase tracking-wider mb-1.5 block">Email</label>
             <input
@@ -94,14 +94,14 @@ export default function VpnLogin() {
             disabled={loading}
             className="w-full py-3 bg-cyan-400 hover:bg-cyan-300 disabled:opacity-50 disabled:cursor-not-allowed text-black font-bold rounded-xl text-sm transition-all flex items-center justify-center gap-2"
           >
-            {loading ? <><Loader2 size={16} className="animate-spin" /> Signing in...</> : 'Sign In'}
+            {loading ? <><Loader2 size={16} className="animate-spin" /> Creating account...</> : 'Create Account'}
           </button>
         </form>
 
         <p className="text-center text-slate-500 text-sm mt-6">
-          Don't have an account?{' '}
-          <Link to="/vpn-signup" className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors">
-            Sign Up
+          Already have an account?{' '}
+          <Link to="/vpn-login" className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors">
+            Sign In
           </Link>
         </p>
       </div>

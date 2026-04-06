@@ -59,6 +59,7 @@ const DeleteAccount = lazy(() => import('./pages/DeleteAccount.jsx'));
 const ReviewDemo = lazy(() => import('./pages/ReviewDemo.jsx'));
 const OsSetupGuide = lazy(() => import('./pages/OsSetupGuide.jsx'));
 const VpnLogin = lazy(() => import('./pages/VpnLogin.jsx'));
+const VpnSignup = lazy(() => import('./pages/VpnSignup.jsx'));
 const VpnDashboard = lazy(() => import('./pages/VpnDashboard.jsx'));
 
 const PageTransition = ({ children }) => (
@@ -137,6 +138,7 @@ const AuthenticatedApp = ({ isMobileDevice }) => {
           <Route path="/review" element={<ReviewDemo />} />
           <Route path="/setup-guide" element={<PageTransition><OsSetupGuide /></PageTransition>} />
           <Route path="/vpn-login" element={<PageTransition><VpnLogin /></PageTransition>} />
+          <Route path="/vpn-signup" element={<PageTransition><VpnSignup /></PageTransition>} />
           <Route path="/vpn-dashboard" element={<PageTransition><VpnDashboard /></PageTransition>} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>

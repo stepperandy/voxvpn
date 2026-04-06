@@ -19,24 +19,18 @@ function CopyButton({ value }) {
 }
 
 export default function VpnDashboard() {
-  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [vpnData, setVpnData] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem('voxvpn_token');
-    const stored = localStorage.getItem('voxvpn_user');
-    if (!token) {
-      navigate('/vpn-login');
-      return;
-    }
-    if (stored) setUser(JSON.parse(stored));
+    const token = localStorage.getItem('auth_token');
+    if (!token) navigate('/vpn-login');
   }, []);
 
   const handleConnect = async () => {
-    const token = localStorage.getItem('voxvpn_token');
+    const token = localStorage.getItem('auth_token');
     setError('');
     setLoading(true);
     setVpnData(null);
@@ -62,8 +56,7 @@ export default function VpnDashboard() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('voxvpn_token');
-    localStorage.removeItem('voxvpn_user');
+    localStorage.removeItem('auth_token');
     navigate('/vpn-login');
   };
 
@@ -92,11 +85,7 @@ export default function VpnDashboard() {
           {/* Welcome */}
           <div className="text-center">
             <h1 className="text-3xl font-black text-white mb-1">VoxVPN Dashboard</h1>
-            {user && (
-              <p className="text-slate-400 text-sm">
-                Welcome back, <span className="text-cyan-400 font-semibold">{user.name || user.email}</span>
-              </p>
-            )}
+            <p className="text-slate-400 text-sm">Your secure VPN connection</p>
           </div>
 
           {/* Connect Card */}
@@ -129,13 +118,13 @@ export default function VpnDashboard() {
           {/* VPN Credentials Card */}
           {vpnData && (
             <div className="rounded-2xl border border-cyan-500/20 bg-[#0d1a20] p-6 space-y-5">
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                 <span className="text-emerald-400 text-sm font-semibold">VPN Provisioned Successfully</span>
               </div>
 
               {/* Location */}
-              <div className="rounded-xl bg-[#0a1020] border border-white/5 p-4 space-y-3">
+              <div className="rounded-xl bg-[#0a1020] border border-white/5 p-4 space-y-2">
                 <p className="text-slate-500 text-xs uppercase tracking-wider font-semibold">Server Location</p>
                 <div className="flex items-center gap-3">
                   <MapPin size={16} className="text-cyan-400 flex-shrink-0" />
@@ -149,7 +138,7 @@ export default function VpnDashboard() {
               <div className="rounded-xl bg-[#0a1020] border border-white/5 p-4 space-y-3">
                 <p className="text-slate-500 text-xs uppercase tracking-wider font-semibold">Your Credentials</p>
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
                     <User size={14} className="text-slate-500" />
                     <span className="text-slate-400 text-sm">Username</span>
                   </div>
@@ -160,7 +149,7 @@ export default function VpnDashboard() {
                 </div>
                 <div className="w-full h-px bg-white/5" />
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
                     <Lock size={14} className="text-slate-500" />
                     <span className="text-slate-400 text-sm">Password</span>
                   </div>
@@ -186,7 +175,6 @@ export default function VpnDashboard() {
                 <p className="text-slate-600 text-xs text-center">{vpnData.download.fileName}</p>
               )}
 
-              {/* Connect again */}
               <button
                 onClick={() => { setVpnData(null); setError(''); }}
                 className="w-full py-2.5 border border-white/10 text-slate-400 hover:text-white text-sm rounded-xl transition-all"
