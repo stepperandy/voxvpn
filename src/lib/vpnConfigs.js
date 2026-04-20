@@ -1,5 +1,108 @@
 export const VPN_CONFIGS = {
-  chicago: ``,
+  chicago: `# Automatically generated OpenVPN client config file
+# Generated on Mon Apr 20 20:18:16 2026 by vultr
+# Note: this config file contains inline private keys
+#       and therefore should be kept confidential!
+#       Certificate serial: 593024351117636171, certificate common name: testuser
+#       Expires 2036-04-17 20:18:16
+# Note: this configuration is user-locked to the username below
+# OVPN_ACCESS_SERVER_USERNAME=testuser
+# Define the profile name of this particular configuration file
+# OVPN_ACCESS_SERVER_PROFILE=testuser@137.220.58.77
+
+# Default Cipher
+cipher AES-256-CBC
+# OVPN_ACCESS_SERVER_CLI_PREF_ALLOW_WEB_IMPORT=True
+# OVPN_ACCESS_SERVER_CLI_PREF_BASIC_CLIENT=False
+# OVPN_ACCESS_SERVER_CLI_PREF_ENABLE_CONNECT=False
+# OVPN_ACCESS_SERVER_CLI_PREF_ENABLE_XD_PROXY=True
+# OVPN_ACCESS_SERVER_WSHOST=137.220.58.77:443
+# OVPN_ACCESS_SERVER_WEB_CA_BUNDLE_START
+# -----BEGIN CERTIFICATE-----
+# MIIBvTCCAUOgAwIBAgIEadFeIDAKBggqhkjOPQQDAjA3MTUwMwYDVQQDDCxPcGVu
+# VlBOIFdlYiBDQSAyMDI2LjA0LjA0IDE4OjUzOjIwIFVUQyB2dWx0cjAeFw0yNjA0
+# MDMxODUzMjBaFw0zNjA0MDExODUzMjBaMDcxNTAzBgNVBAMMLE9wZW5WUE4gV2Vi
+# IENBIDIwMjYuMDQuMDQgMTg6NTM6MjAgVVRDIHZ1bHRyMHYwEAYHKoZIzj0CAQYF
+# K4EEACIDYgAEz9UqKw/27X5uRVPdG3JrDq5PXnGrIPLEiWiOTc2floYxk5BpQNAX
+# 5/JFazSZ1dYyDrPyWBTQ+K9FEYjKVI40CaMUNrTFKpMKi68zeEZngfDlFaCt5tBx
+# DDHHVXEGteproyAwHjAPBgNVHRMBAf8EBTADAQH/MAsGA1UdDwQEAwIBBjAKBggq
+# hkjOPQQDAgNoADBlAjB+fcbllgLIfAATUKGUa7C6hlUTvHTOzxYgP+frI11Kpm3n
+# 9w5DHtN+qGzH/OrpNHgCMQDM6TonooUa3SWzS1iR0dOAL1s5pcoQqZMPyekB3210
+# SdnWDfQCchjeO6lF4/knqH0=
+# -----END CERTIFICATE-----
+# OVPN_ACCESS_SERVER_WEB_CA_BUNDLE_STOP
+# OVPN_ACCESS_SERVER_IS_OPENVPN_WEB_CA=1
+client
+server-poll-timeout 4
+nobind
+remote 137.220.58.77 1194 udp
+remote 137.220.58.77 1194 udp
+remote 137.220.58.77 443 tcp
+remote 137.220.58.77 1194 udp
+remote 137.220.58.77 1194 udp
+remote 137.220.58.77 1194 udp
+remote 137.220.58.77 1194 udp
+remote 137.220.58.77 1194 udp
+dev tun
+dev-type tun
+remote-cert-tls server
+tls-version-min 1.2
+reneg-sec 604800
+tun-mtu 1420
+auth-user-pass
+verb 3
+push-peer-info
+
+<ca>
+-----BEGIN CERTIFICATE-----
+MIIBdzCB/6ADAgECAgRp0V4QMAoGCCqGSM49BAMCMBUxEzARBgNVBAMMCk9wZW5W
+UE4gQ0EwHhcNMjYwNDAzMTg1MzA0WhcNMzYwNDAxMTg1MzA0WjAVMRMwEQYDVQQD
+DApPcGVuVlBOIENBMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEtPhAqbKcFeOgcOCX
+ngdbCUCTlnKpcwmCxRDvRrqByFX6ZiEubJsTI6tjGkXWc2bYoD3By+tGGUJfSYU9
+QJMT1X88FGXsE6FRHTqLiVG2T9K+Npr1Ln/wYIwzfS0jc3yLoyAwHjAPBgNVHRMB
+Af8EBTADAQH/MAsGA1UdDwQEAwIBBjAKBggqhkjOPQQDAgNnADBkAjAZV2fl6V21
+ZtcCPlFZ3h7aLFS8GNJ/dZmkx8/EJORi89K0o6CLz1oBfiqI4ui/tN8CMC2/+32g
+TiXyl2IGYkorgAYUUb8FO2QP40kEGPTtgeen7oxCsIj55FZwEDAoecqgOQ==
+-----END CERTIFICATE-----
+</ca>
+<cert>
+-----BEGIN CERTIFICATE-----
+MIIBoDCCASagAwIBAgIICDrYgV+F8kswCgYIKoZIzj0EAwIwFTETMBEGA1UEAwwK
+T3BlblZQTiBDQTAeFw0yNjA0MTkyMDE4MTZaFw0zNjA0MTcyMDE4MTZaMBMxETAP
+BgNVBAMMCHRlc3R1c2VyMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEtCcNnt9Quq7A
++pyouRDTcUPFZBPX+gO7yyys1CBM8Xk8AJ48I2NxpI14SfBEqaemOqn8gy9t19uZ
+96stXzgCxK9YKxCdANqTnjuxyjpb/kjqnjM2H9YD6/6A2xpgjIuqo0UwQzAMBgNV
+HRMBAf8EAjAAMAsGA1UdDwQEAwIHgDATBgNVHSUEDDAKBggrBgEFBQcDAjARBglg
+hkgBhvhCAQEEBAMCB4AwCgYIKoZIzj0EAwIDaAAwZQIwHUgv98weFoWs6UGWfVv7
+iKn2ZBxOrh2OhWlGOuP/YId0/qJdAVwxg8G86PoiLj9PAjEA6J+FaPetTznwtF8x
+i0NxlIOCLHx/IJ5yo1Kv3vP3L3QRp4whJmYwX2cmdDyWc7dc
+-----END CERTIFICATE-----
+</cert>
+<key>
+-----BEGIN PRIVATE KEY-----
+MIG2AgEAMBAGByqGSM49AgEGBSuBBAAiBIGeMIGbAgEBBDBcwS/YInShen6FdGtN
+4pIUDxylDVfgibuFm1ilswju5WKDIVKN58lNRFeiALYwoRKhZANiAAS0Jw2e31C6
+rsD6nKi5ENNxQ8VkE9f6A7vLLKzUIEzxeTwAnjwjY3GkjXhJ8ESpp6Y6qfyDL23X
+25n3qy1fOALEr1grEJ0A2pOeO7HKOlv+SOqeMzYf1gPr/oDbGmCMi6o=
+-----END PRIVATE KEY-----
+</key>
+<tls-crypt-v2>
+-----BEGIN OpenVPN tls-crypt-v2 client key-----
+hpLfJk1PD4qs1Hg69pD+gwi7I5XnIBhh8wmICVTgB0Y+McGHd9Szhq0MgL6/m9TU
+bwkjSA0XWoHB/vE9QKalVZkiKz3BN1n79vywFdT9ZdazTBjfgNNG8e39/gdCQmMx
+FsCZQAopGLaXYARUJ09+TV1+o7sq3YPUhUIVyRkGtAWNpgvsrStw8S3FBhsf4ptU
+rS3U6Dho3MxuJzdbY8c5YGIZMko8r/4jerLicchMzg+dsujPhUQiD9o9A3FoVB6y
+gNOp0vDYG2rWaukZieHNQnX8lxhC3IVBF1WYzdBz94oJvd2zmQEDsl+gIQaFsUSL
+sV3c3qMij6Qo8u+YsVXfK17A5UN28wsBJPOuWiAXUSIhfBZMfqtaitQPdj/UojUT
+sdw+tUkxiiLZRLYOHchLl6+Cs0Ek0pIkpyTPz0HoA6dhludUJFnFZfvw/4GAtK0p
+nMkJRvkl1OY0NfKBtWbbb92FCeU3n5PEz25h8TEpfu2PMqIONCqL0xZNOFRvTVZT
+fe1Z7rD5mmIwqUaYq5tI97I1xsZk0U4A1Hd0aeZLxbEyVQeFS3dDuMRi+kedmG8l
+I+qLAUNj5LtNCNvELSqerOX05x2jnXbszKtQzISi/CuBq1xepx3XJR56T51/iVrd
+XtvMAfh/WOaZXaluD0NfWEbKQsQPt3kIL1Ah/TKl1iYJ10sc/WtoxAqHnFJ3OSHn
+c5QocxiTyNOxnp8MS8oyiYvo9FW1w5sIzzlG4lqIVnspbV47Iyt5rn2/xvrIleyc
+S1DU2rXPE0faX/Vgzyik+VN9cFl1UwFY
+-----END OpenVPN tls-crypt-v2 client key-----
+</tls-crypt-v2>`,
   london: `# Automatically generated OpenVPN client config file
 # Generated on Mon Apr 20 21:05:02 2026 by voxvpn-eu-west
 # Note: this config file contains inline private keys
