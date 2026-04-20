@@ -29,8 +29,8 @@ export default function ConnectInstructions() {
 
   const handleDownload = () => {
     setLoading(true);
-    const url = `${API_BASE}/download-config/${server.id}`;
-    window.open(url, '_blank');
+    const downloadUrl = `https://voxvpn-backend.onrender.com/download-config/${server.id}`;
+    window.open(downloadUrl, '_blank');
     setTimeout(() => {
       setLoading(false);
       setDownloaded(true);
