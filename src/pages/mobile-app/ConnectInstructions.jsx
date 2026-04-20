@@ -5,10 +5,10 @@ import { ArrowLeft, Download, ExternalLink, CheckCircle2, Shield, Loader2 } from
 const API_BASE = 'https://voxvpn-backend.onrender.com';
 
 const SERVERS = [
-  { id: 1, city: 'Amsterdam',  country: 'Netherlands',    flag: '🇳🇱' },
-  { id: 2, city: 'London',     country: 'United Kingdom', flag: '🇬🇧' },
-  { id: 3, city: 'New York',   country: 'United States',  flag: '🇺🇸' },
-  { id: 4, city: 'Singapore',  country: 'Singapore',      flag: '🇸🇬' },
+  { id: 1, city: 'Amsterdam', country: 'Netherlands',  flag: '🇳🇱' },
+  { id: 2, city: 'London',    country: 'UK',           flag: '🇬🇧' },
+  { id: 3, city: 'USA',       country: 'United States', flag: '🇺🇸' },
+  { id: 4, city: 'Singapore', country: 'Singapore',    flag: '🇸🇬' },
 ];
 
 const STEPS = [

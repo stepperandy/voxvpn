@@ -4,10 +4,10 @@ import { Shield, Settings, CreditCard, LogOut, ChevronRight, Wifi } from 'lucide
 const API_BASE = 'https://voxvpn-backend.onrender.com';
 
 const SERVERS = [
-  { id: 1, city: 'Amsterdam',  country: 'Netherlands',    flag: '🇳🇱', ping: '12ms',  load: 32 },
-  { id: 2, city: 'London',     country: 'United Kingdom', flag: '🇬🇧', ping: '18ms',  load: 45 },
-  { id: 3, city: 'New York',   country: 'United States',  flag: '🇺🇸', ping: '89ms',  load: 67 },
-  { id: 4, city: 'Singapore',  country: 'Singapore',      flag: '🇸🇬', ping: '134ms', load: 28 },
+  { id: 1, city: 'Amsterdam',  country: 'Netherlands', flag: '🇳🇱', ping: '12ms',  load: 32 },
+  { id: 2, city: 'London',     country: 'UK',          flag: '🇬🇧', ping: '18ms',  load: 45 },
+  { id: 3, city: 'USA',        country: 'United States', flag: '🇺🇸', ping: '89ms',  load: 67 },
+  { id: 4, city: 'Singapore',  country: 'Singapore',   flag: '🇸🇬', ping: '134ms', load: 28 },
 ];
 
 function LoadBar({ load }) {
