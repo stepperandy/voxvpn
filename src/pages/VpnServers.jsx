@@ -18,19 +18,17 @@ export default function VpnServers() {
   const [showPanel, setShowPanel] = useState(false);
   const [missingConfig, setMissingConfig] = useState(false);
 
-  const handleConnect = (server) => {
+  const handleConnectClick = (server) => {
     const config = VPN_CONFIGS[server.id];
-    if (!config || config.trim().length === 0) {
-      setSelectedServer(server);
-      setMissingConfig(true);
-      setShowPanel(true);
-      setConnState(STATES.IDLE);
-      return;
-    }
     setSelectedServer(server);
-    setMissingConfig(false);
+    if (!config || config.trim().length === 0) {
+      setMissingConfig(true);
+      setConnState(STATES.IDLE);
+    } else {
+      setMissingConfig(false);
+      setConnState(STATES.READY);
+    }
     setShowPanel(true);
-    setConnState(STATES.READY);
   };
 
   const startConnection = () => {
@@ -48,13 +46,10 @@ export default function VpnServers() {
 
   const closePanel = () => {
     setShowPanel(false);
-    if (connState !== STATES.CONNECTED) {
-      setConnState(STATES.IDLE);
-    }
   };
 
   const config = selectedServer ? VPN_CONFIGS[selectedServer.id] : '';
-  const configPreview = config ? config.split('\n').slice(0, 8).join('\n') : '';
+  const configPreview = config ? config.split('\n').slice(0, 10).join('\n') : '';
 
   return (
     <div className="min-h-screen bg-[#060d1a] px-5 pt-14 pb-10">
@@ -78,10 +73,14 @@ export default function VpnServers() {
             <p className="text-emerald-500 text-xs">{connectedServer.name}</p>
           </div>
           <button
-            onClick={disconnect}
-            className="px-3 py-1.5 rounded-xl text-xs font-black bg-rose-500/20 text-rose-400 border border-rose-500/20 hover:bg-rose-500/30 transition-all active:scale-95"
+            onClick={() => {
+              setSelectedServer(connectedServer);
+              setMissingConfig(false);
+              setShowPanel(true);
+            }}
+            className="px-3 py-1.5 rounded-xl text-xs font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/30 transition-all active:scale-95"
           >
-            Disconnect
+            Manage
           </button>
         </div>
       )}
@@ -106,7 +105,10 @@ export default function VpnServers() {
               <div className="flex items-center justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <Server size={14} className={isConnected ? 'text-emerald-400' : isSelected ? 'text-cyan-400' : 'text-slate-500'} />
+                    <Server
+                      size={14}
+                      className={isConnected ? 'text-emerald-400' : isSelected ? 'text-cyan-400' : 'text-slate-500'}
+                    />
                     <p className={`font-bold text-sm ${isConnected || isSelected ? 'text-white' : 'text-slate-200'}`}>
                       {server.name}
                     </p>
@@ -130,12 +132,11 @@ export default function VpnServers() {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      setSelectedServer(server);
-                      handleConnect(server);
+                      handleConnectClick(server);
                     }}
                     className={`px-4 py-1.5 rounded-xl text-xs font-black transition-all active:scale-95 ${
                       isConnected
-                        ? 'bg-emerald-400 text-black'
+                        ? 'bg-emerald-400 hover:bg-emerald-300 text-black'
                         : isSelected
                         ? 'bg-cyan-400 hover:bg-cyan-300 text-black shadow-lg shadow-cyan-500/20'
                         : 'bg-white/10 hover:bg-white/15 text-white border border-white/10'
@@ -150,7 +151,7 @@ export default function VpnServers() {
         })}
       </div>
 
-      {/* Connection Panel / Modal */}
+      {/* Connection Panel (bottom sheet) */}
       {showPanel && selectedServer && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end justify-center z-50 px-4 pb-6">
           <div className="w-full max-w-md bg-[#0d1120] border border-white/10 rounded-3xl p-6 space-y-5">
@@ -162,15 +163,15 @@ export default function VpnServers() {
                 </div>
                 <div>
                   <p className="text-white font-black text-base">{selectedServer.name}</p>
-                  <p className="text-slate-500 text-xs">{selectedServer.file}</p>
+                  <p className="text-slate-500 text-xs font-mono">{selectedServer.file}</p>
                 </div>
               </div>
-              <button onClick={closePanel} className="text-slate-500 hover:text-white transition-colors">
+              <button onClick={closePanel} className="text-slate-500 hover:text-white transition-colors p-1">
                 <X size={20} />
               </button>
             </div>
 
-            {/* Missing config */}
+            {/* Missing config error */}
             {missingConfig ? (
               <div className="flex items-start gap-3 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20">
                 <AlertCircle size={18} className="text-rose-400 flex-shrink-0 mt-0.5" />
@@ -181,12 +182,12 @@ export default function VpnServers() {
               </div>
             ) : (
               <>
-                {/* Status indicator */}
+                {/* Status row */}
                 <div className="flex items-center gap-3 p-4 rounded-2xl bg-white/5 border border-white/5">
                   {connState === STATES.CONNECTING && <Loader2 size={18} className="text-cyan-400 animate-spin flex-shrink-0" />}
                   {connState === STATES.CONNECTED && <Wifi size={18} className="text-emerald-400 flex-shrink-0" />}
                   {connState === STATES.DISCONNECTED && <WifiOff size={18} className="text-slate-500 flex-shrink-0" />}
-                  {connState === STATES.READY && <Shield size={18} className="text-cyan-400 flex-shrink-0" />}
+                  {(connState === STATES.READY || connState === STATES.IDLE) && <Shield size={18} className="text-cyan-400 flex-shrink-0" />}
                   <div>
                     <p className={`font-bold text-sm ${
                       connState === STATES.CONNECTED ? 'text-emerald-300' :
@@ -206,12 +207,12 @@ export default function VpnServers() {
                 {/* Config preview */}
                 <div>
                   <p className="text-slate-500 text-xs uppercase tracking-widest mb-2">Config Preview</p>
-                  <pre className="text-xs text-slate-400 bg-black/30 rounded-xl p-3 overflow-hidden leading-relaxed border border-white/5 whitespace-pre-wrap break-all line-clamp-6">
+                  <pre className="text-xs text-slate-400 bg-black/30 rounded-xl p-3 overflow-hidden leading-relaxed border border-white/5 whitespace-pre-wrap break-all max-h-32">
                     {configPreview}
                   </pre>
                 </div>
 
-                {/* Action buttons */}
+                {/* Action button */}
                 {connState === STATES.READY && (
                   <button
                     onClick={startConnection}
@@ -221,7 +222,7 @@ export default function VpnServers() {
                   </button>
                 )}
                 {connState === STATES.CONNECTING && (
-                  <button disabled className="w-full py-3.5 bg-cyan-400/50 text-black/60 font-black rounded-2xl text-sm flex items-center justify-center gap-2">
+                  <button disabled className="w-full py-3.5 bg-cyan-400/50 text-black/60 font-black rounded-2xl text-sm flex items-center justify-center gap-2 cursor-not-allowed">
                     <Loader2 size={16} className="animate-spin" /> Connecting...
                   </button>
                 )}
