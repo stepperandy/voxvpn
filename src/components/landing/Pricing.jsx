@@ -1,55 +1,143 @@
 import { useState } from 'react';
-// Pricing plans match Stripe products exactly
-import { Check } from 'lucide-react';
+import { Check, Zap } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 
-const plans = [
-  {
-    name: 'Monthly',
-    price: 8.99,
-    billingLabel: 'billed monthly',
-    popular: false,
-    features: ['5 Devices', '50+ Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', 'No-Log Policy'],
-    priceId: 'price_1TDvPiAj5jZA8C2y4aS6FXt1',
-  },
+const PLANS = [
   {
     name: 'Basic',
-    price: 9.99,
-    billingLabel: 'billed monthly',
+    monthlyPrice: 3.99,
+    yearlyPrice: 2.49,
+    yearlyTotal: 29.88,
+    devices: 1,
+    badge: null,
+    color: 'border-white/5 bg-[#0d1120]',
+    btnClass: 'border border-slate-700 hover:border-cyan-500 text-white hover:text-cyan-400',
     popular: false,
-    features: ['5 Devices', '50+ Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', 'No-Log Policy', '3-Day Free Trial'],
-    priceId: 'price_1TFwCxAj5jZA8C2ywLEfaNXR',
-    trial: true,
+    features: [
+      '1 Device',
+      '10+ Server Locations',
+      'Unlimited Bandwidth',
+      'AES-256 Encryption',
+      'No-Logs Policy',
+      'WireGuard Protocol',
+    ],
+    priceId: { monthly: 'price_basic_monthly', yearly: 'price_basic_yearly' },
   },
   {
-    name: 'Annual',
-    price: 4.99,
-    billingLabel: 'billed $59.88/year',
+    name: 'Standard',
+    monthlyPrice: 6.99,
+    yearlyPrice: 4.49,
+    yearlyTotal: 53.88,
+    devices: 3,
+    badge: null,
+    color: 'border-white/5 bg-[#0d1120]',
+    btnClass: 'border border-slate-700 hover:border-cyan-500 text-white hover:text-cyan-400',
+    popular: false,
+    features: [
+      '3 Devices',
+      '30+ Server Locations',
+      'Unlimited Bandwidth',
+      'AES-256 Encryption',
+      'No-Logs Policy',
+      'WireGuard & OpenVPN',
+      'Kill Switch',
+    ],
+    priceId: { monthly: 'price_standard_monthly', yearly: 'price_standard_yearly' },
+  },
+  {
+    name: 'Premium',
+    monthlyPrice: 9.99,
+    yearlyPrice: 6.49,
+    yearlyTotal: 77.88,
+    devices: 5,
+    badge: 'Most Popular',
+    badgeColor: 'bg-cyan-500 text-black',
+    color: 'border-2 border-cyan-500 bg-[#0d1a20] shadow-lg shadow-cyan-500/10',
+    btnClass: 'bg-cyan-500 hover:bg-cyan-400 text-black',
     popular: true,
-    features: ['5 Devices', 'All Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', 'No-Log Policy', 'Priority Support', 'Kill Switch'],
-    priceId: 'price_1TDvPjAj5jZA8C2yKmoBiYce',
-    savings: 'Save 44%',
+    features: [
+      '5 Devices',
+      '50+ Server Locations',
+      'Unlimited Bandwidth',
+      'AES-256 Encryption',
+      'No-Logs Policy',
+      'WireGuard & OpenVPN',
+      'Kill Switch',
+      'Split Tunneling',
+      'DNS Leak Protection',
+      'Priority Support',
+    ],
+    priceId: { monthly: 'price_premium_monthly', yearly: 'price_premium_yearly' },
   },
   {
-    name: '2-Year',
-    price: 2.99,
-    billingLabel: 'billed $71.76 every 2 years',
+    name: 'Advanced',
+    monthlyPrice: 14.99,
+    yearlyPrice: 9.99,
+    yearlyTotal: 119.88,
+    devices: 10,
+    badge: 'Best Value',
+    badgeColor: 'bg-emerald-500 text-black',
+    color: 'border-white/5 bg-[#0d1120]',
+    btnClass: 'border border-slate-700 hover:border-cyan-500 text-white hover:text-cyan-400',
     popular: false,
-    features: ['5 Devices', 'All Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', 'No-Log Policy', '24/7 Support', 'Kill Switch', 'Dedicated IP'],
-    priceId: 'price_1TDvPjAj5jZA8C2yrapCxQbT',
-    savings: 'Best Value',
+    features: [
+      '10 Devices',
+      '60+ Server Locations',
+      'Unlimited Bandwidth',
+      'AES-256 Encryption',
+      'No-Logs Policy',
+      'All VPN Protocols',
+      'Kill Switch',
+      'Split Tunneling',
+      'DNS Leak Protection',
+      'Dedicated IP Address',
+      '24/7 Priority Support',
+      'Double VPN (Multi-hop)',
+    ],
+    priceId: { monthly: 'price_advanced_monthly', yearly: 'price_advanced_yearly' },
+  },
+  {
+    name: 'Enterprise',
+    monthlyPrice: 29.99,
+    yearlyPrice: 19.99,
+    yearlyTotal: 239.88,
+    devices: 'Unlimited',
+    badge: null,
+    color: 'border-violet-500/30 bg-[#120d1a] shadow-lg shadow-violet-500/5',
+    btnClass: 'bg-violet-600 hover:bg-violet-500 text-white',
+    popular: false,
+    features: [
+      'Unlimited Devices',
+      'All 60+ Server Locations',
+      'Unlimited Bandwidth',
+      'AES-256 Encryption',
+      'No-Logs Policy',
+      'All VPN Protocols',
+      'Kill Switch',
+      'Split Tunneling',
+      'DNS & IPv6 Leak Protection',
+      'Static Dedicated IP',
+      'Dedicated Account Manager',
+      'Double VPN (Multi-hop)',
+      'Custom DNS Settings',
+      'Team Management Dashboard',
+      'SLA Guarantee',
+    ],
+    priceId: { monthly: 'price_enterprise_monthly', yearly: 'price_enterprise_yearly' },
   },
 ];
 
-function PlanCard({ plan }) {
+function PlanCard({ plan, yearly }) {
   const [loading, setLoading] = useState(false);
+  const price = yearly ? plan.yearlyPrice : plan.monthlyPrice;
+  const priceId = yearly ? plan.priceId.yearly : plan.priceId.monthly;
 
   const handleCheckout = async () => {
     setLoading(true);
     try {
       const res = await base44.functions.invoke('createStripeCheckout', {
         plan: plan.name,
-        priceId: plan.priceId,
+        priceId,
       });
       if (res.data?.url) {
         window.location.href = res.data.url;
@@ -63,39 +151,39 @@ function PlanCard({ plan }) {
   };
 
   return (
-    <div className={`relative rounded-xl p-6 flex flex-col ${
-      plan.popular
-        ? 'border-2 border-cyan-500 bg-[#0d1a20] shadow-lg shadow-cyan-500/10'
-        : 'border border-white/5 bg-[#0d1120]'
-    }`}>
-      {plan.popular && (
+    <div className={`relative rounded-xl p-6 flex flex-col ${plan.color}`}>
+      {plan.badge && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-          <span className="px-3 py-1 bg-cyan-500 text-black text-xs font-bold rounded-full">Most Popular</span>
+          <span className={`px-3 py-1 text-xs font-bold rounded-full ${plan.badgeColor}`}>{plan.badge}</span>
         </div>
       )}
-      {plan.savings && !plan.popular && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-          <span className="px-3 py-1 bg-emerald-500 text-black text-xs font-bold rounded-full">{plan.savings}</span>
-        </div>
-      )}
-      <h3 className="text-white font-bold text-base mb-1">{plan.name}</h3>
-      <div className="flex items-baseline gap-1 mb-1">
-        <span className="text-3xl font-extrabold text-white">${plan.price}</span>
-        <span className="text-slate-500 text-xs">/month</span>
+
+      <div className="mb-4">
+        <h3 className="text-white font-bold text-base mb-0.5">{plan.name}</h3>
+        <p className="text-slate-600 text-xs">{plan.devices} {typeof plan.devices === 'number' ? 'device' + (plan.devices > 1 ? 's' : '') : 'devices'}</p>
       </div>
-      <p className="text-slate-600 text-xs mb-4">{plan.billingLabel}</p>
-      {plan.trial && <p className="text-cyan-400 text-xs font-semibold mb-3">✓ 3-day free trial</p>}
-      <button onClick={handleCheckout} disabled={loading} className={`w-full py-2.5 rounded text-sm font-bold mb-5 transition-all disabled:opacity-50 ${
-        plan.popular
-          ? 'bg-cyan-500 hover:bg-cyan-400 text-black'
-          : 'border border-slate-700 hover:border-cyan-500 text-white hover:text-cyan-400'
-      }`}>
+
+      <div className="flex items-baseline gap-1 mb-1">
+        <span className="text-3xl font-extrabold text-white">${price}</span>
+        <span className="text-slate-500 text-xs">/mo</span>
+      </div>
+      <p className="text-slate-600 text-xs mb-5">
+        {yearly ? `Billed $${plan.yearlyTotal}/year` : 'Billed monthly'}
+        {yearly && <span className="ml-2 text-emerald-400 font-semibold">Save {Math.round((1 - plan.yearlyPrice / plan.monthlyPrice) * 100)}%</span>}
+      </p>
+
+      <button
+        onClick={handleCheckout}
+        disabled={loading}
+        className={`w-full py-2.5 rounded-lg text-sm font-bold mb-5 transition-all disabled:opacity-50 ${plan.btnClass}`}
+      >
         {loading ? 'Processing...' : `Get ${plan.name}`}
       </button>
+
       <ul className="space-y-2.5 flex-1">
         {plan.features.map((f, fi) => (
           <li key={fi} className="flex items-center gap-2">
-            <Check size={14} className="text-cyan-400 flex-shrink-0" />
+            <Check size={13} className="text-cyan-400 flex-shrink-0" />
             <span className="text-slate-400 text-xs">{f}</span>
           </li>
         ))}
@@ -106,17 +194,14 @@ function PlanCard({ plan }) {
 
 export default function Pricing() {
   const [yearly, setYearly] = useState(false);
-  const visiblePlans = yearly
-    ? plans.filter(p => p.name === 'Annual' || p.name === '2-Year')
-    : plans.filter(p => p.name === 'Monthly' || p.name === 'Basic');
 
   return (
     <section id="pricing" className="bg-[#080c18] py-20 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <div className="text-center mb-10">
           <p className="text-cyan-400 text-xs font-semibold tracking-widest uppercase mb-3">Pricing</p>
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Simple, Transparent Pricing</h2>
-          <p className="text-slate-400 text-sm">All plans include AES-256 encryption and no-log policy</p>
+          <p className="text-slate-400 text-sm">All plans include AES-256 encryption and a strict no-logs policy. Cancel anytime.</p>
         </div>
 
         {/* Toggle */}
@@ -133,14 +218,23 @@ export default function Pricing() {
               className={`px-5 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-2 ${yearly ? 'bg-cyan-500 text-black' : 'text-slate-400 hover:text-white'}`}
             >
               Yearly
-              <span className={`text-xs font-black px-2 py-0.5 rounded-full ${yearly ? 'bg-black/20 text-black' : 'bg-emerald-500/20 text-emerald-400'}`}>-30%</span>
+              <span className={`text-xs font-black px-2 py-0.5 rounded-full ${yearly ? 'bg-black/20 text-black' : 'bg-emerald-500/20 text-emerald-400'}`}>
+                <Zap size={10} className="inline mr-0.5" />Save up to 33%
+              </span>
             </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
-          {visiblePlans.map((plan) => <PlanCard key={plan.name} plan={plan} />)}
+        {/* Plans grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          {PLANS.map((plan) => (
+            <PlanCard key={plan.name} plan={plan} yearly={yearly} />
+          ))}
         </div>
+
+        <p className="text-center text-slate-600 text-xs mt-8">
+          All prices in USD. 30-day money-back guarantee. Secure payment via Stripe.
+        </p>
       </div>
     </section>
   );

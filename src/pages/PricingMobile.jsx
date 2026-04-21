@@ -5,44 +5,57 @@ import MobileSelectSheet from '@/mobile/MobileSelectSheet';
 import { Check } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 
-const plans = [
-  {
-    name: 'Monthly',
-    price: 8.99,
-    billingLabel: 'billed monthly',
-    priceId: 'price_1TDvPiAj5jZA8C2y4aS6FXt1',
-    features: ['5 Devices', '50+ Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', 'No-Log Policy'],
-  },
+const MONTHLY_PLANS = [
   {
     name: 'Basic',
+    price: 3.99,
+    billingLabel: 'billed monthly',
+    priceId: 'price_basic_monthly',
+    features: ['1 Device', '10+ Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', 'No-Logs Policy', 'WireGuard Protocol'],
+  },
+  {
+    name: 'Standard',
+    price: 6.99,
+    billingLabel: 'billed monthly',
+    priceId: 'price_standard_monthly',
+    features: ['3 Devices', '30+ Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', 'No-Logs Policy', 'Kill Switch'],
+  },
+  {
+    name: 'Premium',
     price: 9.99,
     billingLabel: 'billed monthly',
-    priceId: 'price_1TFwCxAj5jZA8C2ywLEfaNXR',
-    trial: true,
-    features: ['5 Devices', '50+ Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', '3-Day Free Trial'],
-  },
-  {
-    name: 'Annual',
-    price: 4.99,
-    billingLabel: '$59.88/year',
-    priceId: 'price_1TDvPjAj5jZA8C2yKmoBiYce',
+    priceId: 'price_premium_monthly',
     popular: true,
-    savings: 'Save 44%',
-    features: ['5 Devices', 'All Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', 'Priority Support', 'Kill Switch'],
+    features: ['5 Devices', '50+ Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', 'No-Logs Policy', 'Kill Switch', 'Split Tunneling', 'Priority Support'],
   },
   {
-    name: '2-Year',
-    price: 2.99,
-    billingLabel: '$71.76 every 2 years',
-    priceId: 'price_1TDvPjAj5jZA8C2yrapCxQbT',
+    name: 'Advanced',
+    price: 14.99,
+    billingLabel: 'billed monthly',
+    priceId: 'price_advanced_monthly',
     savings: 'Best Value',
-    features: ['5 Devices', 'All Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', '24/7 Support', 'Dedicated IP'],
+    features: ['10 Devices', '60+ Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', 'No-Logs Policy', 'Kill Switch', 'Dedicated IP', '24/7 Support'],
   },
+  {
+    name: 'Enterprise',
+    price: 29.99,
+    billingLabel: 'billed monthly',
+    priceId: 'price_enterprise_monthly',
+    features: ['Unlimited Devices', 'All Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', 'No-Logs Policy', 'Kill Switch', 'Dedicated IP', 'Team Dashboard', 'SLA Guarantee'],
+  },
+];
+
+const YEARLY_PLANS = [
+  { name: 'Basic',      price: 2.49, yearlyTotal: 29.88,  priceId: 'price_basic_yearly',      popular: false, savings: 'Save 38%', features: ['1 Device', '10+ Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', 'No-Logs Policy', 'WireGuard Protocol'] },
+  { name: 'Standard',   price: 4.49, yearlyTotal: 53.88,  priceId: 'price_standard_yearly',   popular: false, savings: 'Save 36%', features: ['3 Devices', '30+ Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', 'No-Logs Policy', 'Kill Switch'] },
+  { name: 'Premium',    price: 6.49, yearlyTotal: 77.88,  priceId: 'price_premium_yearly',    popular: true,  savings: 'Save 35%', features: ['5 Devices', '50+ Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', 'No-Logs Policy', 'Kill Switch', 'Split Tunneling', 'Priority Support'] },
+  { name: 'Advanced',   price: 9.99, yearlyTotal: 119.88, priceId: 'price_advanced_yearly',   popular: false, savings: 'Save 33%', features: ['10 Devices', '60+ Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', 'No-Logs Policy', 'Kill Switch', 'Dedicated IP', '24/7 Support'] },
+  { name: 'Enterprise', price: 19.99,yearlyTotal: 239.88, priceId: 'price_enterprise_yearly', popular: false, savings: 'Save 33%', features: ['Unlimited Devices', 'All Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', 'No-Logs Policy', 'Kill Switch', 'Dedicated IP', 'Team Dashboard', 'SLA Guarantee'] },
 ];
 
 const HUBTEL_BASE_LINK = 'https://paylink.hubtel.com/voxvpn';
 
-function PlanCard({ plan, onCheckout, isLoading }) {
+function PlanCard({ plan, onCheckout, isLoading, yearly }) {
   const cedisPrice = (plan.price * 12.5).toFixed(2);
   return (
     <div
@@ -55,15 +68,14 @@ function PlanCard({ plan, onCheckout, isLoading }) {
       {plan.popular && (
         <div className="mb-2 text-xs font-bold text-cyan-400">⭐ MOST POPULAR</div>
       )}
-      {plan.savings && !plan.popular && (
+      {plan.savings && (
         <div className="mb-2 text-xs font-bold text-emerald-400">🏆 {plan.savings}</div>
       )}
       <h3 className="text-white font-bold text-lg">{plan.name}</h3>
       <div className="text-2xl font-black text-white mt-1">
         ${plan.price}<span className="text-xs text-slate-400">/mo</span>
       </div>
-      <p className="text-slate-500 text-xs mb-1">{plan.billingLabel}</p>
-      {plan.trial && <p className="text-cyan-400 text-xs font-semibold mb-2">✓ 3-day free trial</p>}
+      <p className="text-slate-500 text-xs mb-1">{yearly ? `Billed $${plan.yearlyTotal}/year` : plan.billingLabel}</p>
 
       {/* Stripe button */}
       <button
@@ -113,9 +125,7 @@ export default function PricingMobile() {
     if (ref) sessionStorage.setItem('referral_code', ref);
   }, []);
 
-  const visiblePlans = yearly
-    ? plans.filter(p => p.name === 'Annual' || p.name === '2-Year')
-    : plans.filter(p => p.name === 'Monthly' || p.name === 'Basic');
+  const visiblePlans = yearly ? YEARLY_PLANS : MONTHLY_PLANS;
 
   const handleCheckout = async (plan) => {
     setLoadingPlan(plan.name);
@@ -181,6 +191,7 @@ export default function PricingMobile() {
                 plan={plan}
                 onCheckout={handleCheckout}
                 isLoading={loading && loadingPlan === plan.name}
+                yearly={yearly}
               />
             ))}
           </div>
