@@ -1,15 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { VPN_SERVERS } from '@/lib/vpnServers';
 import { VPN_CONFIGS } from '@/lib/vpnConfigs';
-import { Shield, Server, FileText, CheckCircle2, Wifi, WifiOff, Loader2, AlertCircle, X, Search, Zap } from 'lucide-react';
-
-const STATES = {
-  IDLE: 'idle',
-  READY: 'ready',
-  CONNECTING: 'connecting',
-  CONNECTED: 'connected',
-  DISCONNECTED: 'disconnected',
-};
+import { connectToVpn, disconnectVpn, STATES } from '@/lib/vpnConnectionService';
+import { Shield, Server, FileText, Wifi, WifiOff, Loader2, AlertCircle, X, Search, Zap } from 'lucide-react';
 
 function useTimer(running) {
   const [seconds, setSeconds] = useState(0);
@@ -62,15 +55,20 @@ export default function VpnServers() {
     handleConnectClick(target);
   };
 
-  const startConnection = () => {
+  const startConnection = async () => {
     setConnState(STATES.CONNECTING);
-    setTimeout(() => {
+    const config = VPN_CONFIGS[selectedServer.id];
+    const result = await connectToVpn(selectedServer, config);
+    if (result.success) {
       setConnState(STATES.CONNECTED);
       setConnectedServer(selectedServer);
-    }, 2000);
+    } else {
+      setConnState(STATES.FAILED);
+    }
   };
 
-  const disconnect = () => {
+  const disconnect = async () => {
+    await disconnectVpn();
     setConnState(STATES.DISCONNECTED);
     setConnectedServer(null);
     setShowPanel(false);
@@ -117,6 +115,7 @@ export default function VpnServers() {
                 {connState === STATES.CONNECTING && 'Connecting...'}
                 {connState === STATES.CONNECTED && connectedServer?.name}
                 {connState === STATES.DISCONNECTED && 'Disconnected'}
+                {connState === STATES.FAILED && 'Connection Failed'}
               </p>
               <p className="text-slate-600 text-xs">
                 {connState === STATES.CONNECTED ? timer : `${VPN_SERVERS.length} servers available`}
@@ -265,6 +264,7 @@ export default function VpnServers() {
                       {connState === STATES.CONNECTING && 'Connecting...'}
                       {connState === STATES.CONNECTED && 'Connected'}
                       {connState === STATES.DISCONNECTED && 'Disconnected'}
+                      {connState === STATES.FAILED && 'Connection Failed'}
                     </p>
                     <p className="text-slate-500 text-xs">
                       {connState === STATES.CONNECTED ? timer : 'OpenVPN · AES-256-CBC'}
@@ -299,6 +299,11 @@ export default function VpnServers() {
                 {connState === STATES.DISCONNECTED && (
                   <button onClick={startConnection} className="w-full py-3.5 bg-cyan-400 hover:bg-cyan-300 text-black font-black rounded-2xl text-sm transition-all active:scale-[0.98]">
                     Reconnect
+                  </button>
+                )}
+                {connState === STATES.FAILED && (
+                  <button onClick={startConnection} className="w-full py-3.5 bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/20 font-black rounded-2xl text-sm transition-all active:scale-[0.98]">
+                    Retry Connection
                   </button>
                 )}
               </>
