@@ -40,8 +40,8 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
                 className="mt-1.5"
               />
               <div className="flex-1">
-                <p className="text-white font-bold text-sm">Admin Bypass</p>
-                <p className="text-slate-400 text-xs mt-0.5">Grant subscription without payment</p>
+                <p className="text-white font-bold text-sm">Admin Credit</p>
+                <p className="text-slate-400 text-xs mt-0.5">Grant subscription using admin credit balance</p>
               </div>
             </label>
           )}
