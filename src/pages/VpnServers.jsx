@@ -19,7 +19,7 @@ function downloadOvpn(server) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `${server.id}.ovpn`;
+  a.download = `VoxVPN-${server.name}.ovpn`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -73,12 +73,10 @@ export default function VpnServers() {
     <div className="min-h-screen bg-[#060d1a] px-5 pt-14 pb-10">
       {/* Header */}
       <div className="flex items-center gap-3 mb-5">
-        <div className="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
-          <Shield size={18} className="text-cyan-400" />
-        </div>
+        <img src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/5e71f2d6f_image.png" alt="VoxVPN" className="h-10 w-auto" />
         <div>
-          <h1 className="text-white font-black text-xl leading-none">VPN Servers</h1>
-          <p className="text-slate-500 text-xs mt-0.5">{VPN_SERVERS.length} locations available</p>
+          <h1 className="text-white font-black text-xl leading-none">VoxVPN Servers</h1>
+          <p className="text-slate-500 text-xs mt-0.5">{VPN_SERVERS.length} secure locations available</p>
         </div>
       </div>
 
@@ -94,7 +92,7 @@ export default function VpnServers() {
           <div className="flex-1 min-w-0">
             <p className={`font-bold text-sm ${status.color}`}>{status.label}</p>
             <p className="text-slate-600 text-xs truncate">
-              {flow === FLOW.CONNECTED && selectedServer ? `Connected via ${selectedServer.name}` : `${VPN_SERVERS.length} servers available`}
+              {flow === FLOW.CONNECTED && selectedServer ? `VoxVPN connected via ${selectedServer.name}` : `${VPN_SERVERS.length} VoxVPN servers available`}
             </p>
           </div>
           {flow === FLOW.CONNECTED && (
@@ -123,7 +121,7 @@ export default function VpnServers() {
       {/* Server list */}
       <div className="space-y-2.5">
         {filteredServers.length === 0 && (
-          <p className="text-slate-600 text-sm text-center py-8">No servers match "{search}"</p>
+          <p className="text-slate-600 text-sm text-center py-8">No VoxVPN servers match "{search}"</p>
         )}
         {filteredServers.map((server) => {
           const isSel = selectedServer?.id === server.id;
@@ -149,7 +147,7 @@ export default function VpnServers() {
                     </p>
                     <div className="flex items-center gap-1.5 text-slate-600 text-xs mt-0.5">
                       <FileText size={10} />
-                      <span className="font-mono truncate">{server.id}.ovpn</span>
+                      <span className="font-mono truncate">VoxVPN-{server.name}.ovpn</span>
                     </div>
                   </div>
                 </div>
@@ -190,7 +188,7 @@ export default function VpnServers() {
               </div>
               <div>
                 <p className="text-white font-black text-base leading-none">{selectedServer.name}</p>
-                <p className="text-slate-500 text-xs mt-0.5">Server Details</p>
+                <p className="text-slate-500 text-xs mt-0.5">VoxVPN Secure Access</p>
               </div>
             </div>
             <button onClick={() => setSelectedServer(null)} className="text-slate-500 hover:text-white transition-colors p-1">
@@ -214,7 +212,7 @@ export default function VpnServers() {
               <span className="text-slate-500 text-xs uppercase tracking-wider">Config File</span>
               <div className="flex items-center gap-1.5">
                 <FileText size={12} className="text-slate-400" />
-                <span className="text-slate-200 text-xs font-mono">{selectedServer.id}.ovpn</span>
+                <span className="text-slate-200 text-xs font-mono">VoxVPN-{selectedServer.name}.ovpn</span>
               </div>
             </div>
 
@@ -237,7 +235,7 @@ export default function VpnServers() {
           <div className="flex items-start gap-3 p-3 rounded-xl bg-cyan-500/5 border border-cyan-500/15">
             <Info size={14} className="text-cyan-400 flex-shrink-0 mt-0.5" />
             <p className="text-cyan-200/70 text-xs leading-relaxed">
-              Download the config and open it with <span className="font-bold text-cyan-300">OpenVPN Connect</span>
+              Download your VoxVPN profile and open it with <span className="font-bold text-cyan-300">OpenVPN Connect</span>
             </p>
           </div>
 
@@ -249,7 +247,7 @@ export default function VpnServers() {
                 className="w-full py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-black rounded-xl text-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2"
               >
                 <Download size={15} />
-                {flow === FLOW.DOWNLOADED ? 'Re-download Config' : 'Download Config'}
+                {flow === FLOW.DOWNLOADED ? 'Re-download VoxVPN Profile' : 'Download VoxVPN Profile'}
               </button>
 
               {flow === FLOW.DOWNLOADED && (
@@ -273,7 +271,7 @@ export default function VpnServers() {
           ) : (
             <div className="flex items-start gap-3 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
               <AlertCircle size={14} className="text-rose-400 flex-shrink-0 mt-0.5" />
-              <p className="text-rose-300 text-xs">Config not available for this server yet.</p>
+              <p className="text-rose-300 text-xs">VoxVPN profile not available for this server yet.</p>
             </div>
           )}
         </div>

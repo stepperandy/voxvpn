@@ -4,10 +4,10 @@ import { ArrowLeft, Download, ExternalLink, CheckCircle2, Shield, AlertCircle } 
 import { VPN_SERVERS } from '@/lib/vpnServers';
 
 const STEPS = [
-  { num: 1, title: 'Download Config', desc: 'Tap the button below to download your VPN profile.' },
+  { num: 1, title: 'Download VoxVPN Profile', desc: 'Tap the button below to download your VoxVPN config file.' },
   { num: 2, title: 'Open OpenVPN Connect', desc: 'Launch the OpenVPN Connect app on your device.' },
-  { num: 3, title: 'Import Profile', desc: 'Tap "+" → "Import from Files" and select the downloaded profile.' },
-  { num: 4, title: 'Tap Connect', desc: 'Enable the profile to start your encrypted VPN session.' },
+  { num: 3, title: 'Import into OpenVPN Connect', desc: 'Tap "+" → "Import from Files" and select your VoxVPN profile.' },
+  { num: 4, title: 'Connect with VoxVPN', desc: 'Enable the profile to start your VoxVPN encrypted session.' },
 ];
 
 const STATUS = { IDLE: 'idle', READY: 'ready', DOWNLOADED: 'downloaded' };
@@ -29,7 +29,7 @@ export default function ConnectInstructions() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${server.name}.ovpn`;
+    a.download = `VoxVPN-${server.name}.ovpn`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -51,8 +51,9 @@ export default function ConnectInstructions() {
   if (!server) {
     return (
       <div className="min-h-screen bg-[#060d1a] flex flex-col items-center justify-center px-5 gap-4">
-        <AlertCircle size={40} className="text-amber-400" />
-        <p className="text-white font-bold text-lg">Select a server first</p>
+        <img src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/5e71f2d6f_image.png" alt="VoxVPN" className="w-24 h-auto mb-2" />
+        <AlertCircle size={32} className="text-amber-400" />
+        <p className="text-white font-bold text-lg">Select a VoxVPN server first</p>
         <button onClick={() => navigate('/app/servers')}
           className="px-6 py-3 bg-cyan-400 text-black font-bold rounded-2xl">
           Back to Servers
@@ -71,8 +72,9 @@ export default function ConnectInstructions() {
           className="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center text-slate-400 hover:text-white transition-colors">
           <ArrowLeft size={18} />
         </button>
-        <div>
-          <h1 className="text-white font-black text-lg leading-none">Connect to VPN</h1>
+        <img src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/5e71f2d6f_image.png" alt="VoxVPN" className="h-8 w-auto" />
+        <div className="ml-1">
+          <h1 className="text-white font-black text-lg leading-none">VoxVPN Secure Access</h1>
           <p className="text-slate-500 text-xs mt-0.5">{server.name}</p>
         </div>
       </div>
@@ -85,7 +87,7 @@ export default function ConnectInstructions() {
           </div>
           <div>
             <p className="text-white font-black text-xl">{server.name}</p>
-            <p className="text-slate-400 text-sm font-mono">{server.id}.ovpn</p>
+            <p className="text-slate-400 text-sm font-mono">VoxVPN-{server.name}.ovpn</p>
           </div>
           <div className="ml-auto">
             <span className={`px-2 py-1 rounded-full text-xs font-bold ${hasConfig ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}`}>
@@ -99,7 +101,7 @@ export default function ConnectInstructions() {
           <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-start gap-3">
             <CheckCircle2 size={18} className="text-emerald-400 flex-shrink-0 mt-0.5" />
             <p className="text-emerald-300 text-sm leading-relaxed">
-              <strong>{server.name}.ovpn</strong> downloaded. Import it into OpenVPN Connect to start your session.
+              <strong>VoxVPN-{server.name}.ovpn</strong> downloaded. Open this profile in OpenVPN Connect to start your VoxVPN session.
             </p>
           </div>
         )}
@@ -113,7 +115,7 @@ export default function ConnectInstructions() {
 
         {/* Steps */}
         <div className="space-y-2">
-          <p className="text-slate-500 text-xs uppercase tracking-widest font-semibold mb-3">How to Connect</p>
+          <p className="text-slate-500 text-xs uppercase tracking-widest font-semibold mb-3">How to Connect with VoxVPN</p>
           {STEPS.map((step) => (
             <div key={step.num} className="flex gap-3 p-4 rounded-2xl bg-[#0d1120] border border-white/5">
               <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-black ${
@@ -137,8 +139,8 @@ export default function ConnectInstructions() {
             className="w-full py-4 bg-cyan-400 hover:bg-cyan-300 disabled:opacity-40 disabled:cursor-not-allowed text-black font-black rounded-2xl text-base transition-all flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 active:scale-[0.98]"
           >
             {status === STATUS.DOWNLOADED
-              ? <><CheckCircle2 size={18} /> Download Again</>
-              : <><Download size={18} /> {hasConfig ? 'Download Config' : 'Config Not Available'}</>
+              ? <><CheckCircle2 size={18} /> Download VoxVPN Profile Again</>
+              : <><Download size={18} /> {hasConfig ? 'Download VoxVPN Profile' : 'Config Not Available'}</>
             }
           </button>
 
