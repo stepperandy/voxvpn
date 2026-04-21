@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Shield, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 
 const API_BASE = 'https://voxvpn-backend.onrender.com';
 
@@ -60,10 +60,11 @@ export default function Login() {
     <div className="min-h-screen bg-[#060d1a] flex flex-col">
       {/* Header */}
       <div className="flex flex-col items-center pt-16 pb-8 px-6">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/30 mb-4">
-          <Shield size={32} className="text-white" />
-        </div>
-        <h1 className="text-3xl font-black text-white">VoxVPN</h1>
+        <img
+          src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/5e71f2d6f_image.png"
+          alt="VoxVPN"
+          className="w-28 h-auto mb-2 drop-shadow-[0_0_16px_rgba(34,211,238,0.4)]"
+        />
         <p className="text-slate-500 text-sm mt-1">Your privacy, protected</p>
       </div>
 

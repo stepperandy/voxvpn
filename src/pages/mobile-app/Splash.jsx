@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shield } from 'lucide-react';
 
 export default function Splash() {
   const navigate = useNavigate();
@@ -21,13 +20,12 @@ export default function Splash() {
       </div>
 
       <div className="relative flex flex-col items-center gap-6 animate-pulse">
-        <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-2xl shadow-cyan-500/40">
-          <Shield size={48} className="text-white" />
-        </div>
-        <div className="text-center">
-          <h1 className="text-4xl font-black text-white tracking-tight">VoxVPN</h1>
-          <p className="text-cyan-400 text-sm font-medium mt-1 tracking-widest uppercase">Secure · Private · Fast</p>
-        </div>
+        <img
+          src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/5e71f2d6f_image.png"
+          alt="VoxVPN"
+          className="w-36 h-auto drop-shadow-[0_0_24px_rgba(34,211,238,0.5)]"
+        />
+        <p className="text-cyan-400 text-sm font-medium tracking-widest uppercase">Secure · Private · Fast</p>
       </div>
 
       <div className="absolute bottom-12 flex flex-col items-center gap-3">

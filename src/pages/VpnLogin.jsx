@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
+// Logo updated
 
 export default function VpnLogin() {
   useEffect(() => {
