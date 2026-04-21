@@ -107,9 +107,9 @@ export default function Footer() {
           {/* Brand */}
           <div className="col-span-2 sm:col-span-3 lg:col-span-1">
             <img
-              src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/e4e826602_f43645b8-7e9b-46cb-9b95-1fc45590f65b.png"
+              src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/5e71f2d6f_image.png"
               alt="VoxVPN"
-              className="h-10 w-auto mb-4"
+              className="h-16 w-auto mb-4"
             />
             <p className="text-slate-500 text-xs leading-relaxed mb-4">
               Your privacy is our priority. Stay protected, stay unrestricted.
