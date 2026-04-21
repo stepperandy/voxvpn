@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Server, LogOut, Menu, X, Shield, ChevronRight, Home, Download, Link, Radio, TrendingUp } from 'lucide-react';
+import { LayoutDashboard, Users, Server, LogOut, Menu, X, Shield, ChevronRight, Home, Download, Link, Radio, TrendingUp, Megaphone } from 'lucide-react';
 import { useState } from 'react';
 
 const navItems = [
@@ -9,6 +9,7 @@ const navItems = [
   { icon: Link, label: 'Setups', id: 'setups', desc: 'Setup portals' },
   { icon: Download, label: 'Downloads', id: 'downloads', desc: 'Setup files & payments' },
   { icon: TrendingUp, label: 'Analytics', id: 'analytics', desc: 'Real-time traffic & trends' },
+  { icon: Megaphone, label: 'Marketing', id: 'marketing', desc: 'SEO, PPC & AI campaigns' },
 ];
 
 export default function AdminSidebar({ activePage, onNavigate, onLogout }) {

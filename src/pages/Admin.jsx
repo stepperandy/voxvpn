@@ -10,6 +10,7 @@ import DownloadsView from '@/components/admin/DownloadsView';
 import VPNServerManagement from '@/components/admin/VPNServerManagement';
 import VPNServerEditor from '@/components/admin/VPNServerEditor';
 import AnalyticsDashboard from '@/components/admin/AnalyticsDashboard';
+import MarketingView from '@/components/admin/MarketingView';
 
 export default function Admin() {
   const [activePage, setActivePage] = useState('dashboard');
@@ -26,6 +27,7 @@ export default function Admin() {
       case 'setups': return <SetupsView />;
       case 'downloads': return <DownloadsView />;
       case 'analytics': return <AnalyticsDashboard />;
+      case 'marketing': return <MarketingView />;
       default: return <DashboardView />;
     }
   };
