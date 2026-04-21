@@ -14,9 +14,9 @@ export default function TermsOfService() {
             { title: '2. Service Description', content: 'VoxVPN provides a Virtual Private Network service that encrypts your internet connection and masks your IP address. The service is provided as-is and we reserve the right to modify, suspend or discontinue it at any time.' },
             { title: '3. Acceptable Use', content: 'You agree to use VoxVPN only for lawful purposes. You may not use the service for: illegal activities, accessing child exploitation material, spamming or network attacks, infringing intellectual property rights, or circumventing legal orders against you specifically.' },
             { title: '4. Subscriptions & Payments', content: 'VoxVPN subscriptions are billed on a monthly or annual basis. All payments are processed securely by Stripe. Prices are listed in USD and may change with 30 days notice.' },
-            { title: '5. Refund Policy', content: 'We offer a 30-day money-back guarantee for new subscribers. Refund requests after 30 days will be considered on a case-by-case basis. Contact support@voxvpn.net for refund requests.' },
+            { title: '5. Refund Policy', content: 'We offer a 30-day money-back guarantee for new subscribers. Refund requests after 30 days will be considered on a case-by-case basis. Contact support@voxdigits.com for refund requests.' },
             { title: '6. Limitation of Liability', content: 'VoxDigits Communications LLC is not liable for indirect, incidental, or consequential damages arising from your use of the service. Our total liability is limited to the amount you paid in the last 12 months.' },
-            { title: '7. Contact', content: 'VoxDigits Communications LLC — support@voxvpn.net — www.voxvpn.net' },
+            { title: '7. Contact', content: 'VoxDigits Communications LLC — support@voxdigits.com — www.voxvpn.net' },
           ].map(({ title, content }) => (
             <div key={title}>
               <h2 className="text-white font-bold text-base mb-3">{title}</h2>

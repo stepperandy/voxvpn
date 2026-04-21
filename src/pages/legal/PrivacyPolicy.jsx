@@ -201,7 +201,7 @@ export default function PrivacyPolicy() {
             <div className="rounded-xl border border-cyan-500/15 bg-cyan-500/5 p-5 space-y-2 text-sm text-slate-300">
               <p><span className="text-white font-semibold">Company:</span> VoxDigits Communications LLC</p>
               <p><span className="text-white font-semibold">Email:</span>{' '}
-                <a href="mailto:support@voxvpn.net" className="text-cyan-400 hover:underline">support@voxvpn.net</a>
+                <a href="mailto:support@voxdigits.com" className="text-cyan-400 hover:underline">support@voxdigits.com</a>
               </p>
               <p><span className="text-white font-semibold">Website:</span>{' '}
                 <a href="https://www.voxvpn.net" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">www.voxvpn.net</a>

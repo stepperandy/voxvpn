@@ -13,7 +13,7 @@ export default function ContactUs() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-12">
           {[
-            { icon: Mail, title: 'Email Support', desc: 'support@voxvpn.net', sub: 'We reply within 24 hours' },
+            { icon: Mail, title: 'Email Support', desc: 'support@voxdigits.com', sub: 'We reply within 24 hours' },
             { icon: MessageSquare, title: 'Live Chat', desc: 'Available in the app', sub: 'Monday–Friday, 9am–6pm UTC' },
             { icon: Phone, title: 'Phone', desc: '+1 (555) 123-4567', sub: 'Business hours only' },
             { icon: Clock, title: 'Response Time', desc: '< 24 hours', sub: 'Average response time' },
