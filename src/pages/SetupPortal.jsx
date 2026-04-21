@@ -394,7 +394,7 @@ export default function SetupPortal() {
       </main>
 
       <footer className="text-center py-8 text-[#a9b7c9] text-sm border-t border-[#223654]">
-        © 2026 VoxVPN / VoxDigits. Secure setup delivery portal.
+        © 2026 VoxDigits Communications LLC. Secure setup delivery portal. www.voxvpn.net
       </footer>
     </div>
   );

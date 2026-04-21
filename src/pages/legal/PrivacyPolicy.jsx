@@ -120,7 +120,7 @@ export default function PrivacyPolicy() {
       {/* Hero header */}
       <div className="pt-28 pb-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-[#0a1628] to-[#0d1f3c] border-b border-white/5">
         <div className="max-w-3xl mx-auto">
-          <p className="text-cyan-400 text-xs font-bold uppercase tracking-widest mb-3">VoxVPN / VoxDigits</p>
+          <p className="text-cyan-400 text-xs font-bold uppercase tracking-widest mb-3">VoxDigits Communications LLC</p>
           <h1 className="text-4xl sm:text-5xl font-black text-white mb-4">Privacy Policy</h1>
           <p className="text-slate-400 text-base leading-relaxed">
             This Privacy Policy explains how we collect, use, disclose, and protect your information when you use our apps, website, and services.
@@ -140,7 +140,7 @@ export default function PrivacyPolicy() {
           </div>
 
           <p className="text-slate-400 text-sm leading-relaxed">
-            VoxVPN and VoxDigits ("we," "our," or "us") are committed to protecting your privacy.
+            VoxDigits Communications LLC ("we," "our," or "us") are committed to protecting your privacy.
             This Privacy Policy explains how we collect, use, disclose, and safeguard your information
             when you use our mobile applications, websites, and related services.
           </p>
@@ -199,18 +199,18 @@ export default function PrivacyPolicy() {
           <div>
             <h2 className="text-white font-bold text-lg border-b border-white/10 pb-2 mb-4">12. Contact Us</h2>
             <div className="rounded-xl border border-cyan-500/15 bg-cyan-500/5 p-5 space-y-2 text-sm text-slate-300">
-              <p><span className="text-white font-semibold">Company:</span> VoxVPN / VoxDigits</p>
+              <p><span className="text-white font-semibold">Company:</span> VoxDigits Communications LLC</p>
               <p><span className="text-white font-semibold">Email:</span>{' '}
-                <a href="mailto:support@voxdigits.com" className="text-cyan-400 hover:underline">support@voxdigits.com</a>
+                <a href="mailto:support@voxvpn.net" className="text-cyan-400 hover:underline">support@voxvpn.net</a>
               </p>
               <p><span className="text-white font-semibold">Website:</span>{' '}
-                <a href="https://voxdigits.com" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">https://voxdigits.com</a>
+                <a href="https://www.voxvpn.net" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">www.voxvpn.net</a>
               </p>
             </div>
           </div>
         </div>
 
-        <p className="text-center text-slate-600 text-xs mt-8">© 2026 VoxVPN / VoxDigits. All rights reserved.</p>
+        <p className="text-center text-slate-600 text-xs mt-8">© 2026 VoxDigits Communications LLC. All rights reserved.</p>
       </div>
 
       <Footer />
