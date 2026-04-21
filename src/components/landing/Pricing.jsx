@@ -220,7 +220,7 @@ export default function Pricing() {
       // Regular checkout via Stripe
       const res = await base44.functions.invoke('createStripeCheckout', {
         plan: selectedPlan.name,
-        priceId: selectedPriceId,
+        isBilledYearly: selectedYearly,
       });
       if (res.data?.url) {
         window.location.href = res.data.url;

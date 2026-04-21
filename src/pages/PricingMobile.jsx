@@ -177,7 +177,7 @@ export default function PricingMobile() {
       // Regular checkout via Stripe
       const res = await base44.functions.invoke('createStripeCheckout', {
         plan: selectedPlan.name,
-        priceId: selectedPriceId,
+        isBilledYearly: yearly,
       });
       if (res.data?.url) {
         window.location.href = res.data.url;
