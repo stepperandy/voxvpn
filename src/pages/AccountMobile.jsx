@@ -3,6 +3,7 @@ import MobileLayout from '@/mobile/MobileLayout';
 import PullToRefresh from '@/mobile/PullToRefresh';
 import { base44 } from '@/api/base44Client';
 import { LogOut, Trash2, ChevronRight } from 'lucide-react';
+import ReferralWidget from '@/components/ReferralWidget';
 
 export default function AccountMobile() {
   const [user, setUser] = useState(null);
@@ -63,6 +64,11 @@ export default function AccountMobile() {
                     {user.role.toUpperCase()}
                   </div>
                 )}
+              </div>
+
+              {/* Referral */}
+              <div className="mb-6">
+                <ReferralWidget />
               </div>
 
               {/* Actions */}

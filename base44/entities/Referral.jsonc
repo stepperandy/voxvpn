@@ -1,0 +1,37 @@
+{
+  "name": "Referral",
+  "type": "object",
+  "properties": {
+    "referrer_email": {
+      "type": "string",
+      "description": "Email of the user who shared the referral link"
+    },
+    "referee_email": {
+      "type": "string",
+      "description": "Email of the user who signed up via the referral link"
+    },
+    "referral_code": {
+      "type": "string",
+      "description": "Unique referral code belonging to the referrer"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "completed",
+        "rewarded"
+      ],
+      "default": "pending",
+      "description": "pending = signed up but not paid, completed = paid, rewarded = free month granted"
+    },
+    "reward_granted_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the free month reward was applied"
+    }
+  },
+  "required": [
+    "referrer_email",
+    "referral_code"
+  ]
+}

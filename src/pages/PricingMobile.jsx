@@ -1,4 +1,4 @@
-import { useState, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import MobileLayout from '@/mobile/MobileLayout';
 import PullToRefresh from '@/mobile/PullToRefresh';
 import MobileSelectSheet from '@/mobile/MobileSelectSheet';
@@ -106,6 +106,13 @@ export default function PricingMobile() {
   const [loading, setLoading] = useState(false);
   const [loadingPlan, setLoadingPlan] = useState(null);
 
+  // Capture referral code from URL and store it
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref');
+    if (ref) sessionStorage.setItem('referral_code', ref);
+  }, []);
+
   const visiblePlans = yearly
     ? plans.filter(p => p.name === 'Annual' || p.name === '2-Year')
     : plans.filter(p => p.name === 'Monthly' || p.name === 'Basic');
@@ -114,6 +121,17 @@ export default function PricingMobile() {
     setLoadingPlan(plan.name);
     setLoading(true);
     try {
+      // Register referral if one was captured
+      const refCode = sessionStorage.getItem('referral_code');
+      if (refCode) {
+        try {
+          await base44.functions.invoke('referral', { action: 'register_referee', code: refCode });
+          sessionStorage.removeItem('referral_code');
+        } catch (e) {
+          // Non-fatal — proceed with checkout regardless
+        }
+      }
+
       const res = await base44.functions.invoke('createStripeCheckout', {
         plan: plan.name,
         priceId: plan.priceId,
