@@ -1,14 +1,5 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.23';
-
 Deno.serve(async (req) => {
   try {
-    const base44 = createClientFromRequest(req);
-    const user = await base44.auth.me();
-
-    if (!user) {
-      return Response.json({ error: 'Unauthorized', servers: [] }, { status: 200 });
-    }
-
     const apiKey = Deno.env.get("VULTR_API_KEY");
 
     const response = await fetch("https://api.vultr.com/v2/instances?per_page=100", {
