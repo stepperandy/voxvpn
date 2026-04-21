@@ -202,8 +202,9 @@ export default function Navbar() {
       {announcementVisible && (
         <div className="bg-[#0a1a1f] border-b border-cyan-500/20 py-2 px-4 flex items-center justify-center gap-2 text-xs text-slate-300 relative">
           <span>🌐 📱 <span className="text-white font-semibold">Global Communication, Simplified</span> · Get eSIM via{' '}
-            <a href="https://voxdigits.com" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline font-medium">Zendit</a> or{' '}
-            <a href="https://voxdigits.com" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline font-medium">Airalo</a>
+            <a href="https://voxdigits.com" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline font-medium">esimgo</a>, {' '}
+            <a href="https://voxdigits.com" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline font-medium">Airalo</a>, or {' '}
+            <a href="https://voxdigits.com" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline font-medium">Zendit</a>
           </span>
           <button
             onClick={() => setAnnouncementVisible(false)}
