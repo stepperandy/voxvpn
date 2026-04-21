@@ -61,7 +61,7 @@ export default function Navbar() {
               <img
                 src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/5e71f2d6f_image.png"
                 alt="VoxVPN"
-                className="h-14 w-auto"
+                className="h-20 w-auto"
               />
             </Link>
 
