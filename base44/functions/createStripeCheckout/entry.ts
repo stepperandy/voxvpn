@@ -18,16 +18,6 @@ Deno.serve(async (req) => {
       // unauthenticated — continue
     }
 
-    // Admins get free access, skip Stripe checkout
-    if (user?.role === 'admin') {
-      const setupToken = crypto.randomUUID();
-      return Response.json({
-        sessionId: setupToken,
-        url: `${Deno.env.get('APP_URL')}/setup?token=${setupToken}`,
-        freeAccess: true,
-      });
-    }
-
     const customerEmail = user?.email || bodyEmail || undefined;
 
     const stripe = await import('npm:stripe@14.0.0');

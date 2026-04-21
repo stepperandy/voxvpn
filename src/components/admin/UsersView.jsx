@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Loader2, Search, Shield, Trash2, UserPlus, RefreshCw, Filter, Mail, Crown, User } from 'lucide-react';
+import { Loader2, Search, Shield, UserPlus, RefreshCw, Mail, Crown, User, Gift } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { format } from 'date-fns';
@@ -64,6 +64,31 @@ export default function UsersView() {
 
   const toggleAll = () => {
     setSelected(selected.length === filtered.length ? [] : filtered.map(u => u.id));
+  };
+
+  const [grantModal, setGrantModal] = useState(null); // { email, name }
+  const [grantPlan, setGrantPlan] = useState('Standard');
+  const [grantMonths, setGrantMonths] = useState(1);
+  const [granting, setGranting] = useState(false);
+  const [grantMsg, setGrantMsg] = useState('');
+
+  const handleGrant = async () => {
+    setGranting(true);
+    setGrantMsg('');
+    try {
+      await base44.functions.invoke('grantSubscription', {
+        target_email: grantModal.email,
+        plan: grantPlan,
+        billing_cycle: 'monthly',
+        months: grantMonths,
+      });
+      setGrantMsg('✓ Subscription granted successfully!');
+      setTimeout(() => { setGrantModal(null); setGrantMsg(''); }, 1800);
+    } catch (err) {
+      setGrantMsg('Error: ' + err.message);
+    } finally {
+      setGranting(false);
+    }
   };
 
   const adminCount = users.filter(u => u.role === 'admin').length;
@@ -235,15 +260,24 @@ export default function UsersView() {
                           <Mail size={14} />
                         </button>
                         {u.role !== 'admin' && (
-                          <button
-                            onClick={() => handlePromoteAdmin(u.id, u.full_name)}
-                            title="Promote to admin"
-                            className="p-1.5 rounded-lg hover:bg-white/5 text-slate-600 hover:text-violet-400 transition-colors"
-                          >
-                            <Shield size={14} />
-                          </button>
+                         <>
+                           <button
+                             onClick={() => handlePromoteAdmin(u.id, u.full_name)}
+                             title="Promote to admin"
+                             className="p-1.5 rounded-lg hover:bg-white/5 text-slate-600 hover:text-violet-400 transition-colors"
+                           >
+                             <Shield size={14} />
+                           </button>
+                           <button
+                             onClick={() => { setGrantModal({ email: u.email, name: u.full_name }); setGrantMsg(''); }}
+                             title="Grant subscription"
+                             className="p-1.5 rounded-lg hover:bg-white/5 text-slate-600 hover:text-emerald-400 transition-colors"
+                           >
+                             <Gift size={14} />
+                           </button>
+                         </>
                         )}
-                      </div>
+                        </div>
                     </td>
                   </motion.tr>
                 ))}
@@ -263,6 +297,71 @@ export default function UsersView() {
           </div>
         )}
       </div>
+      {/* Grant Subscription Modal */}
+      <AnimatePresence>
+        {grantModal && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4"
+            onClick={(e) => { if (e.target === e.currentTarget) setGrantModal(null); }}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-[#0d1120] border border-white/10 rounded-2xl p-6 w-full max-w-sm space-y-4"
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <Gift size={18} className="text-emerald-400" />
+                <h3 className="text-white font-bold text-base">Grant Subscription</h3>
+              </div>
+              <p className="text-slate-400 text-sm">Granting access to <strong className="text-white">{grantModal.name || grantModal.email}</strong></p>
+
+              <div className="space-y-3">
+                <div>
+                  <label className="text-slate-500 text-xs uppercase tracking-wider block mb-1">Plan</label>
+                  <select
+                    value={grantPlan}
+                    onChange={e => setGrantPlan(e.target.value)}
+                    className="w-full px-3 py-2.5 rounded-xl bg-[#060910] border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500/50"
+                  >
+                    {['Basic', 'Standard', 'Premium', 'Advanced', 'Enterprise'].map(p => (
+                      <option key={p} value={p}>{p}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-slate-500 text-xs uppercase tracking-wider block mb-1">Duration (months)</label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={24}
+                    value={grantMonths}
+                    onChange={e => setGrantMonths(Number(e.target.value))}
+                    className="w-full px-3 py-2.5 rounded-xl bg-[#060910] border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500/50"
+                  />
+                </div>
+              </div>
+
+              {grantMsg && (
+                <p className={`text-sm ${grantMsg.startsWith('✓') ? 'text-emerald-400' : 'text-rose-400'}`}>{grantMsg}</p>
+              )}
+
+              <div className="flex gap-3 pt-1">
+                <button onClick={() => setGrantModal(null)} className="flex-1 py-2.5 rounded-xl border border-white/10 text-slate-400 text-sm font-semibold hover:text-white transition-colors">
+                  Cancel
+                </button>
+                <button
+                  onClick={handleGrant}
+                  disabled={granting}
+                  className="flex-1 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-black text-sm font-bold transition-all flex items-center justify-center gap-2"
+                >
+                  {granting ? <Loader2 size={14} className="animate-spin" /> : <Gift size={14} />}
+                  Grant Access
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
