@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Download, Trash2, Loader2, Check, AlertCircle, Smartphone, Monitor, Wifi, CreditCard, ExternalLink } from 'lucide-react';
+import { Download, Trash2, Loader2, Check, AlertCircle, Smartphone, Monitor, Wifi, CreditCard, ExternalLink, UserCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import UsageCharts from '@/components/dashboard/UsageCharts';
 
@@ -218,13 +219,15 @@ export default function CustomerDashboard() {
     <div className="min-h-screen bg-[#060910] pt-20 pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl sm:text-4xl font-black text-white mb-2">
-            VPN Dashboard
-          </h1>
-          <p className="text-slate-400">
-            Welcome back, {user?.full_name}. Manage your VPN subscription and devices.
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-black text-white mb-2">VPN Dashboard</h1>
+            <p className="text-slate-400">Welcome back, {user?.full_name}. Manage your VPN subscription and devices.</p>
+          </div>
+          <Link to="/profile"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-white/10 hover:border-cyan-500/30 text-slate-400 hover:text-white text-sm font-semibold transition-all self-start sm:self-auto">
+            <UserCircle size={16} /> My Profile
+          </Link>
         </div>
 
         {/* Subscription Status */}

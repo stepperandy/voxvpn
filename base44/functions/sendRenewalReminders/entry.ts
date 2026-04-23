@@ -21,9 +21,9 @@ Deno.serve(async (req) => {
       const renewal = new Date(sub.renewal_date);
       const daysUntilRenewal = Math.ceil((renewal - now) / (1000 * 60 * 60 * 24));
 
-      // Send reminders at 7 days and 3 days before renewal
-      if (daysUntilRenewal === 7 || daysUntilRenewal === 3) {
-        const dayWord = daysUntilRenewal === 1 ? 'day' : 'days';
+      // Send reminder 3 days before renewal
+      if (daysUntilRenewal === 3) {
+        const dayWord = 'days';
         await base44.asServiceRole.integrations.Core.SendEmail({
           to: sub.user_email,
           subject: `⏰ Your VoxVPN subscription renews in ${daysUntilRenewal} ${dayWord}`,
