@@ -20,100 +20,103 @@ const GUIDES = {
   windows: {
     steps: [
       {
-        title: 'Download VoxVPN for Windows',
-        desc: 'Click the "Download Config" button below to get your personal VoxVPN configuration file for Windows.',
+        title: 'Download the VoxVPN Setup Script',
+        desc: 'Click "Download Setup" below — you\'ll get VoxVPN-Windows-Setup.ps1, a branded PowerShell installer.',
       },
       {
-        title: 'Install & Launch',
-        desc: 'Run the downloaded installer and open the VoxVPN app on your Windows device.',
+        title: 'Run as Administrator',
+        desc: 'Right-click the downloaded .ps1 file → select "Run with PowerShell". Click Yes on the UAC prompt to allow admin access.',
       },
       {
-        title: 'Import the Config',
-        desc: 'Inside the VoxVPN app, click "Import" and select the downloaded VoxVPN-Windows.conf file.',
+        title: 'Auto-install OpenVPN',
+        desc: 'The script automatically downloads and silently installs OpenVPN, then writes your personal VoxVPN config into the OpenVPN config folder.',
       },
       {
-        title: 'Connect',
-        desc: 'Click the "Connect" button next to VoxVPN. You\'re now protected!',
+        title: 'Connect via OpenVPN GUI',
+        desc: 'After the script finishes, find the OpenVPN GUI icon in your system tray. Right-click it → select your VoxVPN server → Connect.',
       },
     ],
+    note: '⚠️ Note: We generate a .ps1 PowerShell installer (not a .exe). A branded .exe requires compiling with NSIS/Inno Setup in a build pipeline. The .ps1 does the same job automatically.',
   },
   macos: {
     steps: [
       {
-        title: 'Download VoxVPN for macOS',
-        desc: 'Click the "Download Config" button below to get your personal VoxVPN configuration file for macOS.',
+        title: 'Download the VoxVPN Setup Script',
+        desc: 'Click "Download Setup" — you\'ll get VoxVPN-macOS-Setup.sh, a shell script that installs OpenVPN and your config.',
       },
       {
-        title: 'Install & Launch',
-        desc: 'Open the downloaded file and follow the installation steps. Launch the VoxVPN app.',
+        title: 'Open Terminal and Run',
+        desc: 'Open Terminal (Spotlight → Terminal) and run: sudo bash ~/Downloads/VoxVPN-macOS-Setup.sh',
       },
       {
-        title: 'Import the Config',
-        desc: 'In VoxVPN, click "+" → "Import from file" → select the downloaded VoxVPN-macOS.conf file.',
+        title: 'Auto-install OpenVPN',
+        desc: 'The script installs Homebrew (if needed) and OpenVPN, then writes your VoxVPN config automatically.',
       },
       {
-        title: 'Connect',
-        desc: 'Toggle the VoxVPN connection on. Allow the VPN configuration when macOS prompts you.',
+        title: 'Connected!',
+        desc: 'VoxVPN activates automatically. To disconnect, run: sudo pkill openvpn',
       },
     ],
   },
   linux: {
     steps: [
       {
-        title: 'Download VoxVPN for Linux',
-        desc: 'Click the "Download Config" button below to get your VoxVPN configuration file.',
+        title: 'Download the VoxVPN Setup Script',
+        desc: 'Click "Download Setup" — you\'ll get VoxVPN-Linux-Setup.sh.',
       },
       {
-        title: 'Move Config to VPN Directory',
-        desc: 'Run: sudo mv ~/Downloads/VoxVPN-Linux.conf /etc/voxvpn/voxvpn.conf',
+        title: 'Run in Terminal',
+        desc: 'Open a terminal and run: sudo bash ~/Downloads/VoxVPN-Linux-Setup.sh',
       },
       {
-        title: 'Start VoxVPN',
-        desc: 'Run: sudo voxvpn up\nTo disconnect: sudo voxvpn down\nTo auto-start: sudo systemctl enable voxvpn',
+        title: 'Auto-install OpenVPN',
+        desc: 'The script installs OpenVPN via apt or yum and writes your VoxVPN config to /etc/openvpn/.',
       },
       {
-        title: 'Verify Connection',
-        desc: 'Check your IP has changed to confirm you are connected through VoxVPN.',
+        title: 'Connected!',
+        desc: 'VoxVPN connects automatically. To disconnect: sudo pkill openvpn',
       },
     ],
   },
   ios: {
     steps: [
       {
-        title: 'Download VoxVPN for iPhone / iPad',
-        desc: 'Tap the "Download Config" button below. Your VoxVPN config file will be saved to your Files app.',
+        title: 'Install OpenVPN Connect',
+        desc: 'Download OpenVPN Connect from the App Store — this is the client app that powers VoxVPN on iOS.',
+        action: { label: 'Get OpenVPN Connect', href: 'https://apps.apple.com/app/openvpn-connect/id590379981' },
       },
       {
-        title: 'Install VoxVPN App',
-        desc: 'Search for "VoxVPN" on the App Store and install the official app.',
+        title: 'Download Your VoxVPN Config',
+        desc: 'Tap "Download Config" below. Your VoxVPN .ovpn file will be saved to your Files app.',
       },
       {
-        title: 'Import the Config',
-        desc: 'Open VoxVPN → tap "+" → "Import from Files" → locate the downloaded VoxVPN-iOS.conf.',
+        title: 'Import into OpenVPN Connect',
+        desc: 'Tap the downloaded .ovpn file → "Share" → "Copy to OpenVPN". The profile imports automatically.',
       },
       {
         title: 'Connect',
-        desc: 'Toggle the VoxVPN connection on and allow VPN configuration when prompted.',
+        desc: 'In OpenVPN Connect, tap the VoxVPN profile toggle to ON. Allow VPN configuration when iOS prompts you.',
       },
     ],
   },
   android: {
     steps: [
       {
-        title: 'Download VoxVPN for Android',
-        desc: 'Tap the "Download Config" button below to get your VoxVPN config file.',
+        title: 'Install OpenVPN Connect',
+        desc: 'Download OpenVPN Connect from Google Play — this is the client that runs VoxVPN on Android.',
+        action: { label: 'Get OpenVPN Connect', href: 'https://play.google.com/store/apps/details?id=net.openvpn.openvpn' },
       },
       {
-        title: 'Install VoxVPN App',
-        desc: 'Search for "VoxVPN" on Google Play and install the official app.',
+        title: 'Download Your VoxVPN Config',
+        desc: 'Tap "Download Config" below. The .ovpn file saves to your Downloads folder.',
       },
       {
-        title: 'Import the Config',
-        desc: 'Open VoxVPN → tap "+" → "Import from file" → locate VoxVPN-Android.conf in your Downloads.',
+        title: 'Import into OpenVPN Connect',
+        desc: 'Open OpenVPN Connect → tap "+" → "Import" → "Import from file" → select VoxVPN.ovpn.',
       },
       {
         title: 'Connect',
-        desc: 'Toggle the VoxVPN connection on. Grant VPN permission when Android prompts.',
+        desc: 'Tap the VoxVPN profile to connect. Grant VPN permission when Android prompts.',
       },
     ],
   },
@@ -121,19 +124,19 @@ const GUIDES = {
     steps: [
       {
         title: 'Check Router Compatibility',
-        desc: 'Ensure your router supports VPN client mode. Recommended: GL.iNet routers, or routers running OpenWrt/DD-WRT firmware.',
+        desc: 'Your router must support OpenVPN client mode. Recommended: GL.iNet routers, or routers running OpenWrt / DD-WRT firmware.',
       },
       {
         title: 'Download Your VoxVPN Config',
-        desc: 'Click "Download Config" below for the Router configuration.',
+        desc: 'Click "Download Config" below to get your VoxVPN .ovpn file.',
       },
       {
         title: 'Access Router Admin Panel',
-        desc: 'Log in to your router admin panel (typically 192.168.1.1 or 192.168.0.1) and navigate to VPN settings.',
+        desc: 'Log in to your router admin panel (usually 192.168.1.1) and go to VPN → OpenVPN Client.',
       },
       {
         title: 'Import & Activate',
-        desc: 'Upload the downloaded VoxVPN .conf file in your router\'s VPN section, save, and enable the tunnel.',
+        desc: 'Upload the VoxVPN .ovpn file in the OpenVPN client section, save settings, and enable the tunnel.',
       },
     ],
   },
@@ -317,7 +320,7 @@ export default function OsSetupGuide() {
                     <CheckCircle2 size={14} />
                     Active subscription detected
                   </div>
-                  <p className="text-slate-400 text-xs">Your unique WireGuard config for <strong className="text-white">{osInfo.label}</strong> will be generated and downloaded.</p>
+                  <p className="text-slate-400 text-xs">Your personal OpenVPN config for <strong className="text-white">{osInfo.label}</strong> will be generated and downloaded.</p>
                   <button
                     onClick={handleDownload}
                     disabled={downloading}
@@ -326,10 +329,17 @@ export default function OsSetupGuide() {
                     {downloading ? (
                       <><Loader2 size={16} className="animate-spin" /> Generating...</>
                     ) : (
-                      <><Download size={16} /> Download Config</>
+                      <><Download size={16} /> {['windows','macos','linux'].includes(selectedOS) ? 'Download Setup Script' : 'Download .ovpn Config'}</>
                     )}
                   </button>
-                  <p className="text-slate-600 text-xs text-center">VoxVPN-{osInfo.label.replace(' / ', '-').replace(' ', '')}.conf</p>
+                  <p className="text-slate-600 text-xs text-center">
+                    {['windows','macos','linux'].includes(selectedOS)
+                      ? `VoxVPN-${osInfo.label}-Setup.${selectedOS === 'windows' ? 'ps1' : 'sh'}`
+                      : `VoxVPN-${osInfo.label.replace(' / ', '-').replace(' ', '')}.ovpn`}
+                  </p>
+                  {guide.note && (
+                    <p className="text-amber-400/80 text-[11px] leading-relaxed mt-1">{guide.note}</p>
+                  )}
                 </div>
               )}
             </div>
