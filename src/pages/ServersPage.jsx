@@ -40,11 +40,16 @@ function LoadBar({ pct }) {
 
 // Real VoxVPN servers (from database)
 const REAL_SERVERS = [
-  { city: 'Amsterdam',   country_code: 'NL', region: 'Europe',        ip_address: '45.32.232.63',   ping_ms: 18, load_pct: 32, specialty: 'General' },
-  { city: 'London',      country_code: 'GB', region: 'Europe',        ip_address: '45.76.133.13',   ping_ms: 12, load_pct: 28, specialty: 'Streaming' },
-  { city: 'New Jersey',  country_code: 'US', region: 'North America', ip_address: '45.76.7.211',    ping_ms: 22, load_pct: 41, specialty: 'General' },
-  { city: 'Los Angeles', country_code: 'US', region: 'North America', ip_address: '45.76.170.131',  ping_ms: 35, load_pct: 37, specialty: 'Gaming' },
-  { city: 'Singapore',   country_code: 'SG', region: 'Asia Pacific',  ip_address: '207.148.70.59',  ping_ms: 45, load_pct: 25, specialty: 'Streaming' },
+  { city: 'Amsterdam',    country_code: 'NL', region: 'Europe',         ip_address: '45.32.232.63',  ping_ms: 18, load_pct: 32, specialty: 'General' },
+  { city: 'London',       country_code: 'GB', region: 'Europe',         ip_address: '45.76.133.13',  ping_ms: 12, load_pct: 28, specialty: 'Streaming' },
+  { city: 'Frankfurt',    country_code: 'DE', region: 'Europe',         ip_address: '45.76.81.204',  ping_ms: 15, load_pct: 30, specialty: 'P2P' },
+  { city: 'New Jersey',   country_code: 'US', region: 'North America',  ip_address: '45.76.7.211',   ping_ms: 22, load_pct: 41, specialty: 'General' },
+  { city: 'Los Angeles',  country_code: 'US', region: 'North America',  ip_address: '45.76.170.131', ping_ms: 35, load_pct: 37, specialty: 'Gaming' },
+  { city: 'Chicago',      country_code: 'US', region: 'North America',  ip_address: '137.220.58.77', ping_ms: 28, load_pct: 33, specialty: 'General' },
+  { city: 'San Jose',     country_code: 'US', region: 'North America',  ip_address: '45.63.93.123',  ping_ms: 38, load_pct: 29, specialty: 'Gaming' },
+  { city: 'Singapore',    country_code: 'SG', region: 'Asia Pacific',   ip_address: '207.148.70.59', ping_ms: 45, load_pct: 25, specialty: 'Streaming' },
+  { city: 'Sydney',       country_code: 'AU', region: 'Asia Pacific',   ip_address: '45.77.237.5',   ping_ms: 55, load_pct: 22, specialty: 'General' },
+  { city: 'Johannesburg', country_code: 'ZA', region: 'Africa',         ip_address: '139.84.244.22', ping_ms: 62, load_pct: 18, specialty: 'General' },
 ];
 
 export default function ServersPage() {
