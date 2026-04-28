@@ -1,151 +1,119 @@
 import { useState } from 'react';
-import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
-import { X } from 'lucide-react';
-import 'leaflet/dist/leaflet.css';
 
-const SERVER_LOCATIONS = {
-  lhr: { name: 'London',        country: 'United Kingdom',  flag: '🇬🇧', lat: 51.5,  lng: -0.1  },
-  ewr: { name: 'New York',      country: 'United States',   flag: '🇺🇸', lat: 40.7,  lng: -74.0 },
-  lax: { name: 'Los Angeles',   country: 'United States',   flag: '🇺🇸', lat: 34.0,  lng: -118.2},
-  ord: { name: 'Chicago',       country: 'United States',   flag: '🇺🇸', lat: 41.8,  lng: -87.6 },
-  dfw: { name: 'Dallas',        country: 'United States',   flag: '🇺🇸', lat: 32.8,  lng: -96.8 },
-  sea: { name: 'Seattle',       country: 'United States',   flag: '🇺🇸', lat: 47.6,  lng: -122.3},
-  atl: { name: 'Atlanta',       country: 'United States',   flag: '🇺🇸', lat: 33.7,  lng: -84.4 },
-  mia: { name: 'Miami',         country: 'United States',   flag: '🇺🇸', lat: 25.8,  lng: -80.2 },
-  yto: { name: 'Toronto',       country: 'Canada',          flag: '🇨🇦', lat: 43.7,  lng: -79.4 },
-  ams: { name: 'Amsterdam',     country: 'Netherlands',     flag: '🇳🇱', lat: 52.4,  lng: 4.9   },
-  fra: { name: 'Frankfurt',     country: 'Germany',         flag: '🇩🇪', lat: 50.1,  lng: 8.7   },
-  par: { name: 'Paris',         country: 'France',          flag: '🇫🇷', lat: 48.9,  lng: 2.3   },
-  mad: { name: 'Madrid',        country: 'Spain',           flag: '🇪🇸', lat: 40.4,  lng: -3.7  },
-  waw: { name: 'Warsaw',        country: 'Poland',          flag: '🇵🇱', lat: 52.2,  lng: 21.0  },
-  sto: { name: 'Stockholm',     country: 'Sweden',          flag: '🇸🇪', lat: 59.3,  lng: 18.1  },
-  bom: { name: 'Mumbai',        country: 'India',           flag: '🇮🇳', lat: 19.1,  lng: 72.9  },
-  sgp: { name: 'Singapore',     country: 'Singapore',       flag: '🇸🇬', lat: 1.3,   lng: 103.8 },
-  nrt: { name: 'Tokyo',         country: 'Japan',           flag: '🇯🇵', lat: 35.7,  lng: 139.7 },
-  syd: { name: 'Sydney',        country: 'Australia',       flag: '🇦🇺', lat: -33.9, lng: 151.2 },
-  jnb: { name: 'Johannesburg',  country: 'South Africa',    flag: '🇿🇦', lat: -26.2, lng: 28.0  },
-};
+const SERVER_LOCATIONS = [
+  { key: 'lhr', name: 'London',       country: 'United Kingdom', flag: '🇬🇧', x: 48.5, y: 28 },
+  { key: 'ewr', name: 'New York',     country: 'United States',  flag: '🇺🇸', x: 23,   y: 32 },
+  { key: 'lax', name: 'Los Angeles',  country: 'United States',  flag: '🇺🇸', x: 14,   y: 35 },
+  { key: 'ord', name: 'Chicago',      country: 'United States',  flag: '🇺🇸', x: 20,   y: 30 },
+  { key: 'mia', name: 'Miami',        country: 'United States',  flag: '🇺🇸', x: 22,   y: 40 },
+  { key: 'yto', name: 'Toronto',      country: 'Canada',         flag: '🇨🇦', x: 22,   y: 27 },
+  { key: 'ams', name: 'Amsterdam',    country: 'Netherlands',    flag: '🇳🇱', x: 50,   y: 26 },
+  { key: 'fra', name: 'Frankfurt',    country: 'Germany',        flag: '🇩🇪', x: 51.5, y: 27 },
+  { key: 'par', name: 'Paris',        country: 'France',         flag: '🇫🇷', x: 49,   y: 29 },
+  { key: 'sto', name: 'Stockholm',    country: 'Sweden',         flag: '🇸🇪', x: 53,   y: 20 },
+  { key: 'sgp', name: 'Singapore',    country: 'Singapore',      flag: '🇸🇬', x: 78,   y: 54 },
+  { key: 'nrt', name: 'Tokyo',        country: 'Japan',          flag: '🇯🇵', x: 84,   y: 31 },
+  { key: 'syd', name: 'Sydney',       country: 'Australia',      flag: '🇦🇺', x: 84,   y: 73 },
+  { key: 'jnb', name: 'Johannesburg', country: 'South Africa',   flag: '🇿🇦', x: 56,   y: 70 },
+  { key: 'bom', name: 'Mumbai',       country: 'India',          flag: '🇮🇳', x: 70,   y: 43 },
+];
 
 const PROTOCOLS = ['WireGuard', 'OpenVPN', 'IKEv2'];
 
 export default function WorldMap({ servers = [] }) {
+  const [tooltip, setTooltip] = useState(null);
+
   const getServerData = (key) => servers.find(s => s.location === key);
   const isOnline = (s) => s && s.status === 'active' && s.power === 'running';
 
   return (
-    <div className="relative w-full rounded-2xl overflow-hidden border border-white/5" style={{ height: 420 }}>
-      <style>{`
-        .leaflet-container { background: #060a14; }
-        .leaflet-tile-pane { filter: brightness(0.45) saturate(0.3) hue-rotate(190deg); }
-        .leaflet-control-zoom { display: none; }
-        .leaflet-control-attribution { display: none; }
-        .leaflet-popup-content-wrapper {
-          background: rgba(10,16,32,0.97);
-          border: 1px solid rgba(34,211,238,0.25);
-          border-radius: 12px;
-          box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-          color: white;
-          padding: 0;
-        }
-        .leaflet-popup-tip-container { display: none; }
-        .leaflet-popup-close-button { display: none; }
-        .leaflet-popup-content { margin: 0; }
-      `}</style>
+    <div className="relative w-full rounded-2xl overflow-hidden border border-white/5 bg-[#060a14]" style={{ height: 420 }}>
+      {/* World map background image */}
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: `url("https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/World_map_-_low_resolution.svg/2560px-World_map_-_low_resolution.svg.png")`,
+          backgroundSize: '96% auto',
+          backgroundPosition: 'center 40%',
+          backgroundRepeat: 'no-repeat',
+          filter: 'brightness(0.12) saturate(0.3) hue-rotate(180deg)',
+        }}
+      />
 
-      <MapContainer
-        center={[20, 10]}
-        zoom={2}
-        minZoom={2}
-        maxZoom={5}
-        scrollWheelZoom={false}
-        style={{ width: '100%', height: '100%' }}
-        worldCopyJump={false}
-        maxBounds={[[-85, -180], [85, 180]]}
-        maxBoundsViscosity={1.0}
-      >
-        <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-          attribution=""
-        />
-
-        {Object.entries(SERVER_LOCATIONS).map(([key, loc]) => {
-          const serverData = getServerData(key);
+      {/* SVG overlay with pins */}
+      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+        {SERVER_LOCATIONS.map((loc) => {
+          const serverData = getServerData(loc.key);
           const online = isOnline(serverData);
-          const hasData = !!serverData;
-          const color = hasData ? (online ? '#22d3ee' : '#f43f5e') : '#22d3ee';
-          const ram = serverData?.ram >= 1024 ? `${serverData.ram / 1024}GB` : serverData ? `${serverData.ram}MB` : null;
-
+          const color = serverData ? (online ? '#22d3ee' : '#f43f5e') : '#22d3ee';
           return (
-            <CircleMarker
-              key={key}
-              center={[loc.lat, loc.lng]}
-              radius={6}
-              pathOptions={{
-                color: color,
-                fillColor: color,
-                fillOpacity: 0.9,
-                weight: 2,
-                opacity: 0.8,
-              }}
-            >
-              <Popup>
-                <div className="p-4 min-w-[200px]">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-xl">{loc.flag}</span>
-                    <div>
-                      <p className="text-white font-bold text-sm leading-tight">{loc.name}</p>
-                      <p className="text-slate-400 text-[11px]">{loc.country}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-1.5 mb-3">
-                    <div className={`w-1.5 h-1.5 rounded-full ${hasData ? (online ? 'bg-cyan-400' : 'bg-rose-500') : 'bg-cyan-400'}`} />
-                    <span className={`text-xs font-semibold ${hasData ? (online ? 'text-cyan-400' : 'text-rose-400') : 'text-cyan-400'}`}>
-                      {hasData ? (online ? 'Online' : 'Offline') : 'Available'}
-                    </span>
-                  </div>
-
-                  {serverData && (
-                    <div className="space-y-1.5 mb-3 text-xs text-slate-400">
-                      <div className="flex justify-between gap-4">
-                        <span>IP</span>
-                        <span className="font-mono text-slate-300">{serverData.ip}</span>
-                      </div>
-                      <div className="flex justify-between gap-4">
-                        <span>CPU</span>
-                        <span className="text-slate-300">{serverData.vcpu} vCPU</span>
-                      </div>
-                      <div className="flex justify-between gap-4">
-                        <span>RAM</span>
-                        <span className="text-slate-300">{ram}</span>
-                      </div>
-                    </div>
-                  )}
-
-                  <div>
-                    <p className="text-slate-600 text-[10px] uppercase tracking-wider mb-1.5">Protocols</p>
-                    <div className="flex flex-wrap gap-1">
-                      {PROTOCOLS.map(p => (
-                        <span key={p} className="px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-semibold">
-                          {p}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </Popup>
-            </CircleMarker>
+            <g key={loc.key}>
+              {/* Pulse ring */}
+              <circle
+                cx={loc.x}
+                cy={loc.y}
+                r="1.8"
+                fill={color}
+                opacity="0.15"
+              />
+              {/* Main dot */}
+              <circle
+                cx={loc.x}
+                cy={loc.y}
+                r="0.9"
+                fill={color}
+                opacity="0.9"
+                style={{ cursor: 'pointer' }}
+                onMouseEnter={(e) => setTooltip({ loc, serverData, online, e })}
+                onMouseLeave={() => setTooltip(null)}
+              />
+            </g>
           );
         })}
-      </MapContainer>
+      </svg>
 
-      {/* Legend overlay */}
-      <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-4 py-3 bg-[#060a14]/80 backdrop-blur-sm border-t border-white/5 z-[1000]">
+      {/* Tooltip */}
+      {tooltip && (
+        <div
+          className="absolute z-50 pointer-events-none"
+          style={{
+            left: `${tooltip.loc.x}%`,
+            top: `${tooltip.loc.y}%`,
+            transform: 'translate(-50%, -120%)',
+          }}
+        >
+          <div className="bg-[#0a1020]/97 border border-cyan-500/25 rounded-xl p-3 min-w-[180px] shadow-2xl">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-lg">{tooltip.loc.flag}</span>
+              <div>
+                <p className="text-white font-bold text-sm leading-tight">{tooltip.loc.name}</p>
+                <p className="text-slate-400 text-[11px]">{tooltip.loc.country}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5 mb-2">
+              <div className={`w-1.5 h-1.5 rounded-full ${tooltip.serverData ? (tooltip.online ? 'bg-cyan-400' : 'bg-rose-500') : 'bg-cyan-400'}`} />
+              <span className={`text-xs font-semibold ${tooltip.serverData ? (tooltip.online ? 'text-cyan-400' : 'text-rose-400') : 'text-cyan-400'}`}>
+                {tooltip.serverData ? (tooltip.online ? 'Online' : 'Offline') : 'Available'}
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-1 mt-2">
+              {PROTOCOLS.map(p => (
+                <span key={p} className="px-1.5 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-semibold">
+                  {p}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Legend */}
+      <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-4 py-3 bg-[#060a14]/80 backdrop-blur-sm border-t border-white/5 z-10">
         <div className="flex items-center gap-4 text-xs text-slate-500">
           <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-cyan-400 inline-block" /> Online</span>
           <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-rose-500 inline-block" /> Offline</span>
         </div>
-        <p className="text-slate-600 text-xs">{Object.keys(SERVER_LOCATIONS).length} locations · Click a pin for details</p>
+        <p className="text-slate-600 text-xs">{SERVER_LOCATIONS.length} locations · Hover a pin for details</p>
       </div>
     </div>
   );
