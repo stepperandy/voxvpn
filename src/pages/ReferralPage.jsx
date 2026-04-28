@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
 import { motion } from 'framer-motion';
-import { Copy, CheckCircle2, Gift, Users, Share2, Loader2, Clock, Star } from 'lucide-react';
+import { Copy, CheckCircle2, Gift, Users, Share2, Loader2, Clock, Star, Trophy, Zap, TrendingUp } from 'lucide-react';
 
 const STATUS_STYLES = {
   pending:   { label: 'Pending',   cls: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
@@ -82,23 +82,69 @@ export default function ReferralPage() {
         ) : (
           <div className="space-y-6">
 
-            {/* Stats */}
-            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }}
-              className="grid grid-cols-2 gap-4">
-              <div className="rounded-2xl border border-white/5 bg-[#0d1120] p-6 text-center">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <Users size={16} className="text-cyan-400" />
-                  <span className="text-slate-400 text-sm">Friends Referred</span>
+            {/* Animated Rewards Summary Banner */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.06 }}
+              className="rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-[#0d1a14] to-[#0d1120] p-6 md:p-8 relative overflow-hidden"
+            >
+              {/* Background glow */}
+              <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
+
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
+                  <Trophy size={20} className="text-emerald-400" />
                 </div>
-                <p className="text-4xl font-black text-white">{stats.total_referrals}</p>
-              </div>
-              <div className="rounded-2xl border border-emerald-500/20 bg-[#0d1a14] p-6 text-center">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <Star size={16} className="text-emerald-400" />
-                  <span className="text-slate-400 text-sm">Free Months Earned</span>
+                <div>
+                  <h2 className="text-white font-bold text-lg leading-tight">Your Rewards Summary</h2>
+                  <p className="text-slate-500 text-xs">Updated in real-time</p>
                 </div>
-                <p className="text-4xl font-black text-white">{stats.total_rewards}</p>
               </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                {[
+                  { icon: Users, label: 'Friends Referred', value: stats.total_referrals, color: 'text-cyan-400', border: 'border-cyan-500/20', bg: 'bg-cyan-500/5' },
+                  { icon: Star, label: 'Free Months Earned', value: stats.total_rewards, color: 'text-emerald-400', border: 'border-emerald-500/20', bg: 'bg-emerald-500/5' },
+                  { icon: TrendingUp, label: 'Converted', value: referrals.filter(r => r.status === 'completed' || r.status === 'rewarded').length, color: 'text-violet-400', border: 'border-violet-500/20', bg: 'bg-violet-500/5' },
+                  { icon: Zap, label: 'Pending', value: referrals.filter(r => r.status === 'pending').length, color: 'text-amber-400', border: 'border-amber-500/20', bg: 'bg-amber-500/5' },
+                ].map((stat, i) => {
+                  const Icon = stat.icon;
+                  return (
+                    <motion.div
+                      key={stat.label}
+                      initial={{ opacity: 0, scale: 0.85 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.12 + i * 0.07, type: 'spring', stiffness: 200, damping: 15 }}
+                      className={`rounded-xl border ${stat.border} ${stat.bg} p-4 text-center`}
+                    >
+                      <Icon size={16} className={`${stat.color} mx-auto mb-2`} />
+                      <p className={`text-3xl font-black ${stat.color}`}>{stat.value}</p>
+                      <p className="text-slate-500 text-[11px] mt-1 leading-tight">{stat.label}</p>
+                    </motion.div>
+                  );
+                })}
+              </div>
+
+              {/* Reward milestone message */}
+              {stats.total_rewards > 0 ? (
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="flex items-center gap-3 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20"
+                >
+                  <span className="text-xl">🎉</span>
+                  <p className="text-emerald-300 text-sm font-semibold">
+                    Amazing! You've earned <span className="text-white">{stats.total_rewards} free month{stats.total_rewards > 1 ? 's' : ''}</span> so far. Keep referring to earn more!
+                  </p>
+                </motion.div>
+              ) : (
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-white/3 border border-white/5">
+                  <span className="text-xl">👋</span>
+                  <p className="text-slate-400 text-sm">Share your link to start earning free months for every friend who subscribes.</p>
+                </div>
+              )}
             </motion.div>
 
             {/* Referral Link Card */}
