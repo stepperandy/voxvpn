@@ -160,7 +160,7 @@ Include diverse global locations across NA, Europe, APAC, MENA, LATAM.`,
               <Globe size={12} /> Global Server Network
             </div>
             <h1 className="text-4xl sm:text-6xl font-black text-white mb-6 leading-tight">
-              {aiContent?.headline || 'Connect to the World's Fastest VPN Servers'}
+              {aiContent?.headline || "Connect to the World's Fastest VPN Servers"}
             </h1>
             <p className="text-slate-400 text-lg max-w-2xl mx-auto leading-relaxed">
               {aiContent?.subheadline || 'VoxVPN operates a global network of high-speed, zero-log servers across 60+ locations in 40+ countries.'}
