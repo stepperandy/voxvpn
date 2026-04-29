@@ -69,7 +69,12 @@ export default function VoxVPNApp() {
           setSelectedServer(best);
         }
       } catch (err) {
-        setError(err.message || 'Failed to load. Please ensure you have an active subscription.');
+        const msg = err.message || '';
+        if (msg.includes('subscription') || msg.includes('404') || msg.includes('Unauthorized')) {
+          setError('You need an active VoxVPN subscription to access the app.');
+        } else {
+          setError(msg || 'Failed to load. Please try again.');
+        }
       } finally {
         setLoading(false);
       }
@@ -140,9 +145,20 @@ export default function VoxVPNApp() {
           <WifiOff size={32} className="text-rose-400 mx-auto" />
           <h2 className="text-white font-bold text-xl">Cannot Connect</h2>
           <p className="text-slate-400 text-sm">{error}</p>
-          <a href="/#pricing" className="inline-block px-6 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-xl text-sm transition-all">
-            Get a Subscription
-          </a>
+          <div className="flex flex-col gap-3 items-center">
+            <button
+              onClick={() => { window.location.href = '/'; setTimeout(() => { const el = document.getElementById('pricing'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }, 300); }}
+              className="px-6 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-xl text-sm transition-all"
+            >
+              View Plans & Subscribe
+            </button>
+            <button
+              onClick={() => window.location.href = '/dashboard'}
+              className="text-slate-500 hover:text-slate-300 text-xs transition-colors"
+            >
+              Go to Dashboard →
+            </button>
+          </div>
         </div>
       </div>
     );
