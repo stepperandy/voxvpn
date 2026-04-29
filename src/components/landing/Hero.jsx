@@ -1,5 +1,18 @@
 import { motion } from 'framer-motion';
-import { Lock, Shield, Globe, Zap, Play, ArrowRight } from 'lucide-react';
+import { Lock, Shield, Globe, Zap, Play, ArrowRight, Eye, EyeOff, Wifi, Key, Fingerprint, ShieldCheck, RadioTower, Server } from 'lucide-react';
+
+const FLYING_ICONS = [
+  { Icon: Lock,        x: '8%',  y: '15%', size: 18, duration: 14, delay: 0,   rotate: 25  },
+  { Icon: ShieldCheck, x: '88%', y: '10%', size: 22, duration: 18, delay: 1,   rotate: -15 },
+  { Icon: Key,         x: '5%',  y: '55%', size: 16, duration: 12, delay: 2.5, rotate: 40  },
+  { Icon: Wifi,        x: '92%', y: '45%', size: 20, duration: 16, delay: 0.8, rotate: -30 },
+  { Icon: Globe,       x: '15%', y: '78%', size: 24, duration: 20, delay: 1.5, rotate: 10  },
+  { Icon: Eye,         x: '82%', y: '75%', size: 17, duration: 13, delay: 3,   rotate: -20 },
+  { Icon: Fingerprint, x: '75%', y: '20%', size: 21, duration: 17, delay: 0.5, rotate: 35  },
+  { Icon: Server,      x: '20%', y: '35%', size: 15, duration: 11, delay: 2,   rotate: -10 },
+  { Icon: RadioTower,  x: '60%', y: '82%', size: 19, duration: 15, delay: 1.2, rotate: 20  },
+  { Icon: EyeOff,      x: '40%', y: '8%',  size: 16, duration: 19, delay: 3.5, rotate: -25 },
+];
 
 const TRUST_BADGES = [
   { icon: Lock,   label: 'No-Logs Policy' },
@@ -30,6 +43,31 @@ export default function Hero() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[200px] rounded-full blur-3xl pointer-events-none"
         style={{ background: 'radial-gradient(ellipse, rgba(139,92,246,0.08) 0%, transparent 70%)' }}
       />
+
+      {/* Flying security objects */}
+      {FLYING_ICONS.map(({ Icon, x, y, size, duration, delay, rotate }, i) => (
+        <motion.div
+          key={i}
+          className="absolute pointer-events-none"
+          style={{ left: x, top: y }}
+          initial={{ opacity: 0 }}
+          animate={{
+            opacity: [0, 0.18, 0.12, 0.2, 0],
+            y: [0, -30, -55, -80, -110],
+            x: [0, 12 * (i % 2 === 0 ? 1 : -1), 6, 18 * (i % 2 === 0 ? 1 : -1), 0],
+            rotate: [rotate, rotate + 20, rotate - 10, rotate + 30, rotate],
+            scale: [0.8, 1, 1.1, 0.95, 0.7],
+          }}
+          transition={{
+            duration,
+            delay,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        >
+          <Icon size={size} className="text-cyan-400" style={{ filter: 'drop-shadow(0 0 6px rgba(34,211,238,0.5))' }} />
+        </motion.div>
+      ))}
 
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center text-center max-w-4xl mx-auto w-full">
