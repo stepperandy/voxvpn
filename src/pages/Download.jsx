@@ -18,7 +18,7 @@ const PLATFORMS = [
     bg: 'bg-blue-500/5',
     badge: 'Windows 10 / 11',
     file: 'VoxVPN-Setup.exe',
-    directUrl: 'https://voxvpn.net/downloads/VoxVPN-Setup.exe',
+    directUrl: 'https://github.com/stepperandy/VoxVPN-Backend-Soft/releases/download/voxvpn.exe/VoxVPN-Setup.exe',
     desc: 'One-click installer for Windows 10 and 11. Installs and configures VoxVPN automatically.',
     steps: ['Download VoxVPN-Setup.exe', 'Double-click the installer and follow the prompts', 'VoxVPN installs and connects automatically', 'Look for VoxVPN in your system tray'],
   },
@@ -203,7 +203,7 @@ export default function DownloadPage() {
               <h2 className="text-white font-black text-xl mb-2">Download VoxVPN</h2>
               <p className="text-slate-400 text-sm mb-5">Click below to download the Windows installer.</p>
               <a
-                href="https://voxvpn.net/downloads/VoxVPN-Setup.exe"
+                href="https://github.com/stepperandy/VoxVPN-Backend-Soft/releases/download/voxvpn.exe/VoxVPN-Setup.exe"
                 download
                 className="inline-flex items-center gap-2 px-7 py-3 bg-emerald-400 hover:bg-emerald-300 text-black font-black rounded-xl text-sm transition-all"
               >
