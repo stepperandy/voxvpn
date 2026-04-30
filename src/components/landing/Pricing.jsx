@@ -236,7 +236,17 @@ export default function Pricing() {
   };
 
   return (
-    <section id="pricing" className="bg-[#080c18] py-20 px-4 sm:px-6 lg:px-8">
+    <section id="pricing" className="relative bg-[#080c18] py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      {/* Background world map image */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: `url("https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/2f2ad398a_image.png")`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center center',
+          opacity: 0.18,
+        }}
+      />
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-10">
           <p className="text-cyan-400 text-xs font-semibold tracking-widest uppercase mb-3">Pricing</p>
