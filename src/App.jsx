@@ -77,6 +77,8 @@ const ServersPage = lazy(() => import('./pages/ServersPage.jsx'));
 const DownloadPage = lazy(() => import('./pages/Download.jsx'));
 const AccountSettings = lazy(() => import('./pages/AccountSettings.jsx'));
 const AffiliatePage = lazy(() => import('./pages/AffiliatePage.jsx'));
+const AffiliateRegister = lazy(() => import('./pages/AffiliateRegister.jsx'));
+const AffiliateDashboard = lazy(() => import('./pages/AffiliateDashboard.jsx'));
 
 const PageTransition = ({ children }) => (
   <motion.div
@@ -172,6 +174,8 @@ const AuthenticatedApp = ({ isMobileDevice }) => {
           <Route path="/download" element={<PageTransition><DownloadPage /></PageTransition>} />
           <Route path="/account-settings" element={<PageTransition><AccountSettings /></PageTransition>} />
           <Route path="/affiliate" element={<PageTransition><AffiliatePage /></PageTransition>} />
+          <Route path="/affiliate-register" element={<PageTransition><AffiliateRegister /></PageTransition>} />
+          <Route path="/affiliate-dashboard" element={<PageTransition><AffiliateDashboard /></PageTransition>} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </Suspense>

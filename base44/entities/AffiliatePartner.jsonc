@@ -1,0 +1,88 @@
+{
+  "name": "AffiliatePartner",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email of the affiliate/partner user"
+    },
+    "full_name": {
+      "type": "string",
+      "description": "Full name of the applicant"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "affiliate",
+        "partner"
+      ],
+      "default": "affiliate",
+      "description": "Type: affiliate (commission per sale) or partner (reseller/business)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected",
+        "suspended"
+      ],
+      "default": "pending",
+      "description": "Approval status"
+    },
+    "affiliate_code": {
+      "type": "string",
+      "description": "Unique affiliate tracking code"
+    },
+    "commission_rate": {
+      "type": "number",
+      "default": 20,
+      "description": "Commission percentage (e.g. 20 = 20%)"
+    },
+    "website": {
+      "type": "string",
+      "description": "Applicant website or social media URL"
+    },
+    "promotion_method": {
+      "type": "string",
+      "description": "How they plan to promote VoxVPN"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Admin internal notes"
+    },
+    "total_clicks": {
+      "type": "integer",
+      "default": 0,
+      "description": "Total link clicks tracked"
+    },
+    "total_conversions": {
+      "type": "integer",
+      "default": 0,
+      "description": "Total paying customers referred"
+    },
+    "total_earnings": {
+      "type": "number",
+      "default": 0,
+      "description": "Total commissions earned (USD)"
+    },
+    "paid_earnings": {
+      "type": "number",
+      "default": 0,
+      "description": "Total commissions already paid out (USD)"
+    },
+    "payment_method": {
+      "type": "string",
+      "description": "Preferred payout method (PayPal, bank, crypto)"
+    },
+    "payment_details": {
+      "type": "string",
+      "description": "Payout account details"
+    }
+  },
+  "required": [
+    "user_email",
+    "full_name",
+    "type"
+  ]
+}
