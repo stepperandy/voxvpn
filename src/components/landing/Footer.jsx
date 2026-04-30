@@ -180,11 +180,11 @@ export default function Footer() {
         {/* App store badges */}
         <div className="border-t border-white/5 pt-8 flex flex-col sm:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-3">
-            <a href="#" className="hover:opacity-90 transition-opacity">
-              <img src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/500ebc6c2_generated_image.png" alt="Apple App Store" className="h-10 w-auto" />
+            <a href="https://apps.apple.com/app/openvpn-connect/id590379981" target="_blank" rel="noopener noreferrer" className="hover:opacity-90 transition-opacity">
+              <img src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/49e04d038_image.png" alt="Download on the App Store" className="h-10 w-auto" />
             </a>
-            <a href="#" className="hover:opacity-90 transition-opacity">
-              <img src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/04eefca08_generated_image.png" alt="Google Play Store" className="h-10 w-auto" />
+            <a href="https://play.google.com/store/apps/details?id=net.openvpn.openvpn" target="_blank" rel="noopener noreferrer" className="hover:opacity-90 transition-opacity">
+              <img src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/1349633d5_image.png" alt="Get it on Google Play" className="h-10 w-auto" />
             </a>
           </div>
 
