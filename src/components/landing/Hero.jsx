@@ -86,14 +86,14 @@ export default function Hero() {
       ))}
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center text-center max-w-4xl mx-auto w-full">
+      <div className="relative z-10 flex flex-col items-center text-center max-w-7xl mx-auto w-full px-4">
 
         {/* Headline */}
         <motion.h1
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-5xl sm:text-6xl lg:text-7xl font-black leading-[1.05] tracking-tight mb-6"
+          className="text-6xl sm:text-7xl lg:text-9xl font-black leading-[1.02] tracking-tight mb-8"
           style={{
             background: 'linear-gradient(90deg, #a78bfa 0%, #22d3ee 55%, #34d399 100%)',
             WebkitBackgroundClip: 'text',
@@ -109,7 +109,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15, duration: 0.6 }}
-          className="text-slate-400 text-lg max-w-xl leading-relaxed mb-8"
+          className="text-slate-400 text-xl max-w-3xl leading-relaxed mb-10"
         >
           VoxVPN shields your identity with military-grade encryption, a strict no-logs policy, and blazing-fast VoxVPN servers in 10+ countries.
         </motion.p>
@@ -144,7 +144,7 @@ export default function Hero() {
           className="relative flex items-center justify-center mb-10"
         >
           {/* Shield glow blob */}
-          <div className="absolute w-72 h-72 rounded-full blur-3xl pointer-events-none"
+          <div className="absolute w-[520px] h-[520px] rounded-full blur-3xl pointer-events-none"
             style={{ background: 'radial-gradient(circle, rgba(34,211,238,0.35) 0%, transparent 70%)' }}
           />
           {/* Animated pulse rings */}
@@ -152,7 +152,7 @@ export default function Hero() {
             <motion.div
               key={i}
               className="absolute rounded-full border border-cyan-400/30"
-              style={{ width: 160 + i * 60, height: 160 + i * 60 }}
+              style={{ width: 300 + i * 90, height: 300 + i * 90 }}
               animate={{ scale: [1, 1.12, 1], opacity: [0.4, 0.1, 0.4] }}
               transition={{ duration: 3, repeat: Infinity, delay: i * 0.8, ease: 'easeInOut' }}
             />
@@ -163,7 +163,7 @@ export default function Hero() {
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
             className="relative z-10"
           >
-            <svg width="200" height="228" viewBox="0 0 88 100" fill="none"
+            <svg width="380" height="434" viewBox="0 0 88 100" fill="none"
               style={{ filter: 'drop-shadow(0 0 24px rgba(34,211,238,0.7)) drop-shadow(0 0 60px rgba(34,211,238,0.3))' }}
             >
               <defs>
@@ -217,7 +217,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="w-full max-w-sm rounded-2xl border border-white/10 overflow-hidden"
+          className="w-full max-w-2xl rounded-2xl border border-white/10 overflow-hidden"
           style={{ background: 'rgba(10,16,30,0.92)', backdropFilter: 'blur(16px)' }}
         >
           {/* Card header */}
