@@ -3,7 +3,7 @@ import { Lock, Zap, Shield, Globe, AlertCircle, Smartphone, Wifi, GitBranch } fr
 
 const features = [
   { icon: Lock,         title: 'No-Logs Policy',       description: 'We never record your browsing activity, IP address, or DNS queries.',       color: 'text-cyan-400',   bg: 'from-cyan-500/10 to-transparent',   border: 'border-cyan-500/20' },
-  { icon: Zap,          title: 'Lightning Fast',        description: 'Optimized OpenVPN routing ensures minimal speed loss globally.',           color: 'text-amber-400',  bg: 'from-amber-500/10 to-transparent',  border: 'border-amber-500/20' },
+  { icon: Zap,          title: 'Lightning Fast',        description: 'Optimized VoxVPN routing ensures minimal speed loss globally.',           color: 'text-amber-400',  bg: 'from-amber-500/10 to-transparent',  border: 'border-amber-500/20' },
   { icon: Shield,       title: 'AES-256 Encryption',    description: 'Military-grade encryption protects every byte of your data in transit.',    color: 'text-violet-400', bg: 'from-violet-500/10 to-transparent', border: 'border-violet-500/20' },
   { icon: Globe,        title: 'Bypass Geo-Blocks',     description: 'Access Netflix, BBC iPlayer, Hulu and any geo-restricted content.',         color: 'text-emerald-400',bg: 'from-emerald-500/10 to-transparent',border: 'border-emerald-500/20' },
   { icon: AlertCircle,  title: 'Kill Switch',           description: 'If your VPN drops, our kill switch instantly cuts your internet.',           color: 'text-rose-400',   bg: 'from-rose-500/10 to-transparent',   border: 'border-rose-500/20' },

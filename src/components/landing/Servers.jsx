@@ -35,7 +35,7 @@ const REGION_GROUPS = [
 ];
 
 const PERKS = [
-  { icon: Zap,    label: 'OpenVPN Protocol',      desc: 'Industry-leading encryption' },
+  { icon: Zap,    label: 'VoxVPN Protocol',        desc: 'Industry-leading encryption' },
   { icon: Shield, label: 'AES-256 Encrypted',    desc: 'Military-grade security' },
   { icon: Wifi,   label: '10 Gbps Uplinks',      desc: 'Blazing-fast backbone' },
   { icon: Globe,  label: '4 Continents',         desc: 'Truly global coverage' },
@@ -84,7 +84,7 @@ export default function Servers() {
             <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent"> Continent</span>
           </h2>
           <p className="text-slate-400 text-base max-w-lg mx-auto">
-            Connect through our high-speed infrastructure in 10+ countries. Every server runs OpenVPN with AES-256 encryption.
+            Connect through our high-speed infrastructure in 10+ countries. Every server runs VoxVPN with AES-256 encryption.
           </p>
         </motion.div>
 

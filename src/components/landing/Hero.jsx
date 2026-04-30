@@ -111,7 +111,7 @@ export default function Hero() {
           transition={{ delay: 0.15, duration: 0.6 }}
           className="text-slate-400 text-lg max-w-xl leading-relaxed mb-8"
         >
-          VoxVPN shields your identity with military-grade encryption, a strict no-logs policy, and blazing-fast OpenVPN servers in 10+ countries.
+          VoxVPN shields your identity with military-grade encryption, a strict no-logs policy, and blazing-fast VoxVPN servers in 10+ countries.
         </motion.p>
 
         {/* CTAs */}

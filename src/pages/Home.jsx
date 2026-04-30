@@ -32,7 +32,7 @@ function MobileHome() {
               <span className="text-cyan-400 italic">Connect through VoxVPN.</span>
             </h1>
             <p className="text-slate-400 text-sm leading-relaxed mb-6">
-              Military-grade encryption, no-logs policy, blazing-fast OpenVPN protocol.
+              Military-grade encryption, no-logs policy, blazing-fast VoxVPN protocol.
             </p>
             <div className="flex gap-3 mb-6">
               {['No-Logs', 'AES-256', '10+ Locations', 'Kill Switch'].map((f) => (
@@ -57,7 +57,7 @@ function MobileHome() {
               {[
                 { icon: Shield, title: 'No-Logs Policy', desc: 'We never track your activity, IP, or browsing history.' },
                 { icon: Lock, title: 'AES-256 Encryption', desc: 'Military-grade encryption on all your traffic.' },
-                { icon: Zap, title: 'OpenVPN Protocol', desc: 'Industry-standard VPN protocol with minimal speed loss.' },
+                { icon: Zap, title: 'VoxVPN Protocol', desc: 'Industry-standard VPN protocol with minimal speed loss.' },
                 { icon: Globe, title: '10+ Server Locations', desc: 'Connect from servers in top countries worldwide.' },
               ].map(({ icon: Icon, title, desc }) => (
                 <div key={title} className="p-4 rounded-xl border border-white/5 bg-[#0d1120] flex items-start gap-3">

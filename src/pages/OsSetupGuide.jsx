@@ -325,7 +325,7 @@ export default function OsSetupGuide() {
                     <CheckCircle2 size={14} />
                     Active subscription detected
                   </div>
-                  <p className="text-slate-400 text-xs">Your personal OpenVPN config for <strong className="text-white">{osInfo.label}</strong> will be generated and downloaded.</p>
+                  <p className="text-slate-400 text-xs">Your personal VoxVPN config for <strong className="text-white">{osInfo.label}</strong> will be generated and downloaded.</p>
                   <button
                     onClick={handleDownload}
                     disabled={downloading}

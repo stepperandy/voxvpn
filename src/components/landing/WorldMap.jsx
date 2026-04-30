@@ -187,7 +187,7 @@ export default function WorldMap({ servers = [] }) {
                 <span className="text-xs text-slate-500 bg-white/5 px-2 py-0.5 rounded-full">{tooltip.loc.region}</span>
               </div>
               <div className="flex gap-1.5 mt-2.5">
-                {['OpenVPN', 'AES-256'].map(p => (
+                {['VoxVPN', 'AES-256'].map(p => (
                   <span key={p} className="px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-bold">{p}</span>
                 ))}
               </div>

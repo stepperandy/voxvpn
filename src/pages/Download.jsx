@@ -291,7 +291,7 @@ export default function DownloadPage() {
 
               <div className="mt-5 pt-5 border-t border-white/5 space-y-3">
                 <div className="flex items-center gap-2 text-slate-500 text-xs">
-                  <Shield size={12} className="text-cyan-500" /> AES-256 · No-Logs · OpenVPN
+                  <Shield size={12} className="text-cyan-500" /> AES-256 · No-Logs · VoxVPN
                 </div>
                 <a href="/contact" className="block text-xs text-slate-500 hover:text-cyan-400 transition-colors">Need help? Contact Support →</a>
               </div>
