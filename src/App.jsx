@@ -79,6 +79,9 @@ const AccountSettings = lazy(() => import('./pages/AccountSettings.jsx'));
 const AffiliatePage = lazy(() => import('./pages/AffiliatePage.jsx'));
 const AffiliateRegister = lazy(() => import('./pages/AffiliateRegister.jsx'));
 const AffiliateDashboard = lazy(() => import('./pages/AffiliateDashboard.jsx'));
+const Blog = lazy(() => import('./pages/Blog.jsx'));
+const BlogPost = lazy(() => import('./pages/BlogPost.jsx'));
+const Press = lazy(() => import('./pages/Press.jsx'));
 
 const PageTransition = ({ children }) => (
   <motion.div
@@ -176,6 +179,9 @@ const AuthenticatedApp = ({ isMobileDevice }) => {
           <Route path="/affiliate" element={<PageTransition><AffiliatePage /></PageTransition>} />
           <Route path="/affiliate-register" element={<PageTransition><AffiliateRegister /></PageTransition>} />
           <Route path="/affiliate-dashboard" element={<PageTransition><AffiliateDashboard /></PageTransition>} />
+          <Route path="/blog" element={<PageTransition><Blog /></PageTransition>} />
+          <Route path="/blog/:slug" element={<PageTransition><BlogPost /></PageTransition>} />
+          <Route path="/press" element={<PageTransition><Press /></PageTransition>} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </Suspense>
