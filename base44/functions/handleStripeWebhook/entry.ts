@@ -1,4 +1,45 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.23';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+
+// Plan → max devices mapping
+const PLAN_DEVICES = {
+  'Basic': 1,
+  'Standard': 3,
+  'Premium': 5,
+  'Advanced': 10,
+  'Enterprise': 999,
+};
+
+async function syncSubscription(base44, customerEmail, plan, stripeSubscriptionId, status, billingCycle) {
+  // Find existing subscription record
+  const subs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: customerEmail });
+  const existing = subs.find(s => s.stripe_subscription_id === stripeSubscriptionId) || subs[0];
+
+  const renewalDate = new Date();
+  if (billingCycle === 'yearly') {
+    renewalDate.setFullYear(renewalDate.getFullYear() + 1);
+  } else {
+    renewalDate.setMonth(renewalDate.getMonth() + 1);
+  }
+
+  const subData = {
+    user_email: customerEmail,
+    plan: plan || existing?.plan || 'Basic',
+    status: status,
+    billing_cycle: billingCycle || existing?.billing_cycle || 'monthly',
+    stripe_subscription_id: stripeSubscriptionId,
+    renewal_date: renewalDate.toISOString(),
+    max_devices: PLAN_DEVICES[plan || existing?.plan || 'Basic'] || 1,
+    price: 0,
+  };
+
+  if (existing) {
+    await base44.asServiceRole.entities.VPNSubscription.update(existing.id, subData);
+    console.log(`Updated subscription for ${customerEmail}: ${status}`);
+  } else {
+    await base44.asServiceRole.entities.VPNSubscription.create(subData);
+    console.log(`Created subscription for ${customerEmail}: ${status}`);
+  }
+}
 
 Deno.serve(async (req) => {
   try {
@@ -19,9 +60,12 @@ Deno.serve(async (req) => {
       Deno.env.get('STRIPE_WEBHOOK_SECRET')
     );
 
+    console.log(`Stripe event: ${event.type}`);
+
+    // ── 1. New checkout completed ─────────────────────────────────────────────
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
-      const { plan, user_id, email } = session.metadata || {};
+      const { plan, billing, user_id, email } = session.metadata || {};
       const customerEmail = email || session.customer_email;
 
       if (!customerEmail) {
@@ -29,7 +73,17 @@ Deno.serve(async (req) => {
         return Response.json({ received: true });
       }
 
-      // 1. Provision VPN credentials for the user (generates keypair + assigns server)
+      // Sync subscription record
+      await syncSubscription(
+        base44,
+        customerEmail,
+        plan,
+        session.subscription,
+        'active',
+        billing || 'monthly'
+      );
+
+      // Provision VPN credentials
       const provisionRes = await base44.asServiceRole.functions.invoke('provisionVpnUser', {
         email: customerEmail,
         plan: plan || 'Basic',
@@ -40,7 +94,7 @@ Deno.serve(async (req) => {
 
       const provisionData = provisionRes?.data || {};
 
-      // 2. Send branded email with download instructions
+      // Send setup email
       await base44.asServiceRole.functions.invoke('sendBuyerSetups', {
         email: customerEmail,
         orderId: session.id,
@@ -50,7 +104,7 @@ Deno.serve(async (req) => {
         configUrl: provisionData.configUrl || null,
       });
 
-      // 3. Provision Zendit eSIM
+      // Provision Zendit eSIM (non-fatal)
       try {
         await base44.asServiceRole.functions.invoke('provisionZenditEsim', {
           email: customerEmail,
@@ -59,21 +113,18 @@ Deno.serve(async (req) => {
         });
       } catch (zenditErr) {
         console.error('Zendit provisioning error:', zenditErr.message);
-        // Non-fatal — VPN access still granted
       }
 
-      // 4. Handle referral reward if this user was referred
+      // Handle referral reward
       try {
         const referrals = await base44.asServiceRole.entities.Referral.filter({ referee_email: customerEmail });
         const pendingReferral = referrals.find(r => r.status === 'pending' && r.referee_email);
         if (pendingReferral) {
-          // Mark referral as completed & rewarded
           await base44.asServiceRole.entities.Referral.update(pendingReferral.id, {
             status: 'rewarded',
             reward_granted_at: new Date().toISOString(),
           });
 
-          // Extend referrer's subscription by 1 month
           const referrerSubs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: pendingReferral.referrer_email });
           const activeSub = referrerSubs.find(s => s.status === 'active');
           if (activeSub && activeSub.renewal_date) {
@@ -84,7 +135,6 @@ Deno.serve(async (req) => {
             });
           }
 
-          // Send reward notification emails
           await base44.asServiceRole.integrations.Core.SendEmail({
             to: pendingReferral.referrer_email,
             subject: '🎉 You earned a free month on VoxVPN!',
@@ -100,6 +150,84 @@ Deno.serve(async (req) => {
         }
       } catch (refErr) {
         console.error('Referral reward error:', refErr.message);
+      }
+    }
+
+    // ── 2. Recurring payment succeeded → keep subscription active & unlock servers ──
+    if (event.type === 'invoice.payment_succeeded') {
+      const invoice = event.data.object;
+
+      // Only handle subscription renewals (not the first payment, handled by checkout.session.completed)
+      if (invoice.billing_reason !== 'subscription_cycle') {
+        return Response.json({ received: true });
+      }
+
+      const customerEmail = invoice.customer_email;
+      const stripeSubscriptionId = invoice.subscription;
+
+      if (!customerEmail || !stripeSubscriptionId) {
+        console.error('Missing email or subscription ID in invoice');
+        return Response.json({ received: true });
+      }
+
+      // Fetch subscription from Stripe to get current plan metadata
+      const stripeSub = await stripeClient.subscriptions.retrieve(stripeSubscriptionId);
+      const interval = stripeSub.items.data[0]?.plan?.interval; // 'month' or 'year'
+      const billingCycle = interval === 'year' ? 'yearly' : 'monthly';
+
+      // Get plan from subscription metadata or existing record
+      const subMeta = stripeSub.metadata || {};
+      const plan = subMeta.plan;
+
+      // Sync subscription to active + update renewal date
+      await syncSubscription(base44, customerEmail, plan, stripeSubscriptionId, 'active', billingCycle);
+
+      // Notify user of successful renewal
+      await base44.asServiceRole.integrations.Core.SendEmail({
+        to: customerEmail,
+        subject: '✅ VoxVPN subscription renewed successfully',
+        body: `Your VoxVPN subscription has been renewed. Your VPN access and all server locations continue uninterrupted.\n\nNext renewal: in ${billingCycle === 'yearly' ? '1 year' : '1 month'}.\n\nThank you for staying protected with VoxVPN!`,
+      });
+
+      console.log(`Renewal processed for ${customerEmail} (${stripeSubscriptionId})`);
+    }
+
+    // ── 3. Payment failed → mark subscription as expired ─────────────────────
+    if (event.type === 'invoice.payment_failed') {
+      const invoice = event.data.object;
+      const customerEmail = invoice.customer_email;
+      const stripeSubscriptionId = invoice.subscription;
+
+      if (customerEmail) {
+        const subs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: customerEmail });
+        const existing = subs.find(s => s.stripe_subscription_id === stripeSubscriptionId) || subs[0];
+        if (existing) {
+          await base44.asServiceRole.entities.VPNSubscription.update(existing.id, { status: 'expired' });
+        }
+
+        await base44.asServiceRole.integrations.Core.SendEmail({
+          to: customerEmail,
+          subject: '⚠️ VoxVPN payment failed — action required',
+          body: `We were unable to process your VoxVPN subscription payment. Please update your payment method to restore full VPN access.\n\nVisit: ${Deno.env.get('APP_URL')}/dashboard\n\nIf you need help, contact support@voxdigits.com`,
+        });
+
+        console.log(`Payment failed for ${customerEmail}`);
+      }
+    }
+
+    // ── 4. Subscription cancelled → revoke access ────────────────────────────
+    if (event.type === 'customer.subscription.deleted') {
+      const subscription = event.data.object;
+      const customerEmail = subscription.customer_email ||
+        (await stripeClient.customers.retrieve(subscription.customer))?.email;
+
+      if (customerEmail) {
+        const subs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: customerEmail });
+        const existing = subs.find(s => s.stripe_subscription_id === subscription.id) || subs[0];
+        if (existing) {
+          await base44.asServiceRole.entities.VPNSubscription.update(existing.id, { status: 'cancelled' });
+          console.log(`Subscription cancelled for ${customerEmail}`);
+        }
       }
     }
 
