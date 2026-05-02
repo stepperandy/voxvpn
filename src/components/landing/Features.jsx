@@ -75,12 +75,12 @@ export default function Features() {
             <h3 className="text-xl font-black text-white mb-1">Ready to get protected?</h3>
             <p className="text-slate-400 text-sm">Join 2,500+ users who trust VoxVPN. Plans start at $2.49/mo.</p>
           </div>
-          <button
-            onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
+          <a
+            href="https://voxvpn.net/#pricing"
             className="flex-shrink-0 px-8 py-3.5 bg-gradient-to-r from-cyan-400 to-cyan-500 hover:from-cyan-300 hover:to-cyan-400 text-black font-black rounded-2xl text-sm transition-all shadow-lg shadow-cyan-500/25 whitespace-nowrap"
           >
             View Plans →
-          </button>
+          </a>
         </motion.div>
       </div>
     </section>

@@ -127,7 +127,7 @@ export default function CustomerDashboard() {
                 <p className="text-slate-400 text-sm">Activate a plan to unlock full VPN access.</p>
               </div>
             </div>
-            <a href="/#pricing" onClick={() => { window.location.href = '/#pricing'; }}
+            <a href="https://voxvpn.net/#pricing"
               className="flex-shrink-0 px-6 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-xl transition-all text-sm">
               View Plans →
             </a>
@@ -156,7 +156,7 @@ export default function CustomerDashboard() {
           <motion.div {...fadeUp(0.24)} className="rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 to-[#0d1120] p-8 text-center">
             <h3 className="text-2xl font-black text-white mb-2">Start protecting yourself today</h3>
             <p className="text-slate-400 text-sm mb-6">Plans from just $2.49/month. Cancel anytime.</p>
-            <a href="/#pricing"
+            <a href="https://voxvpn.net/#pricing"
               className="inline-block px-8 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-xl transition-all shadow-lg shadow-cyan-500/20">
               Get Protected Now
             </a>
@@ -230,7 +230,7 @@ export default function CustomerDashboard() {
 
           <div className="pt-4 border-t border-white/5 flex flex-wrap items-center justify-between gap-3">
             {/* Upgrade button */}
-            <a href="/#pricing" onClick={(e) => { e.preventDefault(); window.location.assign('/#pricing'); }}
+            <a href="https://voxvpn.net/#pricing"
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-black text-sm font-bold transition-all shadow-lg shadow-cyan-500/20">
               <Zap size={14} /> Upgrade Plan
             </a>

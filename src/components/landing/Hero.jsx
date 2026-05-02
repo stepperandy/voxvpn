@@ -265,8 +265,8 @@ export default function Hero() {
           transition={{ delay: 0.45 }}
           className="flex items-center gap-4 mb-8 flex-wrap justify-center"
         >
-          <button
-            onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
+          <a
+            href="https://voxvpn.net/#pricing"
             className="px-8 py-3 font-bold text-white text-sm rounded-lg transition-all hover:opacity-90 active:scale-95"
             style={{
               background: 'linear-gradient(135deg, #7c3aed, #4f46e5)',
@@ -274,7 +274,7 @@ export default function Hero() {
             }}
           >
             Get VoxVPN Now
-          </button>
+          </a>
           <button
             onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
             className="px-8 py-3 font-bold text-white text-sm rounded-lg transition-all hover:bg-white/10 active:scale-95"
