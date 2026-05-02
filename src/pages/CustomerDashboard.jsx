@@ -156,7 +156,7 @@ export default function CustomerDashboard() {
           <motion.div {...fadeUp(0.24)} className="rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 to-[#0d1120] p-8 text-center">
             <h3 className="text-2xl font-black text-white mb-2">Start protecting yourself today</h3>
             <p className="text-slate-400 text-sm mb-6">Plans from just $2.49/month. Cancel anytime.</p>
-            <a href="/#pricing" onClick={() => { window.location.href = '/#pricing'; }}
+            <a href="/#pricing"
               className="inline-block px-8 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-xl transition-all shadow-lg shadow-cyan-500/20">
               Get Protected Now
             </a>
