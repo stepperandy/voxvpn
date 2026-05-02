@@ -1,6 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
-const BASE_URL = Deno.env.get('VOXVPN_API_URL') || 'http://192.168.1.42:5000';
+const BASE_URL = (Deno.env.get('VOXVPN_API_URL') || 'http://192.168.1.42:5000').replace(/\/$/, '');
 
 Deno.serve(async (req) => {
   try {
@@ -26,7 +26,10 @@ Deno.serve(async (req) => {
 
     const fetchOptions = {
       method: route.method,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
+      },
     };
 
     if (route.method === 'POST') {
@@ -34,7 +37,15 @@ Deno.serve(async (req) => {
     }
 
     const res = await fetch(`${BASE_URL}${route.path}`, fetchOptions);
-    const data = await res.json();
+    const text = await res.text();
+
+    // Try to parse as JSON, fall back to raw text
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = { raw: text };
+    }
 
     return Response.json(data, { status: res.status });
   } catch (error) {
