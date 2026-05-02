@@ -28,7 +28,8 @@ Deno.serve(async (req) => {
       method: route.method,
       headers: {
         'Content-Type': 'application/json',
-        'ngrok-skip-browser-warning': 'true',
+        'ngrok-skip-browser-warning': '1',
+        'User-Agent': 'VoxVPN-Backend/1.0',
       },
     };
 
