@@ -80,7 +80,10 @@ export default function VpnDashboard() {
         base44.functions.invoke('voxvpnProxy', { action: 'servers' }),
       ]);
 
-      if (subs.status === 'fulfilled') {
+      if (me.role === 'admin') {
+        // Admins bypass subscription requirement
+        setSubscription({ plan: 'Admin', renewal_date: null });
+      } else if (subs.status === 'fulfilled') {
         const active = subs.value.find(s => s.status === 'active') || null;
         setSubscription(active);
       }
@@ -102,7 +105,7 @@ export default function VpnDashboard() {
   };
 
   const handleConnect = async () => {
-    if (!subscription || status === 'connected') return;
+    if ((!subscription && user?.role !== 'admin') || status === 'connected') return;
     setStatus('connecting');
     setError('');
     try {

@@ -34,6 +34,9 @@ export default function CustomerDashboard() {
           setSubscription(subs[0]);
           const devs = await base44.entities.LinkedDevice.filter({ subscription_id: subs[0].id });
           setDevices(devs);
+        } else if (currentUser.role === 'admin') {
+          // Admins get full access without a subscription
+          setSubscription({ plan: 'Admin', status: 'active', billing_cycle: 'yearly', price: 0, max_devices: 999, renewal_date: null });
         }
         const dlList = await base44.entities.Download.filter({ is_active: true });
         setDownloads(dlList);
