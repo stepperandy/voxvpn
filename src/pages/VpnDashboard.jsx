@@ -4,7 +4,8 @@ import {
   ChevronDown, RefreshCw, CheckCircle2, Lock, Globe
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 // Fallback static servers if backend is unreachable
 const FALLBACK_SERVERS = [
@@ -158,13 +159,100 @@ export default function VpnDashboard() {
   return (
     <div className="min-h-screen bg-[#080c18] flex flex-col">
 
-      {/* Subtle grid background */}
+      {/* Grid background */}
       <div className="fixed inset-0 pointer-events-none"
         style={{
           backgroundImage: 'linear-gradient(rgba(6,182,212,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(6,182,212,0.03) 1px, transparent 1px)',
           backgroundSize: '40px 40px',
         }}
       />
+
+      {/* Flying + blinking tech objects */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        {/* Floating particles */}
+        {[
+          { x: '8%',  y: '15%', size: 4,  color: '#00d4ff', delay: 0,    dur: 7  },
+          { x: '18%', y: '55%', size: 3,  color: '#7c3aed', delay: 1.2,  dur: 9  },
+          { x: '12%', y: '80%', size: 5,  color: '#00d4ff', delay: 0.5,  dur: 8  },
+          { x: '25%', y: '30%', size: 2,  color: '#a855f7', delay: 2,    dur: 6  },
+          { x: '35%', y: '70%', size: 4,  color: '#06b6d4', delay: 0.8,  dur: 10 },
+          { x: '72%', y: '20%', size: 3,  color: '#00d4ff', delay: 1.5,  dur: 7  },
+          { x: '80%', y: '60%', size: 5,  color: '#7c3aed', delay: 0.3,  dur: 9  },
+          { x: '90%', y: '35%', size: 2,  color: '#a855f7', delay: 2.5,  dur: 6  },
+          { x: '88%', y: '78%', size: 4,  color: '#06b6d4', delay: 1,    dur: 8  },
+          { x: '60%', y: '85%', size: 3,  color: '#00d4ff', delay: 1.8,  dur: 11 },
+          { x: '45%', y: '10%', size: 2,  color: '#7c3aed', delay: 0.6,  dur: 7  },
+          { x: '55%', y: '75%', size: 4,  color: '#a855f7', delay: 3,    dur: 9  },
+          { x: '5%',  y: '45%', size: 3,  color: '#06b6d4', delay: 2.2,  dur: 8  },
+          { x: '95%', y: '50%', size: 5,  color: '#00d4ff', delay: 0.4,  dur: 10 },
+        ].map((p, i) => (
+          <motion.div
+            key={`p-${i}`}
+            className="absolute rounded-full"
+            style={{ left: p.x, top: p.y, width: p.size, height: p.size, background: p.color, boxShadow: `0 0 ${p.size * 3}px ${p.color}` }}
+            animate={{ y: [0, -30, 10, -20, 0], x: [0, 15, -10, 20, 0], opacity: [0.4, 1, 0.2, 0.9, 0.4], scale: [1, 1.5, 0.8, 1.3, 1] }}
+            transition={{ duration: p.dur, delay: p.delay, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        ))}
+
+        {/* Flying emoji icons */}
+        {[
+          { x: '7%',  y: '20%', delay: 0,   dur: 8,  label: '🔒' },
+          { x: '85%', y: '25%', delay: 1.5, dur: 10, label: '⚡' },
+          { x: '6%',  y: '65%', delay: 0.8, dur: 7,  label: '🌍' },
+          { x: '88%', y: '70%', delay: 2,   dur: 9,  label: '🛡️' },
+          { x: '50%', y: '90%', delay: 1,   dur: 11, label: '🔑' },
+          { x: '30%', y: '8%',  delay: 2.5, dur: 8,  label: '✨' },
+          { x: '70%', y: '5%',  delay: 0.3, dur: 6,  label: '🌐' },
+          { x: '15%', y: '90%', delay: 1.7, dur: 9,  label: '📡' },
+          { x: '92%', y: '12%', delay: 0.9, dur: 7,  label: '💻' },
+        ].map((f, i) => (
+          <motion.div
+            key={`f-${i}`}
+            className="absolute select-none text-lg"
+            style={{ left: f.x, top: f.y }}
+            animate={{ y: [0, -25, 8, -18, 0], x: [0, 10, -8, 12, 0], rotate: [0, 10, -8, 5, 0], opacity: [0.4, 0.9, 0.2, 0.8, 0.4] }}
+            transition={{ duration: f.dur, delay: f.delay, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            {f.label}
+          </motion.div>
+        ))}
+
+        {/* Blinking ring pulses */}
+        {[
+          { x: '15%', y: '40%', color: '#00d4ff', delay: 0,   size: 40 },
+          { x: '80%', y: '45%', color: '#7c3aed', delay: 1.2, size: 30 },
+          { x: '50%', y: '88%', color: '#06b6d4', delay: 0.6, size: 35 },
+          { x: '30%', y: '60%', color: '#a855f7', delay: 2,   size: 25 },
+          { x: '70%', y: '30%', color: '#00d4ff', delay: 1.5, size: 45 },
+          { x: '20%', y: '15%', color: '#7c3aed', delay: 0.9, size: 28 },
+          { x: '85%', y: '80%', color: '#06b6d4', delay: 2.3, size: 32 },
+        ].map((ring, i) => (
+          <motion.div
+            key={`ring-${i}`}
+            className="absolute rounded-full border"
+            style={{ left: ring.x, top: ring.y, width: ring.size, height: ring.size, marginLeft: -ring.size / 2, marginTop: -ring.size / 2, borderColor: ring.color }}
+            animate={{ scale: [1, 2.5, 1], opacity: [0.7, 0, 0.7] }}
+            transition={{ duration: 3, delay: ring.delay, repeat: Infinity, ease: 'easeOut' }}
+          />
+        ))}
+
+        {/* Flying lines / streaks */}
+        {[
+          { x: '10%', y: '30%', delay: 0,   dur: 4  },
+          { x: '75%', y: '55%', delay: 1.5, dur: 5  },
+          { x: '40%', y: '75%', delay: 0.7, dur: 3.5},
+          { x: '60%', y: '20%', delay: 2.1, dur: 4.5},
+        ].map((s, i) => (
+          <motion.div
+            key={`streak-${i}`}
+            className="absolute rounded-full"
+            style={{ left: s.x, top: s.y, width: 60, height: 1.5, background: 'linear-gradient(90deg, transparent, rgba(6,182,212,0.6), transparent)' }}
+            animate={{ x: [-60, 120], opacity: [0, 1, 0] }}
+            transition={{ duration: s.dur, delay: s.delay, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        ))}
+      </div>
 
       {/* Header */}
       <header className="relative z-10 border-b border-white/5 px-6 py-4 flex items-center justify-between">
@@ -228,7 +316,7 @@ export default function VpnDashboard() {
               <div>
                 <p className="text-amber-300 font-bold text-sm">Subscription Required</p>
                 <p className="text-amber-200/50 text-xs mt-0.5 mb-2">You need an active plan to connect.</p>
-                <a href="/#pricing" onClick={() => { window.location.href = '/#pricing'; }} className="text-cyan-400 text-xs font-bold hover:text-cyan-300 transition-colors">
+                <a href="/#pricing" onClick={(e) => { e.preventDefault(); window.location.assign('/#pricing'); }} className="text-cyan-400 text-xs font-bold hover:text-cyan-300 transition-colors">
                   View Plans →
                 </a>
               </div>
