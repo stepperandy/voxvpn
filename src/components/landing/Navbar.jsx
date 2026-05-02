@@ -17,14 +17,12 @@ const navLinks = [
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [user, setUser] = useState(null);
-  const [vpnLoggedIn, setVpnLoggedIn] = useState(false);
   const [activeHash, setActiveHash] = useState('');
   const [announcementVisible, setAnnouncementVisible] = useState(true);
   const location = useLocation();
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
-    setVpnLoggedIn(!!localStorage.getItem('auth_token'));
   }, []);
 
   useEffect(() => {
@@ -103,7 +101,7 @@ export default function Navbar() {
 
             {/* CTA buttons */}
             <div className="hidden md:flex items-center gap-2 ml-auto">
-              {vpnLoggedIn && (
+              {user && (
                 <Link
                   to="/vpn-dashboard"
                   className="flex items-center gap-1.5 px-4 py-2 bg-cyan-500/10 border border-cyan-500/30 hover:bg-cyan-500/20 text-cyan-400 text-sm font-bold rounded-full transition-all"
@@ -171,7 +169,7 @@ export default function Navbar() {
                   Admin Panel
                 </Link>
               )}
-              {vpnLoggedIn && (
+              {user && (
                 <Link
                   to="/vpn-dashboard"
                   onClick={() => setMobileOpen(false)}
