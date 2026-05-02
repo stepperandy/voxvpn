@@ -28,6 +28,10 @@
       "type": "string",
       "format": "date-time",
       "description": "When the free month reward was applied"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional notes or description for this referral (up to 1000 characters)"
     }
   },
   "required": [

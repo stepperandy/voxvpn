@@ -47,6 +47,10 @@
     "ip_address": {
       "type": "string",
       "description": "Current VPN IP assigned to device"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional notes or description for this device (up to 1000 characters)"
     }
   },
   "required": [

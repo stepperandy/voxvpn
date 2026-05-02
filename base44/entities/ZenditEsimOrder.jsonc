@@ -42,6 +42,10 @@
       "type": "string",
       "format": "date-time",
       "description": "When the user activated the eSIM"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional notes or description for this eSIM order (up to 1000 characters)"
     }
   },
   "required": [

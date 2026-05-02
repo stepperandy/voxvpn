@@ -65,6 +65,10 @@
     "uptime_percentage": {
       "type": "number",
       "description": "Monthly uptime percentage"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional notes or description for this server (up to 1000 characters)"
     }
   },
   "required": [

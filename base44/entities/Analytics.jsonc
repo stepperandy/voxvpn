@@ -34,6 +34,10 @@
     "peak_connections": {
       "type": "integer",
       "description": "Peak concurrent connections during the day"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional notes or description for this analytics record (up to 1000 characters)"
     }
   },
   "required": [

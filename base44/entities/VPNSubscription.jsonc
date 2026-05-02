@@ -57,6 +57,10 @@
     "stripe_subscription_id": {
       "type": "string",
       "description": "Stripe subscription ID for billing"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional notes or description for this subscription (up to 1000 characters)"
     }
   },
   "required": [
