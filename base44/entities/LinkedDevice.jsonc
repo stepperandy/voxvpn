@@ -28,7 +28,11 @@
     },
     "vpn_profile_key": {
       "type": "string",
-      "description": "WireGuard private key for this device"
+      "description": "OpenVPN client private key (PEM) for this device"
+    },
+    "client_cert": {
+      "type": "string",
+      "description": "OpenVPN client certificate (PEM) for this device \u2014 if using cert-based auth"
     },
     "status": {
       "type": "string",

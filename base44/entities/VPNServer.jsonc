@@ -20,12 +20,29 @@
     },
     "port": {
       "type": "integer",
-      "default": 51820,
-      "description": "WireGuard port"
+      "default": 1194,
+      "description": "OpenVPN port (default 1194)"
+    },
+    "proto": {
+      "type": "string",
+      "enum": [
+        "udp",
+        "tcp"
+      ],
+      "default": "udp",
+      "description": "OpenVPN protocol"
     },
     "public_key": {
       "type": "string",
-      "description": "WireGuard public key"
+      "description": "Server public key (legacy / reference)"
+    },
+    "ca_cert": {
+      "type": "string",
+      "description": "CA certificate in PEM format \u2014 embedded inline in .ovpn configs"
+    },
+    "tls_auth_key": {
+      "type": "string",
+      "description": "TLS auth / tls-crypt key in PEM format \u2014 embedded inline in .ovpn configs (optional but recommended)"
     },
     "api_token": {
       "type": "string",
@@ -74,7 +91,6 @@
   "required": [
     "region",
     "country",
-    "ip_address",
-    "public_key"
+    "ip_address"
   ]
 }
