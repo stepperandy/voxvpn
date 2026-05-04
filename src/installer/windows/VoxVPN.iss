@@ -1,4 +1,4 @@
-; VoxVPN Windows Installer Script
+; VoxVPN Windows Installer Script (OpenVPN)
 ; Requires Inno Setup 6+ from https://jrsoftware.org/isinfo.php
 
 #define MyAppName "VoxVPN"
@@ -18,7 +18,7 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
-; Require admin so WireGuard can install properly
+; Admin required so OpenVPN TAP driver can install
 PrivilegesRequired=admin
 OutputDir=output
 OutputBaseFilename=VoxVPN-Setup-{#MyAppVersion}
@@ -26,7 +26,6 @@ SetupIconFile=assets\icon.ico
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
-; Minimum Windows 10
 MinVersion=10.0.17763
 UninstallDisplayIcon={app}\{#MyAppExeName}
 UninstallDisplayName={#MyAppName}
@@ -42,11 +41,11 @@ Name: "startupicon"; Description: "Launch VoxVPN on Windows startup"; GroupDescr
 ; Main Electron app
 Source: "dist\win-unpacked\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
-; WireGuard installer (bundled)
-Source: "assets\wireguard-installer.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall
+; OpenVPN installer (bundled) — download from https://openvpn.net/community-downloads/
+Source: "assets\openvpn-installer.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall
 
-; Visual C++ Redistributable (if needed)
-; Source: "assets\vc_redist.x64.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall
+; Default .ovpn config files — place your server configs here
+Source: "assets\configs\*.ovpn"; DestDir: "{app}\configs"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
@@ -55,31 +54,36 @@ Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: 
 Name: "{userstartup}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: startupicon
 
 [Run]
-; Install WireGuard silently first
-Filename: "{tmp}\wireguard-installer.exe"; Parameters: "/S"; StatusMsg: "Installing WireGuard..."; Flags: waitprocfinished
+; Install OpenVPN silently first (includes TAP driver)
+Filename: "{tmp}\openvpn-installer.exe"; Parameters: "/S /SELECT_OPENVPN=1 /SELECT_OPENVPNGUI=0 /SELECT_TAP=1 /SELECT_OPENSSL_UTILITIES=0 /SELECT_EASY_RSA=0 /SELECT_PATH=1"; StatusMsg: "Installing OpenVPN TAP driver..."; Flags: waitprocfinished
+
+; Copy .ovpn configs to OpenVPN config folder
+Filename: "xcopy"; Parameters: """{app}\configs\*"" ""{commonappdata}\OpenVPN\config\"" /Y /E"; Flags: runhidden waitprocfinished
 
 ; Launch VoxVPN after install
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
-; Stop any running VoxVPN processes before uninstall
+; Kill VoxVPN before uninstall
 Filename: "taskkill"; Parameters: "/F /IM {#MyAppExeName}"; Flags: runhidden waitprocfinished
+; Kill any running OpenVPN processes
+Filename: "taskkill"; Parameters: "/F /IM openvpn.exe"; Flags: runhidden waitprocfinished
 
 [Code]
-// Check if WireGuard is already installed
-function WireGuardInstalled(): Boolean;
-var
-  ResultCode: Integer;
+// Check if OpenVPN is already installed
+function OpenVPNInstalled(): Boolean;
 begin
-  Result := RegKeyExists(HKLM, 'SOFTWARE\WireGuard');
+  Result := RegKeyExists(HKLM, 'SOFTWARE\OpenVPN') or
+            RegKeyExists(HKLM, 'SOFTWARE\WOW6432Node\OpenVPN');
 end;
 
-// Check if app is already running
+// Kill app if already running
 procedure KillRunningApp();
 var
   ResultCode: Integer;
 begin
   Exec('taskkill', '/F /IM ' + '{#MyAppExeName}', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  Exec('taskkill', '/F /IM openvpn.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
 end;
 
 function InitializeSetup(): Boolean;
@@ -91,8 +95,8 @@ end;
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
   if CurStep = ssInstall then begin
-    if WireGuardInstalled() then begin
-      Log('WireGuard already installed, skipping...');
+    if OpenVPNInstalled() then begin
+      Log('OpenVPN already installed, skipping OpenVPN installer...');
     end;
   end;
 end;
