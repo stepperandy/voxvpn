@@ -1,10 +1,28 @@
 import { useNavigate } from 'react-router-dom';
-import { Shield, Settings, CreditCard, LogOut, ChevronRight, Wifi } from 'lucide-react';
-import { VPN_SERVERS } from '@/lib/vpnServers';
+import { useEffect, useState } from 'react';
+import { Shield, Settings, CreditCard, LogOut, ChevronRight, Wifi, Loader2 } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
 
 export default function ServerList() {
   const navigate = useNavigate();
   const email = localStorage.getItem('vpn_email') || '';
+  const [servers, setServers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadServers = async () => {
+      try {
+        const res = await base44.functions.invoke('getServers', {});
+        setServers(res.data?.servers || []);
+      } catch (err) {
+        console.error('Failed to load servers:', err);
+        setServers([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadServers();
+  }, []);
 
   const handleSelect = (server) => {
     navigate(`/app/connect/${server.id}`);
@@ -48,25 +66,34 @@ export default function ServerList() {
 
       {/* Server list */}
       <div className="px-5 flex-1">
-        <p className="text-slate-500 text-xs uppercase tracking-widest font-semibold mb-3">Select Location</p>
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-slate-500 text-xs uppercase tracking-widest font-semibold">Select Location</p>
+          {!loading && <p className="text-slate-600 text-xs">{servers.length} servers</p>}
+        </div>
         <div className="space-y-2">
-          {VPN_SERVERS.map((server) => (
-            <button
-              key={server.id}
-              onClick={() => handleSelect(server)}
-              className="w-full flex items-center gap-4 p-4 rounded-2xl border border-white/5 bg-[#0d1120] hover:border-cyan-500/30 hover:bg-[#0d1a20] transition-all active:scale-[0.98] text-left"
-            >
-              <div className="flex-1 min-w-0">
-                <p className="text-white font-bold text-sm">{server.name}</p>
-                <p className="text-slate-500 text-xs font-mono">{server.id}.ovpn</p>
-                <div className="flex items-center gap-1 mt-1">
-                  <span className={`w-1.5 h-1.5 rounded-full ${server.config?.trim() ? 'bg-emerald-400' : 'bg-slate-600'}`} />
-                  <span className="text-xs text-slate-600">{server.config?.trim() ? 'Config ready' : 'No config'}</span>
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 size={20} className="text-cyan-400 animate-spin" />
+            </div>
+          ) : (
+            servers.map((server) => (
+              <button
+                key={server.id}
+                onClick={() => handleSelect(server)}
+                className="w-full flex items-center gap-4 p-4 rounded-2xl border border-white/5 bg-[#0d1120] hover:border-cyan-500/30 hover:bg-[#0d1a20] transition-all active:scale-[0.98] text-left"
+              >
+                <div className="flex-1 min-w-0">
+                  <p className="text-white font-bold text-sm">{server.name}</p>
+                  <p className="text-slate-500 text-xs font-mono">{server.city}, {server.country}</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className={`w-1.5 h-1.5 rounded-full ${server.status === 'online' ? 'bg-emerald-400' : 'bg-slate-600'}`} />
+                    <span className="text-xs text-slate-600">{server.load || 0}% load</span>
+                  </div>
                 </div>
-              </div>
-              <ChevronRight size={16} className="text-slate-600 flex-shrink-0" />
-            </button>
-          ))}
+                <ChevronRight size={16} className="text-slate-600 flex-shrink-0" />
+              </button>
+            ))
+          )}
         </div>
       </div>
 
