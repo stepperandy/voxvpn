@@ -64,6 +64,7 @@ Deno.serve(async (req) => {
       `persist-key`,
       `persist-tun`,
       `remote-cert-tls server`,
+      `redirect-gateway def1 bypass-dhcp`,
       `cipher AES-256-CBC`,
       `auth SHA256`,
       `compress lz4-v2`,
