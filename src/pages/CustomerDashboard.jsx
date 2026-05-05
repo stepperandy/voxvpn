@@ -279,22 +279,7 @@ export default function CustomerDashboard() {
           </div>
         </motion.div>
 
-        {/* VoxVPN App launcher */}
-        <motion.div {...fadeUp(0.1)} className="rounded-2xl border border-cyan-500/30 bg-gradient-to-r from-cyan-500/10 via-[#0d1120] to-[#0d1120] p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center flex-shrink-0">
-              <Globe size={22} className="text-cyan-400" />
-            </div>
-            <div>
-              <p className="text-white font-bold">VoxVPN App</p>
-              <p className="text-slate-400 text-sm">Browse all servers, pick a location, and download your personal WireGuard config — just like NordVPN or ExpressVPN.</p>
-            </div>
-          </div>
-          <Link to="/vpn-app"
-            className="flex-shrink-0 flex items-center gap-2 px-6 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-xl text-sm transition-all shadow-lg shadow-cyan-500/20">
-            <Globe size={15} /> Open VPN App →
-          </Link>
-        </motion.div>
+
 
         {/* Usage Charts */}
         <motion.div {...fadeUp(0.12)} className="rounded-2xl border border-white/5 bg-[#0d1120] p-6 md:p-8">
