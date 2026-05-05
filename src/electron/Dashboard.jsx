@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { Shield, Loader2, WifiOff, Lock, ChevronDown, CheckCircle2, AlertTriangle, Minus, X } from 'lucide-react';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { Shield, Loader2, WifiOff, Lock, CheckCircle2, AlertTriangle, Minus, X, Search } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 
 const SERVERS = [
@@ -16,12 +16,20 @@ const SERVERS = [
 export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [server, setServer] = useState(SERVERS[0]);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [serverListOpen, setServerListOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const [status, setStatus] = useState('idle'); // idle | connecting | connected | disconnecting
   const [error, setError] = useState('');
   const [log, setLog] = useState('');
-  const dropdownRef = useRef(null);
+  const listRef = useRef(null);
   const vpn = window.electronVPN;
+
+  const filteredServers = useMemo(() => {
+    return SERVERS.filter(s => 
+      s.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      s.country.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [searchTerm]);
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
@@ -33,7 +41,7 @@ export default function Dashboard() {
     }
 
     const handleClick = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) setDropdownOpen(false);
+      if (listRef.current && !listRef.current.contains(e.target)) setServerListOpen(false);
     };
     document.addEventListener('mousedown', handleClick);
     return () => {
@@ -131,39 +139,48 @@ export default function Dashboard() {
         </div>
 
         {/* Server selector */}
-        <div ref={dropdownRef} className="relative w-full">
-          <button
-            onClick={() => !busy && setDropdownOpen(v => !v)}
-            disabled={busy}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-white/10 bg-[#0d1120] hover:border-cyan-500/30 transition-all disabled:opacity-50"
-          >
-            <span className="text-xl">{server.flag}</span>
-            <div className="flex-1 text-left">
-              <p className="text-white font-bold text-sm">{server.label}</p>
-              <p className="text-slate-500 text-xs">{server.country}</p>
-            </div>
-            <ChevronDown size={15} className={`text-slate-500 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
-          </button>
+         <div ref={listRef} className="w-full space-y-2">
+           <button
+             onClick={() => !busy && setServerListOpen(v => !v)}
+             disabled={busy}
+             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-white/10 bg-[#0d1120] hover:border-cyan-500/30 transition-all disabled:opacity-50"
+           >
+             <span className="text-xl">{server.flag}</span>
+             <div className="flex-1 text-left">
+               <p className="text-white font-bold text-sm">{server.label}</p>
+               <p className="text-slate-500 text-xs">{server.country}</p>
+             </div>
+           </button>
 
-          {dropdownOpen && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-[#0d1120] border border-white/10 rounded-xl overflow-hidden z-50 shadow-2xl max-h-52 overflow-y-auto">
-              {SERVERS.map(s => (
-                <button key={s.id}
-                  onClick={() => { setServer(s); setDropdownOpen(false); if (isConnected) handleDisconnect(); }}
-                  className={`w-full flex items-center gap-3 px-4 py-2.5 hover:bg-cyan-500/5 transition-colors text-left
-                    ${s.id === server.id ? 'bg-cyan-500/10' : ''}`}
-                >
-                  <span className="text-lg">{s.flag}</span>
-                  <div className="flex-1">
-                    <p className={`text-sm font-semibold ${s.id === server.id ? 'text-cyan-400' : 'text-white'}`}>{s.label}</p>
-                    <p className="text-slate-500 text-xs">{s.country}</p>
-                  </div>
-                  {s.id === server.id && <CheckCircle2 size={13} className="text-cyan-400 flex-shrink-0" />}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+           {serverListOpen && (
+             <div className="space-y-2 pb-1 max-h-48 overflow-y-auto">
+               <div className="px-2 relative">
+                 <Search size={13} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
+                 <input
+                   type="text"
+                   placeholder="Search..."
+                   value={searchTerm}
+                   onChange={(e) => setSearchTerm(e.target.value)}
+                   className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg bg-[#0d1120] border border-white/10 text-white focus:outline-none focus:border-cyan-500/30"
+                 />
+               </div>
+               <div className="grid grid-cols-2 gap-1.5 px-1">
+                 {filteredServers.map(s => (
+                   <button key={s.id}
+                     onClick={() => { setServer(s); setServerListOpen(false); setSearchTerm(''); if (isConnected) handleDisconnect(); }}
+                     className={`p-2 rounded-lg border transition-all text-left text-xs
+                       ${s.id === server.id
+                         ? 'bg-cyan-500/10 border-cyan-500/40'
+                         : 'bg-[#0d1120] border-white/10 hover:border-white/20'}`}
+                   >
+                     <p className={`font-bold ${s.id === server.id ? 'text-cyan-400' : 'text-white'}`}>{s.label}</p>
+                     <p className="text-slate-500 text-[10px]">{s.country}</p>
+                   </button>
+                 ))}
+               </div>
+             </div>
+           )}
+         </div>
 
         {/* Connect / Disconnect button */}
         {!isConnected ? (
