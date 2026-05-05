@@ -8,28 +8,18 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import ServerSelector from '@/components/vpn/ServerSelector';
 
-// Fallback static servers if backend is unreachable
+// Fallback static servers if backend is unreachable (matches lib/vpnServers.js)
 const FALLBACK_SERVERS = [
-  { id: 'amsterdam',    city: 'Amsterdam',    country: 'Netherlands',    flag: '🇳🇱' },
-  { id: 'atlanta',      city: 'Atlanta',      country: 'United States',  flag: '🇺🇸' },
   { id: 'chicago',      city: 'Chicago',      country: 'United States',  flag: '🇺🇸' },
-  { id: 'frankfurt',    city: 'Frankfurt',    country: 'Germany',        flag: '🇩🇪' },
-  { id: 'johannesburg', city: 'Johannesburg', country: 'South Africa',   flag: '🇿🇦' },
   { id: 'london',       city: 'London',       country: 'United Kingdom', flag: '🇬🇧' },
-  { id: 'losangeles',   city: 'Los Angeles',  country: 'United States',  flag: '🇺🇸' },
-  { id: 'madrid',       city: 'Madrid',       country: 'Spain',          flag: '🇪🇸' },
-  { id: 'manchester',   city: 'Manchester',   country: 'United Kingdom', flag: '🇬🇧' },
-  { id: 'melbourne',    city: 'Melbourne',    country: 'Australia',      flag: '🇦🇺' },
-  { id: 'miami',        city: 'Miami',        country: 'United States',  flag: '🇺🇸' },
-  { id: 'milan',        city: 'Milan',        country: 'Italy',          flag: '🇮🇹' },
-  { id: 'newjersey',    city: 'New Jersey',   country: 'United States',  flag: '🇺🇸' },
-  { id: 'paris',        city: 'Paris',        country: 'France',         flag: '🇫🇷' },
-  { id: 'seattle',      city: 'Seattle',      country: 'United States',  flag: '🇺🇸' },
-  { id: 'siliconvalley',city: 'Silicon Valley',country: 'United States', flag: '🇺🇸' },
+  { id: 'amsterdam',    city: 'Amsterdam',    country: 'Netherlands',    flag: '🇳🇱' },
   { id: 'singapore',    city: 'Singapore',    country: 'Singapore',      flag: '🇸🇬' },
+  { id: 'losangeles',   city: 'Los Angeles',  country: 'United States',  flag: '🇺🇸' },
+  { id: 'newjersey',    city: 'New Jersey',   country: 'United States',  flag: '🇺🇸' },
+  { id: 'frankfurt',    city: 'Frankfurt',    country: 'Germany',        flag: '🇩🇪' },
   { id: 'sydney',       city: 'Sydney',       country: 'Australia',      flag: '🇦🇺' },
-  { id: 'tokyo',        city: 'Tokyo',        country: 'Japan',          flag: '🇯🇵' },
-  { id: 'toronto',      city: 'Toronto',      country: 'Canada',         flag: '🇨🇦' },
+  { id: 'siliconvalley',city: 'Silicon Valley',country: 'United States', flag: '🇺🇸' },
+  { id: 'johannesburg', city: 'Johannesburg', country: 'South Africa',   flag: '🇿🇦' },
 ];
 
 function normalizeServers(raw) {
