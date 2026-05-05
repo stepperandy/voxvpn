@@ -1,11 +1,13 @@
 import { useState } from 'react';
+import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import SocialLoginButtons from '@/components/auth/SocialLoginButtons';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function AuthSignup() {
+  const navigate = useNavigate();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -38,10 +40,20 @@ export default function AuthSignup() {
     }
 
     try {
-      console.log('Email signup:', { fullName, email, password });
-      alert('Email signup coming soon! Use social login for now.');
+      const res = await base44.functions.invoke('emailSignup', {
+        full_name: fullName,
+        email: email,
+        password: password,
+      });
+
+      if (res.data?.success) {
+        // Account created successfully - redirect to dashboard
+        navigate('/dashboard');
+      } else {
+        setError(res.data?.error || 'Signup failed');
+      }
     } catch (err) {
-      setError(err.message || 'Signup failed');
+      setError(err.response?.data?.error || err.message || 'Signup failed');
     } finally {
       setLoading(false);
     }
