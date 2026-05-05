@@ -23,8 +23,10 @@ function generateOvpn({ server, user, device = null, proto = 'udp' }) {
 
   const lines = [
     `# ╔═══════════════════════════════════════════════════════════╗`,
-    `# ║                    🔒 VoxVPN Secure VPN 🔒                 ║`,
-    `# ║              OpenVPN Configuration - Branded               ║`,
+    `# ║         VoxVPN Secure VPN - Official Configuration         ║`,
+    `# ║            https://media.base44.com/images/public/         ║`,
+    `# ║                  69c84f61d5543b54fe26e1e5/                 ║`,
+    `# ║              8e421fdfc_voxmainlogo.png                     ║`,
     `# ╚═══════════════════════════════════════════════════════════╝`,
     `#`,
     `# Server : ${label} (${server.country || ''})`,
