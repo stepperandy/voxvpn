@@ -5,5 +5,7 @@ if %errorlevel% neq 0 (
   exit /b
 )
 taskkill /IM openvpn.exe /F >nul 2>&1
-timeout /t 3 >nul
-"C:\Program Files\OpenVPN\bin\openvpn.exe" --config "C:\Program Files\OpenVPN\config\tokyo.ovpn" --log "%TEMP%\voxvpn.log"
+taskkill /IM openvpn-gui.exe /F >nul 2>&1
+timeout /t 2 >nul
+"C:\Program Files\OpenVPN\bin\openvpn.exe" --config "C:\Program Files\OpenVPN\config\Tokyo.ovpn" --log "%TEMP%\voxvpn.log"
+pause
