@@ -5,5 +5,6 @@ if %errorlevel% neq 0 (
   exit /b
 )
 taskkill /IM openvpn.exe /F >nul 2>&1
+taskkill /IM openvpn-gui.exe /F >nul 2>&1
 echo VPN Disconnected.
 timeout /t 2 >nul

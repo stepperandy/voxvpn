@@ -7,5 +7,5 @@ if %errorlevel% neq 0 (
 taskkill /IM openvpn.exe /F >nul 2>&1
 taskkill /IM openvpn-gui.exe /F >nul 2>&1
 timeout /t 2 >nul
-"C:\Program Files\OpenVPN\bin\openvpn.exe" --config "C:\Users\user\Downloads\London.ovpn" --log "%TEMP%\voxvpn.log"
+"C:\Program Files\OpenVPN\bin\openvpn.exe" --config "C:\Users\user\Downloads\Manchester.ovpn" --log "%TEMP%\voxvpn.log"
 pause
