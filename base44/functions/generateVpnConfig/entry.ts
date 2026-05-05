@@ -50,11 +50,17 @@ Deno.serve(async (req) => {
 
     // Build .ovpn content
     const lines = [
-      `# VoxVPN OpenVPN Config`,
+      `# ╔═══════════════════════════════════════════════════════════╗`,
+      `# ║                    🔒 VoxVPN Secure VPN 🔒                 ║`,
+      `# ║              OpenVPN Configuration - Branded               ║`,
+      `# ╚═══════════════════════════════════════════════════════════╝`,
+      `#`,
       `# Server : ${label} (${server.country || ''})`,
       `# User   : ${user.email}`,
       `# Proto  : ${proto.toUpperCase()}`,
-      ``,
+      `# Brand  : VoxVPN Premium VPN Service`,
+      `# Support: https://voxvpn.net/support`,
+      `#`,
       `client`,
       `dev tun`,
       `proto ${proto}`,

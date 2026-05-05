@@ -22,12 +22,18 @@ function generateOvpn({ server, user, device = null, proto = 'udp' }) {
   const hasTlsAuth    = server.tls_auth_key;
 
   const lines = [
-    `# VoxVPN OpenVPN Configuration`,
+    `# ╔═══════════════════════════════════════════════════════════╗`,
+    `# ║                    🔒 VoxVPN Secure VPN 🔒                 ║`,
+    `# ║              OpenVPN Configuration - Branded               ║`,
+    `# ╚═══════════════════════════════════════════════════════════╝`,
+    `#`,
     `# Server : ${label} (${server.country || ''})`,
     `# User   : ${user.email}`,
     `# Proto  : ${proto.toUpperCase()}`,
     `# Generated: ${new Date().toISOString()}`,
-    ``,
+    `# Brand  : VoxVPN Premium VPN Service`,
+    `# Support: https://voxvpn.net/support`,
+    `#`,
     `client`,
     `dev tun`,
     `proto ${proto}`,
