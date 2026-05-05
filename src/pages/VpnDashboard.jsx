@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   Shield, LogOut, Wifi, WifiOff, Loader2, AlertTriangle,
-  ChevronDown, RefreshCw, CheckCircle2, Lock, Globe
+  RefreshCw, CheckCircle2, Lock
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import ServerSelector from '@/components/vpn/ServerSelector';
 
 // Fallback static servers if backend is unreachable
 const FALLBACK_SERVERS = [
@@ -46,21 +47,12 @@ export default function VpnDashboard() {
   const [subscription, setSubscription] = useState(null);
   const [servers, setServers] = useState(FALLBACK_SERVERS);
   const [selectedServer, setSelectedServer] = useState(FALLBACK_SERVERS[0]);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [status, setStatus] = useState('idle'); // idle | connecting | connected | disconnecting
   const [loadingInit, setLoadingInit] = useState(true);
   const [error, setError] = useState('');
-  const dropdownRef = useRef(null);
 
   useEffect(() => {
     init();
-    const handleClick = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setDropdownOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
   const init = async () => {
@@ -339,49 +331,15 @@ export default function VpnDashboard() {
             </div>
           )}
 
-          {/* Server dropdown */}
-          <div ref={dropdownRef} className="relative">
-            <button
-              onClick={() => setDropdownOpen(v => !v)}
-              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-white/10 bg-[#0d1120] hover:border-cyan-500/30 transition-all"
-            >
-              <span className="text-xl">{selectedServer.flag}</span>
-              <div className="flex-1 text-left">
-                <p className="text-white font-bold text-sm">{selectedServer.city}</p>
-                <p className="text-slate-500 text-xs flex items-center gap-1">
-                  <Globe size={9} /> {selectedServer.country}
-                </p>
-              </div>
-              <ChevronDown
-                size={16}
-                className={`text-slate-500 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}
-              />
-            </button>
-
-            {dropdownOpen && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-[#0d1120] border border-white/10 rounded-xl overflow-hidden z-50 shadow-2xl max-h-64 overflow-y-auto">
-                {servers.map((server) => (
-                  <button
-                    key={server.id}
-                    onClick={() => { setSelectedServer(server); setDropdownOpen(false); if (isConnected) setStatus('idle'); }}
-                    className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-cyan-500/5 transition-colors text-left
-                      ${selectedServer.id === server.id ? 'bg-cyan-500/10' : ''}`}
-                  >
-                    <span className="text-lg">{server.flag}</span>
-                    <div className="flex-1">
-                      <p className={`text-sm font-semibold ${selectedServer.id === server.id ? 'text-cyan-400' : 'text-white'}`}>
-                        {server.city}
-                      </p>
-                      <p className="text-slate-500 text-xs">{server.country}</p>
-                    </div>
-                    {selectedServer.id === server.id && (
-                      <CheckCircle2 size={14} className="text-cyan-400 flex-shrink-0" />
-                    )}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          {/* Server selector */}
+          <ServerSelector
+            servers={servers}
+            selectedServer={selectedServer}
+            onSelect={(server) => {
+              setSelectedServer(server);
+              if (isConnected) setStatus('idle');
+            }}
+          />
 
           {/* Connect / Disconnect button */}
           {!isConnected ? (
