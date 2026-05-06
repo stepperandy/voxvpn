@@ -136,7 +136,8 @@ export default function Navbar() {
                 </>
               )}
               <a
-                href="https://voxvpn.net/#pricing"
+                href="#pricing"
+                onClick={() => handleNavClick('#pricing')}
                 className="px-4 py-1.5 bg-cyan-400 hover:bg-cyan-300 text-black text-xs font-bold rounded-full transition-all shadow-lg shadow-cyan-500/20 whitespace-nowrap"
               >
                 Get Protected
@@ -187,7 +188,7 @@ export default function Navbar() {
                   </>
                 )}
               </div>
-              <a href="https://voxvpn.net/#pricing" className="block mt-1 py-2 text-center bg-cyan-400 text-black text-sm font-bold rounded-full">
+              <a href="#pricing" onClick={() => handleNavClick('#pricing')} className="block mt-1 py-2 text-center bg-cyan-400 text-black text-sm font-bold rounded-full">
                 Get Protected
               </a>
             </div>
