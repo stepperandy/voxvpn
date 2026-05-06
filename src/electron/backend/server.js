@@ -5,6 +5,13 @@ import path from 'path';
 import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 
+// Use global fetch (Node 18+) or fall back to node-fetch
+const _fetch = globalThis.fetch || (await import('node-fetch').then(m => m.default).catch(() => null));
+const apiFetch = _fetch || fetch;
+
+/* global process */
+const BASE44_APP_ID = process.env.BASE44_APP_ID || '';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname  = path.dirname(__filename);
 
@@ -96,23 +103,62 @@ app.post('/register', (req, res) => {
   res.json({ token, email, name: email.split('@')[0] });
 });
 
-// POST /login
-app.post('/login', (req, res) => {
+// POST /login — authenticates against Base44 backend
+app.post('/login', async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'Email and password required.' });
 
-  const db = readDB();
-  const user = db.users.find(u => u.email === email);
-  if (!user || user.password_hash !== hashPassword(password)) {
-    return res.status(401).json({ error: 'Invalid email or password.' });
+  try {
+    // Get a Base44 session token by calling the platform login API
+    const loginRes = await apiFetch(`https://api.base44.com/api/apps/${BASE44_APP_ID}/auth/email/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const loginData = await loginRes.json();
+
+    if (!loginRes.ok || !loginData.access_token) {
+      return res.status(401).json({ error: loginData.error || loginData.message || 'Invalid email or password.' });
+    }
+
+    const accessToken = loginData.access_token;
+
+    // Fetch user info + subscription using the access token
+    const userRes = await apiFetch(`https://api.base44.com/api/apps/${BASE44_APP_ID}/auth/me`, {
+      headers: { 'Authorization': `Bearer ${accessToken}` },
+    });
+    const userData = await userRes.json();
+
+    // Check subscription
+    const subRes = await apiFetch(`https://api.base44.com/api/apps/${BASE44_APP_ID}/entities/VPNSubscription?filter=${encodeURIComponent(JSON.stringify({ user_email: email }))}`, {
+      headers: { 'Authorization': `Bearer ${accessToken}` },
+    });
+    const subData = await subRes.json();
+    const activeSub = Array.isArray(subData) ? subData.find(s => s.status === 'active') : null;
+
+    // Store session locally for subsequent calls
+    const db = readDB();
+    db.sessions = db.sessions.filter(s => s.email !== email); // remove old sessions
+    db.sessions.push({ token: accessToken, email, created_at: new Date().toISOString() });
+    // Upsert user
+    const idx = db.users.findIndex(u => u.email === email);
+    const userRecord = { email, name: userData.full_name || email.split('@')[0], plan: activeSub?.plan || null };
+    if (idx >= 0) db.users[idx] = { ...db.users[idx], ...userRecord };
+    else db.users.push(userRecord);
+    writeDB(db);
+
+    console.log(`[login] ${email} → Base44 auth success`);
+    res.json({
+      token: accessToken,
+      email,
+      name: userData.full_name || email.split('@')[0],
+      plan: activeSub?.plan || null,
+    });
+  } catch (err) {
+    console.error('[login] error:', err.message);
+    res.status(500).json({ error: 'Login failed. Please try again.' });
   }
-
-  const token = generateToken();
-  db.sessions.push({ token, email, created_at: new Date().toISOString() });
-  writeDB(db);
-
-  console.log(`[login] ${email}`);
-  res.json({ token, email, name: email.split('@')[0], plan: user.plan });
 });
 
 // GET /servers
@@ -120,17 +166,24 @@ app.get('/servers', (req, res) => {
   res.json({ servers: SERVERS });
 });
 
-// POST /check-access
-app.post('/check-access', (req, res) => {
+// POST /check-access — checks Base44 subscription
+app.post('/check-access', async (req, res) => {
   const { user_email } = req.body;
+  const token = req.headers['authorization']?.replace('Bearer ', '');
   if (!user_email) return res.status(400).json({ error: 'user_email required.' });
 
-  const db = readDB();
-  const user = db.users.find(u => u.email === user_email);
-  if (!user) return res.status(404).json({ error: 'User not found.' });
+  try {
+    const subRes = await apiFetch(`https://api.base44.com/api/apps/${BASE44_APP_ID}/entities/VPNSubscription?filter=${encodeURIComponent(JSON.stringify({ user_email }))}`, {
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+    const subData = await subRes.json();
+    const activeSub = Array.isArray(subData) ? subData.find(s => s.status === 'active') : null;
 
-  // For local testing: everyone has access. Change to check user.plan for real.
-  res.json({ access: true, plan: user.plan || 'trial', email: user_email });
+    res.json({ access: !!activeSub, plan: activeSub?.plan || null, email: user_email });
+  } catch (err) {
+    // Fallback: allow access if we can't verify (so app doesn't break)
+    res.json({ access: true, plan: null, email: user_email });
+  }
 });
 
 // POST /connect
