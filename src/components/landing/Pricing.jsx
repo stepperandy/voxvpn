@@ -328,7 +328,7 @@ export default function Pricing() {
         </div>
 
         <p className="text-center text-slate-600 text-xs mt-8">
-          All prices in USD. 30-day money-back guarantee. Secure payment via Stripe · Hubtel · Alipay/WeChat (contact us).
+          All prices in USD. 30-day money-back guarantee. Secure payment via Stripe · Hubtel · Alipay · WeChat Pay.
         </p>
       </div>
     </section>
