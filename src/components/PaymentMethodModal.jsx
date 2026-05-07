@@ -30,19 +30,6 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
         }
         return;
       }
-      if (selectedMethod === 'alipay' || selectedMethod === 'wechat_pay') {
-        const res = await base44.functions.invoke('createStripeCheckout', {
-          plan: plan?.name,
-          isBilledYearly: !!isBilledYearly,
-          paymentMethod: selectedMethod,
-        });
-        if (res.data?.url) {
-          window.location.href = res.data.url;
-        } else {
-          alert('Payment error: ' + (res.data?.error || 'Unknown error'));
-        }
-        return;
-      }
       await onProceed(selectedMethod);
     } finally {
       setLoading(false);
@@ -113,42 +100,25 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
 
           {/* Chinese payment methods */}
           <div className="pt-1">
-            <p className="text-slate-600 text-xs uppercase tracking-widest mb-2 font-semibold">🇨🇳 Chinese Payment Methods</p>
+            <p className="text-slate-600 text-xs uppercase tracking-widest mb-2 font-semibold">🇨🇳 Chinese Customers</p>
           </div>
 
-          <label className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-colors ${
-            selectedMethod === 'alipay' ? 'border-blue-500 bg-blue-500/5' : 'border-white/10 hover:border-white/20'
-          }`}>
-            <input type="radio" name="payment" value="alipay"
-              checked={selectedMethod === 'alipay'}
-              onChange={(e) => setSelectedMethod(e.target.value)}
-              className="mt-1.5" />
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <AlipayIcon />
-                <p className="text-white font-bold text-sm">Alipay</p>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400 font-bold">支付宝</span>
-              </div>
-              <p className="text-slate-400 text-xs mt-0.5">Pay with your Alipay account</p>
+          <div className="p-4 rounded-xl border-2 border-yellow-500/30 bg-yellow-500/5">
+            <div className="flex items-center gap-2 mb-1">
+              <AlipayIcon />
+              <WeChatIcon />
+              <p className="text-white font-bold text-sm">Alipay / WeChat Pay</p>
             </div>
-          </label>
-
-          <label className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-colors ${
-            selectedMethod === 'wechat_pay' ? 'border-green-500 bg-green-500/5' : 'border-white/10 hover:border-white/20'
-          }`}>
-            <input type="radio" name="payment" value="wechat_pay"
-              checked={selectedMethod === 'wechat_pay'}
-              onChange={(e) => setSelectedMethod(e.target.value)}
-              className="mt-1.5" />
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <WeChatIcon />
-                <p className="text-white font-bold text-sm">WeChat Pay</p>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-500/20 text-green-400 font-bold">微信支付</span>
-              </div>
-              <p className="text-slate-400 text-xs mt-0.5">Pay with WeChat Pay (scan QR code)</p>
-            </div>
-          </label>
+            <p className="text-slate-400 text-xs mb-2">
+              支付宝 / 微信支付 — Contact us directly to pay via Alipay or WeChat Pay.
+            </p>
+            <a
+              href="mailto:support@voxdigits.com?subject=Alipay/WeChat Pay - VoxVPN"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/30 text-yellow-400 text-xs font-semibold transition-all"
+            >
+              📧 Contact Support to Pay
+            </a>
+          </div>
 
           <label className="flex items-start gap-3 p-4 rounded-xl border-2 border-white/10 cursor-pointer opacity-50">
             <input type="radio" name="payment" value="bank" disabled className="mt-1.5" />
@@ -180,7 +150,7 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
             Cancel
           </button>
           <button onClick={handleProceed}
-            disabled={loading || !['stripe', 'hubtel', 'alipay', 'wechat_pay', 'admin-bypass'].includes(selectedMethod)}
+            disabled={loading || !['stripe', 'hubtel', 'admin-bypass'].includes(selectedMethod)}
             className="flex-1 px-4 py-3 rounded-lg bg-cyan-400 hover:bg-cyan-300 disabled:opacity-50 disabled:cursor-not-allowed text-black font-bold transition-all flex items-center justify-center gap-2">
             <CreditCard size={16} />
             {loading ? 'Processing...' : 'Proceed'}
