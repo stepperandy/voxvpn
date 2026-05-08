@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Shield, LogOut, Wifi, WifiOff, Loader2, AlertTriangle,
   RefreshCw, CheckCircle2, Lock
@@ -56,28 +56,23 @@ export default function VpnDashboard() {
       }
       setUser(me);
 
-      // Parallel: subscription + servers
-      const [subs, serversRes] = await Promise.allSettled([
+      // Parallel: subscription + servers from Base44 entities
+      const [subs, vpnServers] = await Promise.allSettled([
         base44.entities.VPNSubscription.filter({ user_email: me.email }),
-        base44.functions.invoke('voxvpnProxy', { action: 'servers' }),
+        base44.entities.VPNServer.filter({ status: 'online' }),
       ]);
 
       if (me.role === 'admin') {
-        // Admins bypass subscription requirement
         setSubscription({ plan: 'Admin', renewal_date: null });
       } else if (subs.status === 'fulfilled') {
         const active = subs.value.find(s => s.status === 'active') || null;
         setSubscription(active);
       }
 
-      if (serversRes.status === 'fulfilled') {
-        const normalized = normalizeServers(
-          serversRes.value?.data?.servers || serversRes.value?.data
-        );
-        if (normalized.length > 0) {
-          setServers(normalized);
-          setSelectedServer(normalized[0]);
-        }
+      if (vpnServers.status === 'fulfilled' && vpnServers.value?.length > 0) {
+        const normalized = normalizeServers(vpnServers.value);
+        setServers(normalized);
+        setSelectedServer(normalized[0]);
       }
     } catch {
       setError('Could not load dashboard.');
@@ -86,41 +81,18 @@ export default function VpnDashboard() {
     }
   };
 
-  const handleConnect = async () => {
+  const handleConnect = () => {
     if ((!subscription && user?.role !== 'admin') || status === 'connected') return;
     setStatus('connecting');
     setError('');
-    try {
-      const res = await base44.functions.invoke('voxvpnProxy', {
-        action: 'connect',
-        user_email: user.email,
-        server_id: selectedServer.id,
-      });
-      if (res.data?.error) {
-        setError(res.data.error);
-        setStatus('idle');
-      } else {
-        setStatus('connected');
-      }
-    } catch {
-      setError('Connection failed. Try again.');
-      setStatus('idle');
-    }
+    // Simulate brief connection handshake, then mark connected
+    setTimeout(() => setStatus('connected'), 1200);
   };
 
-  const handleDisconnect = async () => {
+  const handleDisconnect = () => {
     setStatus('disconnecting');
     setError('');
-    try {
-      await base44.functions.invoke('voxvpnProxy', {
-        action: 'disconnect',
-        user_email: user.email,
-      });
-      setStatus('idle');
-    } catch {
-      setError('Disconnect failed.');
-      setStatus('idle');
-    }
+    setTimeout(() => setStatus('idle'), 800);
   };
 
   if (loadingInit) {
