@@ -1,0 +1,88 @@
+{
+  "name": "VPNProvider",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Display name of the provider (e.g. PureVPN White-label, Mysterium)"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "white_label",
+        "own_vultr",
+        "wireguard_peer",
+        "openvpn_peer"
+      ],
+      "default": "white_label",
+      "description": "Provider type"
+    },
+    "api_base_url": {
+      "type": "string",
+      "description": "Base URL of the white-label VPN provider API"
+    },
+    "api_key": {
+      "type": "string",
+      "description": "API key or token for authenticating with the provider"
+    },
+    "api_secret": {
+      "type": "string",
+      "description": "API secret (if required)"
+    },
+    "auth_header": {
+      "type": "string",
+      "description": "Custom auth header name (e.g. X-API-Key, Authorization)"
+    },
+    "servers_endpoint": {
+      "type": "string",
+      "description": "Relative path to fetch server list (e.g. /v1/servers)"
+    },
+    "connect_endpoint": {
+      "type": "string",
+      "description": "Relative path to generate credentials/config (e.g. /v1/connect)"
+    },
+    "config_format": {
+      "type": "string",
+      "enum": [
+        "wireguard",
+        "openvpn",
+        "custom"
+      ],
+      "default": "wireguard",
+      "description": "Config file format returned by this provider"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "inactive",
+        "testing"
+      ],
+      "default": "active",
+      "description": "Provider status"
+    },
+    "priority": {
+      "type": "integer",
+      "default": 10,
+      "description": "Server list priority (lower = shown first)"
+    },
+    "tier": {
+      "type": "string",
+      "enum": [
+        "standard",
+        "premium",
+        "dedicated"
+      ],
+      "default": "standard",
+      "description": "Tier label shown to users"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Admin internal notes about this provider"
+    }
+  },
+  "required": [
+    "name",
+    "type"
+  ]
+}

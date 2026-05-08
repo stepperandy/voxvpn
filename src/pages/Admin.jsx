@@ -14,6 +14,7 @@ import MarketingView from '@/components/admin/MarketingView';
 import ServerStatusView from '@/components/admin/ServerStatusView';
 import ConnectionsDashboard from '@/components/admin/ConnectionsDashboard';
 import AffiliatesView from '@/components/admin/AffiliatesView';
+import ProvidersView from '@/components/admin/ProvidersView';
 
 export default function Admin() {
   const [activePage, setActivePage] = useState('dashboard');
@@ -34,6 +35,7 @@ export default function Admin() {
       case 'server-status': return <ServerStatusView />;
       case 'connections': return <ConnectionsDashboard />;
       case 'affiliates': return <AffiliatesView />;
+      case 'providers': return <ProvidersView />;
       default: return <DashboardView />;
     }
   };

@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Server, LogOut, Menu, X, Shield, ChevronRight, Home, Download, Link, Radio, TrendingUp, Megaphone, Activity, BarChart2, Handshake } from 'lucide-react';
+import { LayoutDashboard, Users, Server, LogOut, Menu, X, ChevronRight, Home, Download, Link, Radio, TrendingUp, Megaphone, Activity, BarChart2, Handshake, Globe } from 'lucide-react';
 import { useState } from 'react';
 
 const navItems = [
@@ -13,6 +13,7 @@ const navItems = [
   { icon: BarChart2, label: 'Connections', id: 'connections', desc: 'Connections, bandwidth & export' },
   { icon: Megaphone, label: 'Marketing', id: 'marketing', desc: 'SEO, PPC & AI campaigns' },
   { icon: Handshake, label: 'Affiliates', id: 'affiliates', desc: 'Affiliates & partners' },
+  { icon: Globe, label: 'Providers', id: 'providers', desc: 'Hybrid VPN provider APIs' },
 ];
 
 export default function AdminSidebar({ activePage, onNavigate, onLogout }) {

@@ -28,7 +28,11 @@ function normalizeServers(raw) {
     id: s.id || s.server_id || `srv-${i}`,
     city: s.city || s.name || s.location || `Server ${i + 1}`,
     country: s.country || s.region || '',
-    flag: s.flag || '🌐',
+    flag: s.flag || (s.source === 'own' ? '⭐' : '🌐'),
+    tier: s.tier || 'standard',
+    source: s.source || 'provider',
+    provider_name: s.provider_name || 'VoxVPN',
+    load: s.load || 0,
   }));
 }
 
@@ -56,10 +60,10 @@ export default function VpnDashboard() {
       }
       setUser(me);
 
-      // Parallel: subscription + servers from Base44 entities
-      const [subs, vpnServers] = await Promise.allSettled([
+      // Parallel: subscription + hybrid server list
+      const [subs, hybridServers] = await Promise.allSettled([
         base44.entities.VPNSubscription.filter({ user_email: me.email }),
-        base44.entities.VPNServer.filter({ status: 'online' }),
+        base44.functions.invoke('getServersHybrid', {}),
       ]);
 
       if (me.role === 'admin') {
@@ -69,8 +73,8 @@ export default function VpnDashboard() {
         setSubscription(active);
       }
 
-      if (vpnServers.status === 'fulfilled' && vpnServers.value?.length > 0) {
-        const normalized = normalizeServers(vpnServers.value);
+      if (hybridServers.status === 'fulfilled' && hybridServers.value?.data?.servers?.length > 0) {
+        const normalized = normalizeServers(hybridServers.value.data.servers);
         setServers(normalized);
         setSelectedServer(normalized[0]);
       }
