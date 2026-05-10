@@ -50,9 +50,10 @@ Deno.serve(async (req) => {
 
 
 
-    // Always use payment mode (one-time) since alipay/wechat don't support subscriptions
+    // Always use payment mode (one-time)
     const sessionConfig = {
       mode: 'payment',
+      payment_method_types: ['card'],
       line_items: [
         {
           price_data: {
@@ -66,9 +67,6 @@ Deno.serve(async (req) => {
           quantity: 1,
         },
       ],
-      automatic_payment_methods: {
-        enabled: true,
-      },
       success_url: `${Deno.env.get('APP_URL')}/download?payment=success`,
       cancel_url: `${Deno.env.get('APP_URL')}/pricing`,
       ...(customerEmail ? { customer_email: customerEmail } : {}),
