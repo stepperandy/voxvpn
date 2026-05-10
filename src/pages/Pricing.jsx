@@ -12,7 +12,7 @@ const PLANS = [
     monthlyPrice: 3.99,
     yearlyPrice: 2.49,
     yearlyTotal: 29.88,
-    devices: 1,
+    devices: 3,
     color: 'border-white/5 bg-[#0d1120]',
     btnClass: 'border border-slate-700 hover:border-cyan-500 text-white hover:text-cyan-400',
     features: [
@@ -29,7 +29,7 @@ const PLANS = [
     monthlyPrice: 6.99,
     yearlyPrice: 4.49,
     yearlyTotal: 53.88,
-    devices: 3,
+    devices: 5,
     color: 'border-white/5 bg-[#0d1120]',
     btnClass: 'border border-slate-700 hover:border-cyan-500 text-white hover:text-cyan-400',
     features: [
@@ -47,7 +47,7 @@ const PLANS = [
     monthlyPrice: 9.99,
     yearlyPrice: 6.49,
     yearlyTotal: 77.88,
-    devices: 5,
+    devices: 8,
     badge: 'Most Popular',
     badgeColor: 'bg-cyan-500 text-black',
     color: 'border-2 border-cyan-500 bg-[#0d1a20] shadow-lg shadow-cyan-500/10',
