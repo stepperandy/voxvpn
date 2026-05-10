@@ -131,11 +131,13 @@ export default function Footer() {
         {/* Brand row */}
         <div className="flex flex-col sm:flex-row gap-6 mb-10 items-start">
           <div className="flex-shrink-0 max-w-[200px]">
-            <img
-              src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/5e71f2d6f_image.png"
-              alt="VoxVPN"
-              className="h-16 w-auto mb-4"
-            />
+            <Link to="/">
+              <img
+                src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/5e71f2d6f_image.png"
+                alt="VoxVPN"
+                className="h-16 w-auto mb-4 hover:opacity-80 transition-opacity cursor-pointer"
+              />
+            </Link>
             <p className="text-slate-500 text-xs leading-relaxed mb-4">
               Your privacy is our priority. Stay protected, stay unrestricted.
             </p>

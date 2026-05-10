@@ -205,13 +205,13 @@ export default function VpnDashboard() {
 
       {/* Header */}
       <header className="relative z-10 border-b border-white/5 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+        <a href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
           <img
             src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/5e71f2d6f_image.png"
             alt="VoxVPN"
             className="h-12 w-auto"
           />
-        </div>
+        </a>
         <div className="flex items-center gap-4">
           {user && (
             <span className="text-slate-500 text-xs hidden sm:block truncate max-w-[160px]">{user.email}</span>

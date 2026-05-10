@@ -34,11 +34,13 @@ export default function AdminSidebar({ activePage, onNavigate, onLogout }) {
       <aside className={`fixed left-0 top-0 h-screen w-64 bg-[#060910] border-r border-white/5 transition-transform duration-300 z-40 flex flex-col ${open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         {/* Logo */}
         <div className="p-5 border-b border-white/5">
-          <img
-            src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/5e71f2d6f_image.png"
-            alt="VoxVPN"
-            className="h-12 w-auto"
-          />
+          <a href="/" className="inline-block hover:opacity-80 transition-opacity">
+            <img
+              src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/5e71f2d6f_image.png"
+              alt="VoxVPN"
+              className="h-12 w-auto"
+            />
+          </a>
         </div>
 
         {/* Section label */}
