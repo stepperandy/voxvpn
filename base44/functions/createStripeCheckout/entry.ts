@@ -43,6 +43,9 @@ Deno.serve(async (req) => {
           quantity: 1,
         },
       ],
+      payment_method_options: {
+        wechat_pay: { client: 'web' },
+      },
       success_url: `${origin}/payment-success`,
       cancel_url: `${origin}/pricing`,
     });
