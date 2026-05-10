@@ -45,10 +45,8 @@ Deno.serve(async (req) => {
     const planPrice = prices[plan];
     const amountInCents = Math.round((isBilledYearly ? planPrice.yearly : planPrice.monthly) * 100);
 
-    const appUrl = Deno.env.get('APP_URL');
-    if (!appUrl) {
-      return Response.json({ error: 'APP_URL not configured' }, { status: 500 });
-    }
+    // Use request origin for preview/prod compatibility, fallback to APP_URL
+    const origin = req.headers.get('origin') || Deno.env.get('APP_URL') || 'https://voxvpn.net';
 
     const stripe = await import('npm:stripe@14.0.0');
     const stripeClient = new stripe.default(Deno.env.get('STRIPE_SECRET_KEY'));
@@ -70,8 +68,8 @@ Deno.serve(async (req) => {
           quantity: 1,
         },
       ],
-      success_url: `${appUrl}/download?payment=success`,
-      cancel_url: `${appUrl}/pricing`,
+      success_url: `${origin}/download?payment=success`,
+      cancel_url: `${origin}/pricing`,
       ...(customerEmail ? { customer_email: customerEmail } : {}),
       metadata: {
         plan: plan,
