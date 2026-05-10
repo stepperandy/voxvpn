@@ -1,6 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
-// Plan-to-price mapping (prices come from the app, not Stripe)
+// Plan-to-price mapping (USD prices)
 const PLAN_PRICES = {
   'Basic': { monthly: 3.99, yearly: 29.88 },
   'Standard': { monthly: 6.99, yearly: 53.88 },
@@ -9,15 +9,29 @@ const PLAN_PRICES = {
   'Enterprise': { monthly: 29.99, yearly: 239.88 },
 };
 
+// CNY prices (roughly 7x USD)
+const PLAN_PRICES_CNY = {
+  'Basic': { monthly: 27.93, yearly: 209.16 },
+  'Standard': { monthly: 48.93, yearly: 377.16 },
+  'Premium': { monthly: 69.93, yearly: 545.16 },
+  'Advanced': { monthly: 104.93, yearly: 839.16 },
+  'Enterprise': { monthly: 209.93, yearly: 1679.16 },
+};
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const body = await req.json().catch(() => ({}));
-    const { plan, isBilledYearly, paymentMethod } = body;
+    const { plan, isBilledYearly, paymentMethod, currency } = body;
 
     if (!plan || !PLAN_PRICES[plan]) {
       return Response.json({ error: 'Invalid plan name' }, { status: 400 });
     }
+
+    // Determine currency and validate payment method combo
+    const isCNY = currency === 'CNY' || paymentMethod === 'alipay' || paymentMethod === 'wechat_pay';
+    const finalCurrency = isCNY ? 'CNY' : 'USD';
+    const prices = isCNY ? PLAN_PRICES_CNY : PLAN_PRICES;
 
     // Try to get authenticated user — not required for checkout
     let user = null;
@@ -28,14 +42,17 @@ Deno.serve(async (req) => {
     }
 
     const customerEmail = user?.email || undefined;
-    const planPrice = PLAN_PRICES[plan];
+    const planPrice = prices[plan];
     const amountInCents = Math.round((isBilledYearly ? planPrice.yearly : planPrice.monthly) * 100);
 
     const stripe = await import('npm:stripe@14.0.0');
     const stripeClient = new stripe.default(Deno.env.get('STRIPE_SECRET_KEY'));
 
-    // Only card is supported for USD currency (alipay/wechat require CNY)
-    const paymentMethodTypes = ['card'];
+    // Payment method types based on currency
+    let paymentMethodTypes = ['card'];
+    if (finalCurrency === 'CNY') {
+      paymentMethodTypes = paymentMethod === 'alipay' ? ['alipay'] : paymentMethod === 'wechat_pay' ? ['wechat_pay'] : ['card', 'alipay', 'wechat_pay'];
+    }
 
     // Always use payment mode (one-time) since alipay/wechat don't support subscriptions
     const sessionConfig = {
@@ -43,7 +60,7 @@ Deno.serve(async (req) => {
       line_items: [
         {
           price_data: {
-            currency: 'usd',
+            currency: finalCurrency.toLowerCase(),
             product_data: {
               name: `VoxVPN ${plan} Plan`,
               description: isBilledYearly ? 'Yearly subscription' : 'Monthly subscription',
