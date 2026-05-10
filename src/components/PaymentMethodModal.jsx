@@ -4,17 +4,34 @@ import { base44 } from '@/api/base44Client';
 
 // WeChat Pay and Alipay logos as inline SVGs
 const WeChatIcon = () => (
-  <svg viewBox="0 0 24 24" className="w-4 h-4" fill="#07C160"><path d="M9.5 4C5.36 4 2 6.91 2 10.5c0 2.02 1.07 3.84 2.75 5.03L4 18l2.5-1.25c.95.27 1.96.42 3 .42.26 0 .52-.01.77-.04A5.5 5.5 0 0 0 10 17.5c0-3.04 2.69-5.5 6-5.5.26 0 .52.02.77.05C16.4 9.77 13.28 4 9.5 4zm-1.75 5.25a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm3.5 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2zM16 13c-2.76 0-5 1.79-5 4s2.24 4 5 4c.7 0 1.37-.13 1.97-.36L20 22l-.7-2.35C20.6 18.8 21 17.94 21 17c0-2.21-2.24-4-5-4zm-1.25 3.25a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5zm2.5 0a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5z"/></svg>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/WeChat_logo.svg/120px-WeChat_logo.svg.png" alt="WeChat Pay" className="w-6 h-6 object-contain" />
 );
 
 const AlipayIcon = () => (
-  <svg viewBox="0 0 24 24" className="w-4 h-4" fill="#1677FF"><path d="M3 3h18v18H3V3zm9 2.5C9.01 5.5 6.5 8.01 6.5 11S9.01 16.5 12 16.5c1.37 0 2.62-.51 3.57-1.35-1.18-.57-2.46-1.19-3.57-1.77v-1.63h5.4c.07.31.1.63.1.95 0 2.99-2.51 5.5-5.5 5.5S6.5 13.99 6.5 11 9.01 5.5 12 5.5c1.78 0 3.36.84 4.39 2.15l-1.6 1.1A3.48 3.48 0 0 0 12 7.5c-1.93 0-3.5 1.57-3.5 3.5 0 .83.29 1.59.77 2.19.9.45 2.62 1.3 4.24 2.08C14.3 14.67 15.5 13 15.5 11c0-.35-.04-.7-.1-1.03H12V8.5h5.38c.08.48.12.97.12 1.5 0 3.31-2.69 6-6 6s-6-2.69-6-6 2.69-6 6-6z"/></svg>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Alipay_logo.svg/120px-Alipay_logo.svg.png" alt="Alipay" className="w-6 h-6 object-contain" />
 );
 
 const STRIPE_METHODS = [
-  { id: 'card', label: 'Credit / Debit Card', sub: 'Visa, Mastercard, Amex', icon: <CreditCard size={14} className="text-cyan-400" /> },
-  { id: 'alipay', label: 'Alipay', sub: 'Pay with your Alipay account 支付宝', icon: <AlipayIcon /> },
-  { id: 'wechat_pay', label: 'WeChat Pay', sub: 'Pay with WeChat Pay 微信支付', icon: <WeChatIcon /> },
+  {
+    id: 'card',
+    label: 'Credit / Debit Card',
+    icon: (
+      <div className="flex items-center gap-0.5">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/100px-Visa_Inc._logo.svg.png" alt="Visa" className="h-4 object-contain" />
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/100px-Mastercard-logo.svg.png" alt="Mastercard" className="h-5 object-contain" />
+      </div>
+    ),
+  },
+  {
+    id: 'alipay',
+    label: 'Alipay 支付宝',
+    icon: <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Alipay_logo.svg/200px-Alipay_logo.svg.png" alt="Alipay" className="h-6 object-contain" />,
+  },
+  {
+    id: 'wechat_pay',
+    label: 'WeChat Pay 微信',
+    icon: <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/WeChat_logo.svg/200px-WeChat_logo.svg.png" alt="WeChat Pay" className="h-6 w-6 object-contain" />,
+  },
 ];
 
 export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, isAdmin, isBilledYearly }) {
@@ -90,10 +107,10 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
                   <button
                     key={m.id}
                     onClick={() => setStripeSubMethod(m.id)}
-                    className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 text-center transition-all ${stripeSubMethod === m.id ? 'border-cyan-400 bg-cyan-500/10' : 'border-white/10 hover:border-white/20 bg-[#0a1020]'}`}
+                    className={`flex flex-col items-center justify-center gap-2 p-3 rounded-xl border-2 text-center transition-all min-h-[80px] ${stripeSubMethod === m.id ? 'border-cyan-400 bg-cyan-500/10' : 'border-white/10 hover:border-white/20 bg-[#0a1020]'}`}
                   >
-                    {m.icon}
-                    <span className="text-white text-[11px] font-bold leading-tight">{m.label}</span>
+                    <div className="flex items-center justify-center h-8">{m.icon}</div>
+                    <span className="text-white text-[10px] font-semibold leading-tight">{m.label}</span>
                   </button>
                 ))}
               </div>
