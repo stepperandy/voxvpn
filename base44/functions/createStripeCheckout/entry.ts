@@ -48,12 +48,11 @@ Deno.serve(async (req) => {
     const stripe = await import('npm:stripe@14.0.0');
     const stripeClient = new stripe.default(Deno.env.get('STRIPE_SECRET_KEY'));
 
-    // Payment method types — only card is supported (alipay/wechat require separate handling)
-    const paymentMethodTypes = ['card'];
+
 
     // Always use payment mode (one-time) since alipay/wechat don't support subscriptions
     const sessionConfig = {
-      payment_method_types: paymentMethodTypes,
+      mode: 'payment',
       line_items: [
         {
           price_data: {
@@ -67,7 +66,9 @@ Deno.serve(async (req) => {
           quantity: 1,
         },
       ],
-      mode: 'payment',
+      automatic_payment_methods: {
+        enabled: true,
+      },
       success_url: `${Deno.env.get('APP_URL')}/download?payment=success`,
       cancel_url: `${Deno.env.get('APP_URL')}/pricing`,
       ...(customerEmail ? { customer_email: customerEmail } : {}),
