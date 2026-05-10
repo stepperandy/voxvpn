@@ -52,9 +52,11 @@ Deno.serve(async (req) => {
     const stripeClient = new stripe.default(Deno.env.get('STRIPE_SECRET_KEY'));
 
     // Determine payment method types based on selected method
+    // Note: Alipay and WeChat Pay require special Stripe account setup, fall back to card if not available
     let paymentMethodTypes = ['card'];
-    if (paymentMethod === 'alipay') paymentMethodTypes = ['alipay'];
-    if (paymentMethod === 'wechat_pay') paymentMethodTypes = ['wechat_pay'];
+    // For now, Alipay/WeChat always use card—they'll be enabled later
+    // if (paymentMethod === 'alipay') paymentMethodTypes = ['alipay'];
+    // if (paymentMethod === 'wechat_pay') paymentMethodTypes = ['wechat_pay'];
 
     // Always use payment mode (one-time)
     const sessionConfig = {
