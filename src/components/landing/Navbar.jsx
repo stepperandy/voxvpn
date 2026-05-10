@@ -1,4 +1,4 @@
-import { Menu, X, LogOut, Shield } from 'lucide-react';
+import { Menu, X, LogOut, Shield, Globe } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
@@ -14,11 +14,24 @@ const navLinks = [
   { label: 'Buy VPN', href: '/pricing' },
 ];
 
+const LANGUAGES = [
+  { code: 'en', label: 'English', flag: '🇬🇧' },
+  { code: 'es', label: 'Español', flag: '🇪🇸' },
+  { code: 'fr', label: 'Français', flag: '🇫🇷' },
+  { code: 'de', label: 'Deutsch', flag: '🇩🇪' },
+  { code: 'zh', label: '中文', flag: '🇨🇳' },
+  { code: 'ja', label: '日本語', flag: '🇯🇵' },
+  { code: 'ru', label: 'Русский', flag: '🇷🇺' },
+  { code: 'ar', label: 'العربية', flag: '🇸🇦' },
+];
+
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [activeHash, setActiveHash] = useState('');
   const [announcementVisible, setAnnouncementVisible] = useState(true);
+  const [language, setLanguage] = useState('en');
+  const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -97,6 +110,36 @@ export default function Navbar() {
                   Admin
                 </Link>
               )}
+
+              {/* Language dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setLangDropdownOpen(!langDropdownOpen)}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-slate-400 hover:text-white transition-all"
+                >
+                  <Globe size={14} /> {language.toUpperCase()}
+                </button>
+                {langDropdownOpen && (
+                  <div className="absolute top-full right-0 mt-1 bg-[#0d1120] border border-white/10 rounded-lg shadow-lg z-50 min-w-40">
+                    {LANGUAGES.map((lang) => (
+                      <button
+                        key={lang.code}
+                        onClick={() => {
+                          setLanguage(lang.code);
+                          setLangDropdownOpen(false);
+                        }}
+                        className={`w-full flex items-center gap-2 px-4 py-2 text-sm transition-colors ${
+                          language === lang.code
+                            ? 'bg-cyan-500/10 text-cyan-400 border-l-2 border-cyan-400'
+                            : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                        }`}
+                      >
+                        <span>{lang.flag}</span> {lang.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* CTA buttons */}
@@ -168,6 +211,30 @@ export default function Navbar() {
                   Admin Panel
                 </Link>
               )}
+              
+              {/* Language dropdown mobile */}
+              <div className="px-3 py-2">
+                <p className="text-slate-500 text-xs uppercase tracking-wider mb-2">Language</p>
+                <div className="space-y-1">
+                  {LANGUAGES.map((lang) => (
+                    <button
+                      key={lang.code}
+                      onClick={() => {
+                        setLanguage(lang.code);
+                        setMobileOpen(false);
+                      }}
+                      className={`w-full flex items-center gap-2 px-3 py-1.5 rounded text-sm transition-colors ${
+                        language === lang.code
+                          ? 'bg-cyan-500/10 text-cyan-400'
+                          : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                      }`}
+                    >
+                      <span>{lang.flag}</span> {lang.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               {user && (
                 <Link
                   to="/dashboard"
