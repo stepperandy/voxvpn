@@ -61,8 +61,16 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
         isBilledYearly: !!isBilledYearly,
         paymentMethod: stripeSubMethod,
       });
-      if (res.data?.url) window.location.href = res.data.url;
-      else alert('Payment error: ' + (res.data?.error || 'Unknown error'));
+      console.log('Stripe response:', res);
+      const url = res?.data?.url;
+      if (url) {
+        console.log('Redirecting to:', url);
+        window.location.href = url;
+      } else {
+        const errorMsg = res?.data?.error || res?.data?.message || 'Unknown error';
+        console.error('Stripe error:', errorMsg);
+        alert('Payment error: ' + errorMsg);
+      }
     } finally {
       setLoading(false);
     }
