@@ -169,12 +169,59 @@ export default function DownloadPage() {
           </div>
         </motion.div>
 
-        {/* Other platforms coming soon */}
+        {/* iOS & Android */}
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+          className="rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 to-[#0d1120] p-6 mb-6">
+          <h3 className="text-white font-bold text-base mb-1">iOS & Android</h3>
+          <p className="text-slate-400 text-xs mb-5">Use the free OpenVPN Connect app to connect VoxVPN on your mobile device.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+            {/* iOS */}
+            <div className="rounded-xl border border-white/5 bg-[#0a1020] p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">🍎</span>
+                <p className="text-white font-bold text-sm">iPhone / iPad</p>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 font-bold">Available</span>
+              </div>
+              <ol className="text-slate-400 text-xs space-y-1 list-decimal list-inside">
+                <li>Install <strong className="text-white">OpenVPN Connect</strong> from the App Store</li>
+                <li>Go to your <a href="/setup" className="text-cyan-400 hover:underline">Setup Portal</a> and download your config</li>
+                <li>Open the <code className="text-cyan-400">.ovpn</code> file — it will import into OpenVPN Connect</li>
+                <li>Tap <strong className="text-white">Connect</strong></li>
+              </ol>
+              <a href="https://apps.apple.com/app/openvpn-connect/id590379981" target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-2 px-3 py-2 bg-black border border-white/20 rounded-xl hover:opacity-90 transition-opacity w-full justify-center">
+                <svg viewBox="0 0 24 24" className="w-4 h-4 fill-white"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                <span className="text-white text-xs font-bold">Download on the App Store</span>
+              </a>
+            </div>
+            {/* Android */}
+            <div className="rounded-xl border border-white/5 bg-[#0a1020] p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">🤖</span>
+                <p className="text-white font-bold text-sm">Android</p>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 font-bold">Available</span>
+              </div>
+              <ol className="text-slate-400 text-xs space-y-1 list-decimal list-inside">
+                <li>Install <strong className="text-white">OpenVPN Connect</strong> from Google Play</li>
+                <li>Go to your <a href="/setup" className="text-cyan-400 hover:underline">Setup Portal</a> and download your config</li>
+                <li>Open the <code className="text-cyan-400">.ovpn</code> file — it will import into OpenVPN Connect</li>
+                <li>Tap <strong className="text-white">Connect</strong></li>
+              </ol>
+              <a href="https://play.google.com/store/apps/details?id=net.openvpn.openvpn" target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-2 px-3 py-2 bg-black border border-white/20 rounded-xl hover:opacity-90 transition-opacity w-full justify-center">
+                <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none"><path d="M3.18 23.76c.3.17.65.19.97.06l13.2-7.62-2.82-2.82-11.35 10.38z" fill="#EA4335"/><path d="M21.37 10.3L18.5 8.63l-3.12 3.12 3.12 3.12 2.9-1.67c.83-.48.83-1.42-.03-1.9z" fill="#FBBC05"/><path d="M3.18.24C2.85.38 2.63.74 2.63 1.22v21.56c0 .48.22.84.55.98l.1.06 12.07-12.07v-.28L3.28.18l-.1.06z" fill="#4285F4"/><path d="M15.35 11.75l-3.12-3.12L.17.24C.09.26.02.3 0 .37L12.22 12l3.13-3.13v2.88z" fill="#34A853"/></svg>
+                <span className="text-white text-xs font-bold">Get it on Google Play</span>
+              </a>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Other platforms coming soon */}
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
           className="rounded-2xl border border-white/5 bg-[#0d1120] p-6 mb-6">
           <h3 className="text-white font-bold text-base mb-4">Other Platforms</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {['macOS', 'Linux', 'iOS', 'Android', 'Router'].map(platform => (
+            {['macOS', 'Linux', 'Router'].map(platform => (
               <div key={platform} className="flex items-center justify-between px-4 py-3 rounded-xl border border-white/5 bg-[#0a1020]">
                 <span className="text-slate-400 text-sm">{platform}</span>
                 <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold">Coming Soon</span>
