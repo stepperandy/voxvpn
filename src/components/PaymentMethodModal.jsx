@@ -89,6 +89,32 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
             </div>
           </label>
 
+          {/* WeChat Pay */}
+          <label className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-colors ${selectedMethod === 'wechat_pay' ? 'border-green-500 bg-green-500/5' : 'border-white/10 hover:border-white/20'}`}>
+            <input type="radio" name="payment" value="wechat_pay" checked={selectedMethod === 'wechat_pay'} onChange={(e) => setSelectedMethod(e.target.value)} className="mt-1.5" />
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <Smartphone size={14} className="text-green-400" />
+                <p className="text-white font-bold text-sm">WeChat Pay</p>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-500/20 text-green-400 font-bold">CN</span>
+              </div>
+              <p className="text-slate-400 text-xs mt-0.5">Fast & secure mobile payment</p>
+            </div>
+          </label>
+
+          {/* Alipay */}
+          <label className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-colors ${selectedMethod === 'alipay' ? 'border-blue-500 bg-blue-500/5' : 'border-white/10 hover:border-white/20'}`}>
+            <input type="radio" name="payment" value="alipay" checked={selectedMethod === 'alipay'} onChange={(e) => setSelectedMethod(e.target.value)} className="mt-1.5" />
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <Smartphone size={14} className="text-blue-400" />
+                <p className="text-white font-bold text-sm">Alipay</p>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400 font-bold">CN</span>
+              </div>
+              <p className="text-slate-400 text-xs mt-0.5">Alibaba's digital wallet</p>
+            </div>
+          </label>
+
           <label className="flex items-start gap-3 p-4 rounded-xl border-2 border-white/10 cursor-pointer opacity-50">
             <input type="radio" name="payment" value="bank" disabled className="mt-1.5" />
             <div className="flex-1">

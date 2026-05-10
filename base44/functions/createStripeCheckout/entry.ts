@@ -24,9 +24,8 @@ Deno.serve(async (req) => {
     const amount = Math.round((isBilledYearly ? planPrice.yearly : planPrice.monthly) * 100);
     const origin = req.headers.get('origin') || Deno.env.get('APP_URL') || 'https://voxvpn.net';
 
-    const paymentMethods = ['card'];
-    // Only add Alipay/WeChat if supported currency (they require CNY or other specific currencies)
-    // For USD, keep card-only to avoid Stripe validation errors
+    const paymentMethods = ['card', 'alipay', 'wechat_pay'];
+    // USD supports Alipay and WeChat Pay via Stripe
     
     const session = await client.checkout.sessions.create({
       mode: 'payment',

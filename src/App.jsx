@@ -75,6 +75,7 @@ const UserProfile = lazy(() => import('./pages/UserProfile.jsx'));
 const MobileSetupGuide = lazy(() => import('./pages/MobileSetupGuide.jsx'));
 const VoxVPNApp = lazy(() => import('./pages/VoxVPNApp.jsx'));
 const ReferralPage = lazy(() => import('./pages/ReferralPage.jsx'));
+const ReferralDashboard = lazy(() => import('./pages/ReferralDashboard.jsx'));
 const About = lazy(() => import('./pages/About.jsx'));
 const ServersPage = lazy(() => import('./pages/ServersPage.jsx'));
 const DownloadPage = lazy(() => import('./pages/Download.jsx'));
@@ -181,6 +182,7 @@ const AuthenticatedApp = ({ isMobileDevice }) => {
           <Route path="/mobile-setup" element={<PageTransition><MobileSetupGuide /></PageTransition>} />
           <Route path="/vpn-app" element={<VoxVPNApp />} />
           <Route path="/referral" element={<PageTransition><ReferralPage /></PageTransition>} />
+          <Route path="/referral-dashboard" element={<PageTransition><ReferralDashboard /></PageTransition>} />
           <Route path="/about" element={<PageTransition><About /></PageTransition>} />
           <Route path="/servers" element={<PageTransition><ServersPage /></PageTransition>} />
           <Route path="/download" element={<PageTransition><DownloadPage /></PageTransition>} />
