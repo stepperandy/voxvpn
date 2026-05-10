@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { CreditCard, X, Smartphone } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 
-export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, isAdmin, isBilledYearly }) {
+export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, isAdmin, isBilledYearly, currency, countryCode }) {
   const [selectedMethod, setSelectedMethod] = useState('stripe');
   const [loading, setLoading] = useState(false);
 
@@ -30,6 +30,8 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
         plan: plan?.name,
         isBilledYearly: !!isBilledYearly,
         paymentMethod: selectedMethod,
+        currencyCode: currency?.code || 'USD',
+        countryCode: countryCode || 'US',
       });
       const url = res?.data?.url;
       if (url) {

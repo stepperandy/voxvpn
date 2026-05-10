@@ -8,12 +8,21 @@ const PLAN_PRICES = {
   'Enterprise': { monthly: 29.99, yearly: 239.88 },
 };
 
-const USD_TO_CNY = 7.3; // Approximate exchange rate
+const CURRENCY_RATES = {
+  'CNY': 7.3,
+  'GBP': 0.79,
+  'EUR': 0.92,
+  'JPY': 155,
+  'INR': 83,
+  'BRL': 4.97,
+  'AUD': 1.50,
+  'USD': 1,
+};
 
 Deno.serve(async (req) => {
   try {
     const body = await req.json().catch(() => ({}));
-    const { plan, isBilledYearly, paymentMethod } = body;
+    const { plan, isBilledYearly, paymentMethod, currencyCode, countryCode } = body;
 
     if (!plan || !PLAN_PRICES[plan]) {
       return Response.json({ error: 'Invalid plan' }, { status: 400 });
@@ -25,14 +34,12 @@ Deno.serve(async (req) => {
     const planPrice = PLAN_PRICES[plan];
     let usdAmount = isBilledYearly ? planPrice.yearly : planPrice.monthly;
     
-    // Convert to CNY for Alipay and WeChat Pay
-    let currency = 'usd';
-    if (paymentMethod === 'alipay' || paymentMethod === 'wechat_pay') {
-      usdAmount = usdAmount * USD_TO_CNY;
-      currency = 'cny';
-    }
+    // Use provided currency or default to USD
+    let currency = (currencyCode || 'USD').toLowerCase();
+    const rate = CURRENCY_RATES[currencyCode] || 1;
+    const convertedAmount = usdAmount * rate;
     
-    const amount = Math.round(usdAmount * 100);
+    const amount = Math.round(convertedAmount * 100);
     const origin = req.headers.get('origin') || Deno.env.get('APP_URL') || 'https://voxvpn.net';
 
     const paymentMethods = ['card', 'alipay', 'wechat_pay'];

@@ -118,8 +118,10 @@ const PLANS = [
   },
 ];
 
-function PlanCard({ plan, yearly, onSelectPlan }) {
+function PlanCard({ plan, yearly, onSelectPlan, currency, convertPrice }) {
   const price = yearly ? plan.yearlyPrice : plan.monthlyPrice;
+  const convertedPrice = convertPrice(price);
+  const convertedTotal = yearly ? convertPrice(plan.yearlyPrice * 12) : convertPrice(price);
 
   return (
     <div className={`relative rounded-xl p-6 flex flex-col ${plan.color}`}>
@@ -135,11 +137,11 @@ function PlanCard({ plan, yearly, onSelectPlan }) {
       </div>
 
       <div className="flex items-baseline gap-1 mb-1">
-        <span className="text-3xl font-extrabold text-white">${price}</span>
+        <span className="text-3xl font-extrabold text-white">{currency.symbol}{convertedPrice}</span>
         <span className="text-slate-500 text-xs">/mo</span>
       </div>
       <p className="text-slate-600 text-xs mb-5">
-        {yearly ? `Billed $${plan.yearlyTotal}/year` : 'Billed monthly'}
+        {yearly ? `Billed ${currency.symbol}${convertedTotal}/${currency.code === 'JPY' || currency.code === 'INR' ? 'year' : 'year'}` : 'Billed monthly'}
         {yearly && <span className="ml-2 text-emerald-400 font-semibold">Save {Math.round((1 - plan.yearlyPrice / plan.monthlyPrice) * 100)}%</span>}
       </p>
 
@@ -162,12 +164,38 @@ function PlanCard({ plan, yearly, onSelectPlan }) {
   );
 }
 
+const CURRENCY_RATES = {
+  'CN': { code: 'CNY', rate: 7.3, symbol: '¥' },
+  'US': { code: 'USD', rate: 1, symbol: '$' },
+  'GB': { code: 'GBP', rate: 0.79, symbol: '£' },
+  'EU': { code: 'EUR', rate: 0.92, symbol: '€' },
+  'JP': { code: 'JPY', rate: 155, symbol: '¥' },
+  'IN': { code: 'INR', rate: 83, symbol: '₹' },
+  'BR': { code: 'BRL', rate: 4.97, symbol: 'R$' },
+  'AU': { code: 'AUD', rate: 1.50, symbol: 'A$' },
+};
+
 export default function Pricing() {
   const [yearly, setYearly] = useState(false);
   const [user, setUser] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [selectedYearly, setSelectedYearly] = useState(false);
+  const [currency, setCurrency] = useState({ code: 'USD', rate: 1, symbol: '$' });
+  const [countryCode, setCountryCode] = useState('US');
+
+  useEffect(() => {
+    // Detect user location via IP geolocation
+    fetch('https://ipapi.co/json/')
+      .then(res => res.json())
+      .then(data => {
+        const code = data.country_code || 'US';
+        const detected = CURRENCY_RATES[code] || CURRENCY_RATES['US'];
+        setCurrency(detected);
+        setCountryCode(code);
+      })
+      .catch(() => setCurrency(CURRENCY_RATES['US']));
+  }, []);
 
   useEffect(() => {
     base44.auth.me()
@@ -181,6 +209,10 @@ export default function Pricing() {
     setModalOpen(true);
   };
 
+  const convertPrice = (usdPrice) => {
+    return (usdPrice * currency.rate).toFixed(currency.rate >= 100 ? 0 : 2);
+  };
+
   return (
     <div className="min-h-screen bg-[#060c1a]">
       <Navbar />
@@ -191,6 +223,12 @@ export default function Pricing() {
             <p className="text-cyan-400 text-xs font-semibold tracking-widest uppercase mb-3">Pricing</p>
             <h1 className="text-4xl sm:text-5xl font-black text-white mb-4">Simple, Transparent Pricing</h1>
             <p className="text-slate-400 text-sm max-w-2xl mx-auto">All plans include AES-256 encryption and a strict no-logs policy. Cancel anytime.</p>
+          </motion.div>
+
+          {/* Currency Info */}
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.03 }}
+            className="text-center mb-6">
+            <p className="text-slate-500 text-xs">Prices shown in <span className="text-cyan-400 font-semibold">{currency.code}</span></p>
           </motion.div>
 
           {/* Toggle */}
@@ -218,7 +256,7 @@ export default function Pricing() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-12">
             {PLANS.map((plan, i) => (
               <motion.div key={plan.name} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 + i * 0.05 }}>
-                <PlanCard plan={plan} yearly={yearly} onSelectPlan={handleSelectPlan} />
+                <PlanCard plan={plan} yearly={yearly} onSelectPlan={handleSelectPlan} currency={currency} convertPrice={convertPrice} />
               </motion.div>
             ))}
           </div>
@@ -231,6 +269,8 @@ export default function Pricing() {
             isBilledYearly={selectedYearly}
             isAdmin={user?.role === 'admin'}
             onProceed={() => setModalOpen(false)}
+            currency={currency}
+            countryCode={countryCode}
           />
 
           {/* Trust bar */}
