@@ -4,10 +4,9 @@ import Footer from '@/components/landing/Footer';
 import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { Download, Loader2, AlertCircle, Shield, Lock, CheckCircle2, Monitor, RefreshCw, ExternalLink, Smartphone, Apple } from 'lucide-react';
+
 import { Link } from 'react-router-dom';
 
-const INSTALLER_URL = 'https://github.com/stepperandy/VoxVPN-Setup-1.5/releases/tag/v1.5';
-const INSTALLER_VERSION = 'v1.5';
 
 const PLATFORMS = [
   {
@@ -16,17 +15,19 @@ const PLATFORMS = [
     icon: Monitor,
     color: '#00d4ff',
     title: 'VoxVPN for Windows',
-    subtitle: 'Full desktop installer — installs in seconds, connects in one click',
+    subtitle: 'Get your personal config and connect in minutes using OpenVPN Connect',
     specs: 'Windows 10 / 11',
-    btnLabel: 'Download VoxVPN for Windows',
-    url: INSTALLER_URL,
-    isExternal: true,
-    note: 'Clicking opens the GitHub release page. Select VoxVPN-Setup-v1.5.exe to download.',
+    btnLabel: 'Get Your Windows Config',
+    url: '/setup',
+    isExternal: false,
+    note: 'Step 1: Install OpenVPN Connect (free). Step 2: Use the Setup Portal to download your personal .ovpn config file.',
+    appStoreUrl: 'https://openvpn.net/client/',
+    appStoreLabel: 'Download OpenVPN Connect for Windows →',
     steps: [
-      'Download the installer using the button above',
-      'Run VoxVPN-Setup-v1.5.exe (allow admin prompt if asked)',
-      'Sign in with your VoxVPN account credentials',
-      'Choose a server location and click Connect',
+      'Install OpenVPN Connect (free) from openvpn.net',
+      'Click "Get Your Windows Config" above to open the Setup Portal',
+      'Select "Windows" as your platform and download the .ovpn file',
+      'In OpenVPN Connect, click "+" → Import → select the .ovpn file → Connect',
     ],
   },
   {
@@ -131,7 +132,6 @@ export default function DownloadPage() {
   }, []);
 
   const isExpired = subscription && !canDownload(subscription);
-  const downloadUrl = subscription?.download_link || INSTALLER_URL;
 
   // Not logged in
   if (!loading && !user) {
@@ -274,7 +274,7 @@ export default function DownloadPage() {
                 {/* Platform Card */}
                 {PLATFORMS.filter(p => p.id === activePlatform).map((p) => {
                   const Icon = p.icon;
-                  const url = p.id === 'windows' ? downloadUrl : p.url;
+                  const url = p.url;
                   return (
                     <div key={p.id}>
                       <div className="rounded-2xl border bg-[#0d1420] p-8 mb-6 text-center space-y-6"
