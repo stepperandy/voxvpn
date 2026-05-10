@@ -3,7 +3,7 @@ import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
 import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
-import { Monitor, Download, Loader2, AlertCircle, Shield, Clock, Lock } from 'lucide-react';
+import { Monitor, Download, Loader2, AlertCircle, Shield, Clock, Lock, CheckCircle2 } from 'lucide-react';
 
 const INSTALLER_URL = 'https://github.com/stepperandy/VoxVPN-Setup-1.5/releases/download/v1.5/VoxVPN-Setup-v1.5.exe';
 const INSTALLER_FILE = 'VoxVPN-Setup-v1.5.exe';
@@ -226,6 +226,7 @@ export default function DownloadPage() {
   const [user, setUser] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [loading, setLoading] = useState(true);
+  const justPaid = new URLSearchParams(window.location.search).get('payment') === 'success';
 
   useEffect(() => {
     base44.auth.me()
@@ -323,6 +324,18 @@ export default function DownloadPage() {
           </div>
         ) : (
           <>
+            {/* Payment success banner */}
+            {justPaid && (
+              <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+                className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-5 mb-6 flex items-center gap-4">
+                <CheckCircle2 size={28} className="text-emerald-400 flex-shrink-0" />
+                <div>
+                  <p className="text-emerald-300 font-bold text-base">Payment Successful! 🎉</p>
+                  <p className="text-emerald-300/60 text-xs mt-0.5">Your subscription is now active. Download VoxVPN for your device{allowedPlatforms.length > 1 ? 's' : ''} below.</p>
+                </div>
+              </motion.div>
+            )}
+
             {/* Countdown timer */}
             {subscription?.renewal_date && (
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>

@@ -21,30 +21,9 @@ export default function PaymentSuccess() {
   ];
 
   useEffect(() => {
-    loadUserAndSetups();
+    // Redirect all users to the download page which handles plan-based gating
+    window.location.href = '/download?payment=success';
   }, []);
-
-  const loadUserAndSetups = async () => {
-    try {
-      const currentUser = await base44.auth.me();
-      
-      // Redirect admins to server downloads page
-      if (currentUser?.role === 'admin') {
-        window.location.href = '/download';
-        return;
-      }
-
-      setUser(currentUser);
-
-      // Generate setups for all devices
-      const res = await base44.functions.invoke('generateSetups', {});
-      setDownloads(res.data?.setups || []);
-    } catch (err) {
-      console.error('Failed to load user/setups:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDownload = async (deviceId) => {
     setDownloading(prev => ({ ...prev, [deviceId]: true }));

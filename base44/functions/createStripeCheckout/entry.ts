@@ -59,7 +59,7 @@ Deno.serve(async (req) => {
         },
       ],
       mode: 'subscription',
-      success_url: `${Deno.env.get('APP_URL')}/setup?token={CHECKOUT_SESSION_ID}`,
+      success_url: `${Deno.env.get('APP_URL')}/download?payment=success`,
       cancel_url: `${Deno.env.get('APP_URL')}/#pricing`,
       ...(customerEmail ? { customer_email: customerEmail } : {}),
       metadata: {
