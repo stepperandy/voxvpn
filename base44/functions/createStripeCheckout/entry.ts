@@ -1,6 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
-// Plan-to-price mapping (USD prices)
 const PLAN_PRICES = {
   'Basic': { monthly: 3.99, yearly: 29.88 },
   'Standard': { monthly: 6.99, yearly: 53.88 },
@@ -9,92 +8,45 @@ const PLAN_PRICES = {
   'Enterprise': { monthly: 29.99, yearly: 239.88 },
 };
 
-// CNY prices (roughly 7x USD)
-const PLAN_PRICES_CNY = {
-  'Basic': { monthly: 27.93, yearly: 209.16 },
-  'Standard': { monthly: 48.93, yearly: 377.16 },
-  'Premium': { monthly: 69.93, yearly: 545.16 },
-  'Advanced': { monthly: 104.93, yearly: 839.16 },
-  'Enterprise': { monthly: 209.93, yearly: 1679.16 },
-};
-
 Deno.serve(async (req) => {
   try {
-    const base44 = createClientFromRequest(req);
     const body = await req.json().catch(() => ({}));
-    const { plan, isBilledYearly, paymentMethod, currency } = body;
+    const { plan, isBilledYearly } = body;
 
     if (!plan || !PLAN_PRICES[plan]) {
-      return Response.json({ error: 'Invalid plan name' }, { status: 400 });
+      return Response.json({ error: 'Invalid plan' }, { status: 400 });
     }
-
-    // Determine currency and validate payment method combo
-    // Alipay and WeChat require USD on Stripe (they handle currency conversion)
-    const isCNY = currency === 'CNY' && paymentMethod !== 'alipay' && paymentMethod !== 'wechat_pay';
-    const finalCurrency = isCNY ? 'CNY' : 'USD';
-    const prices = isCNY ? PLAN_PRICES_CNY : PLAN_PRICES;
-
-    // Try to get authenticated user — not required for checkout
-    let user = null;
-    try {
-      user = await base44.auth.me();
-    } catch (_) {
-      // unauthenticated — continue
-    }
-
-    const customerEmail = user?.email || undefined;
-    const planPrice = prices[plan];
-    const amountInCents = Math.round((isBilledYearly ? planPrice.yearly : planPrice.monthly) * 100);
-
-    // Use request origin for preview/prod compatibility, fallback to APP_URL
-    const origin = req.headers.get('origin') || Deno.env.get('APP_URL') || 'https://voxvpn.net';
 
     const stripe = await import('npm:stripe@14.0.0');
-    const stripeClient = new stripe.default(Deno.env.get('STRIPE_SECRET_KEY'));
+    const client = new stripe.default(Deno.env.get('STRIPE_SECRET_KEY'));
 
-    // Determine payment method types based on selected method
-    let paymentMethodTypes = ['card'];
-    if (paymentMethod === 'alipay') paymentMethodTypes = ['alipay'];
-    if (paymentMethod === 'wechat_pay') paymentMethodTypes = ['wechat_pay'];
+    const planPrice = PLAN_PRICES[plan];
+    const amount = Math.round((isBilledYearly ? planPrice.yearly : planPrice.monthly) * 100);
+    const origin = req.headers.get('origin') || Deno.env.get('APP_URL') || 'https://voxvpn.net';
 
-    // Always use payment mode (one-time)
-    const sessionConfig = {
+    const session = await client.checkout.sessions.create({
       mode: 'payment',
-      payment_method_types: paymentMethodTypes,
+      payment_method_types: ['card'],
       line_items: [
         {
           price_data: {
-            currency: finalCurrency.toLowerCase(),
+            currency: 'usd',
             product_data: {
               name: `VoxVPN ${plan} Plan`,
-              description: isBilledYearly ? 'Yearly subscription' : 'Monthly subscription',
+              description: isBilledYearly ? 'Yearly' : 'Monthly',
             },
-            unit_amount: amountInCents,
+            unit_amount: amount,
           },
           quantity: 1,
         },
       ],
       success_url: `${origin}/payment-success`,
       cancel_url: `${origin}/pricing`,
-      ...(customerEmail ? { customer_email: customerEmail } : {}),
-      metadata: {
-        plan: plan,
-        billing: isBilledYearly ? 'yearly' : 'monthly',
-        ...(user ? { user_id: user.id, email: user.email } : {}),
-      },
-    };
-
-    const session = await stripeClient.checkout.sessions.create(sessionConfig);
-
-    if (!session || !session.url) {
-      return Response.json({ error: 'Failed to create checkout session' }, { status: 500 });
-    }
-
-    return Response.json({
-      sessionId: session.id,
-      url: session.url,
     });
+
+    return Response.json({ sessionId: session.id, url: session.url });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    console.error('Stripe error:', error);
+    return Response.json({ error: 'Checkout failed' }, { status: 500 });
   }
 });
