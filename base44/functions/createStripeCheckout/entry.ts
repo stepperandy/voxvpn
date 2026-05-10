@@ -26,7 +26,7 @@ Deno.serve(async (req) => {
 
     const session = await client.checkout.sessions.create({
       mode: 'payment',
-      payment_method_types: ['card'],
+      payment_method_types: ['card', 'alipay', 'wechat_pay'],
       line_items: [
         {
           price_data: {
