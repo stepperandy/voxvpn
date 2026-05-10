@@ -128,15 +128,20 @@ function PlanCard({ plan, yearly, onCheckout }) {
         plan: plan.name,
         isBilledYearly: yearly,
       });
-      console.log('Checkout response:', res);
-      if (res.data?.url) {
-        window.location.href = res.data.url;
+      // Handle axios response structure
+      const data = res?.data;
+      console.log('Checkout response:', { res, data });
+      
+      if (data?.url) {
+        window.location.href = data.url;
+      } else if (data?.error) {
+        alert('Payment error: ' + data.error);
       } else {
-        alert('Payment error: ' + (res.data?.error || JSON.stringify(res.data)));
+        alert('Payment error: Unable to process request');
       }
     } catch (err) {
       console.error('Checkout error:', err);
-      alert('Error: ' + err.message);
+      alert('Error: ' + (err?.message || 'Unknown error occurred'));
     } finally {
       setLoading(false);
     }
