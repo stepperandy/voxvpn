@@ -15,6 +15,8 @@ import ServerStatusView from '@/components/admin/ServerStatusView';
 import ConnectionsDashboard from '@/components/admin/ConnectionsDashboard';
 import AffiliatesView from '@/components/admin/AffiliatesView';
 import ProvidersView from '@/components/admin/ProvidersView';
+import DownloadLinkManager from '@/components/admin/DownloadLinkManager';
+import SubscriberStats from '@/components/admin/SubscriberStats';
 
 export default function Admin() {
   const [activePage, setActivePage] = useState('dashboard');
@@ -36,6 +38,16 @@ export default function Admin() {
       case 'connections': return <ConnectionsDashboard />;
       case 'affiliates': return <AffiliatesView />;
       case 'providers': return <ProvidersView />;
+      case 'subscribers': return (
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-black text-white">Subscriber Overview</h2>
+            <p className="text-slate-400 text-sm mt-1">Total subscriber stats and download link management.</p>
+          </div>
+          <SubscriberStats />
+          <DownloadLinkManager />
+        </div>
+      );
       default: return <DashboardView />;
     }
   };

@@ -78,6 +78,8 @@ const ReferralPage = lazy(() => import('./pages/ReferralPage.jsx'));
 const About = lazy(() => import('./pages/About.jsx'));
 const ServersPage = lazy(() => import('./pages/ServersPage.jsx'));
 const DownloadPage = lazy(() => import('./pages/Download.jsx'));
+const UserDashboard = lazy(() => import('./pages/UserDashboard.jsx'));
+const RenewSubscription = lazy(() => import('./pages/RenewSubscription.jsx'));
 const AccountSettings = lazy(() => import('./pages/AccountSettings.jsx'));
 const AffiliatePage = lazy(() => import('./pages/AffiliatePage.jsx'));
 const AffiliateRegister = lazy(() => import('./pages/AffiliateRegister.jsx'));
@@ -116,7 +118,7 @@ const AuthenticatedApp = ({ isMobileDevice }) => {
         <Routes>
           <Route path="/" element={<PageTransition><Home /></PageTransition>} />
           <Route path="/admin" element={<PageTransition><Admin /></PageTransition>} />
-          <Route path="/dashboard" element={<PageTransition><CustomerDashboard /></PageTransition>} />
+          <Route path="/customer-dashboard" element={<PageTransition><CustomerDashboard /></PageTransition>} />
           <Route path="/vpn-for-usa" element={<PageTransition><VpnUSA /></PageTransition>} />
           <Route path="/vpn-for-uk" element={<PageTransition><VpnUK /></PageTransition>} />
           <Route path="/vpn-for-canada" element={<PageTransition><VpnCanada /></PageTransition>} />
@@ -181,6 +183,8 @@ const AuthenticatedApp = ({ isMobileDevice }) => {
           <Route path="/about" element={<PageTransition><About /></PageTransition>} />
           <Route path="/servers" element={<PageTransition><ServersPage /></PageTransition>} />
           <Route path="/download" element={<PageTransition><DownloadPage /></PageTransition>} />
+          <Route path="/dashboard" element={<PageTransition><UserDashboard /></PageTransition>} />
+          <Route path="/renew" element={<PageTransition><RenewSubscription /></PageTransition>} />
           <Route path="/account-settings" element={<PageTransition><AccountSettings /></PageTransition>} />
           <Route path="/affiliate" element={<PageTransition><AffiliatePage /></PageTransition>} />
           <Route path="/affiliate-register" element={<PageTransition><AffiliateRegister /></PageTransition>} />

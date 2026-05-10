@@ -9,6 +9,10 @@
     "plan": {
       "type": "string",
       "enum": [
+        "Free Trial",
+        "Pro Monthly",
+        "Pro Annual",
+        "Business",
         "Basic",
         "Standard",
         "Premium",
@@ -21,9 +25,10 @@
       "type": "string",
       "enum": [
         "active",
-        "paused",
+        "trial",
         "expired",
-        "cancelled"
+        "cancelled",
+        "paused"
       ],
       "default": "active",
       "description": "Current subscription status"
@@ -32,7 +37,9 @@
       "type": "string",
       "enum": [
         "monthly",
-        "yearly"
+        "yearly",
+        "trial",
+        "custom"
       ],
       "description": "Billing cycle"
     },
@@ -48,7 +55,7 @@
     "renewal_date": {
       "type": "string",
       "format": "date-time",
-      "description": "Next renewal date"
+      "description": "Next renewal / expiry date"
     },
     "max_devices": {
       "type": "integer",
@@ -58,9 +65,13 @@
       "type": "string",
       "description": "Stripe subscription ID for billing"
     },
-    "description": {
+    "download_link": {
       "type": "string",
-      "description": "Optional notes or description for this subscription (up to 1000 characters)"
+      "description": "Override download URL (admin-configurable)"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Admin internal notes"
     }
   },
   "required": [

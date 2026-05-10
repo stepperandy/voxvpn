@@ -103,10 +103,10 @@ export default function Navbar() {
             <div className="hidden md:flex items-center gap-1.5 ml-auto flex-shrink-0">
               {user && (
                 <Link
-                  to="/vpn-dashboard"
+                  to="/dashboard"
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-cyan-500/10 border border-cyan-500/30 hover:bg-cyan-500/20 text-cyan-400 text-xs font-bold rounded-full transition-all"
                 >
-                  <Shield size={14} /> My VPN
+                  <Shield size={14} /> My Dashboard
                 </Link>
               )}
               {user ? (
@@ -171,11 +171,11 @@ export default function Navbar() {
               )}
               {user && (
                 <Link
-                  to="/vpn-dashboard"
+                  to="/dashboard"
                   onClick={() => setMobileOpen(false)}
                   className="flex items-center gap-2 px-3 py-2 rounded text-sm font-bold text-cyan-400"
                 >
-                  <Shield size={15} /> My VPN Dashboard
+                  <Shield size={15} /> My Dashboard
                 </Link>
               )}
               <div className="flex gap-2 pt-2">

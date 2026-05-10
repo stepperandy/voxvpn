@@ -14,6 +14,7 @@ const navItems = [
   { icon: Megaphone, label: 'Marketing', id: 'marketing', desc: 'SEO, PPC & AI campaigns' },
   { icon: Handshake, label: 'Affiliates', id: 'affiliates', desc: 'Affiliates & partners' },
   { icon: Globe, label: 'Providers', id: 'providers', desc: 'Hybrid VPN provider APIs' },
+  { icon: Users, label: 'Subscribers', id: 'subscribers', desc: 'Stats & download link' },
 ];
 
 export default function AdminSidebar({ activePage, onNavigate, onLogout }) {
