@@ -169,6 +169,20 @@ export default function DownloadPage() {
           </div>
         </motion.div>
 
+        {/* Other platforms coming soon */}
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+          className="rounded-2xl border border-white/5 bg-[#0d1120] p-6 mb-6">
+          <h3 className="text-white font-bold text-base mb-4">Other Platforms</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {['macOS', 'Linux', 'iOS', 'Android', 'Router'].map(platform => (
+              <div key={platform} className="flex items-center justify-between px-4 py-3 rounded-xl border border-white/5 bg-[#0a1020]">
+                <span className="text-slate-400 text-sm">{platform}</span>
+                <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold">Coming Soon</span>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
         {/* Trust footer */}
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center gap-2 text-slate-600 text-xs">
