@@ -34,14 +34,15 @@ Deno.serve(async (req) => {
     const stripe = await import('npm:stripe@14.0.0');
     const stripeClient = new stripe.default(Deno.env.get('STRIPE_SECRET_KEY'));
 
-    // Map payment method to Stripe types
-    const paymentMethodTypes = ['card'];
-    if (paymentMethod === 'alipay') paymentMethodTypes.push('alipay');
-    if (paymentMethod === 'wechat_pay') paymentMethodTypes.push('wechat_pay');
+    // Alipay and WeChat Pay don't support subscription mode — use one-time payment
+    const isAlternativeMethod = paymentMethod === 'alipay' || paymentMethod === 'wechat_pay';
 
-    const session = await stripeClient.checkout.sessions.create({
+    const paymentMethodTypes = isAlternativeMethod
+      ? [paymentMethod]
+      : ['card'];
+
+    const sessionConfig = {
       payment_method_types: paymentMethodTypes,
-      ...(paymentMethod === 'wechat_pay' ? { payment_method_options: { wechat_pay: { client: 'web' } } } : {}),
       line_items: [
         {
           price_data: {
@@ -51,23 +52,28 @@ Deno.serve(async (req) => {
               description: isBilledYearly ? 'Yearly subscription' : 'Monthly subscription',
             },
             unit_amount: amountInCents,
-            recurring: isBilledYearly
-              ? { interval: 'year', interval_count: 1 }
-              : { interval: 'month', interval_count: 1 },
+            ...(isAlternativeMethod ? {} : {
+              recurring: isBilledYearly
+                ? { interval: 'year', interval_count: 1 }
+                : { interval: 'month', interval_count: 1 },
+            }),
           },
           quantity: 1,
         },
       ],
-      mode: 'subscription',
+      mode: isAlternativeMethod ? 'payment' : 'subscription',
       success_url: `${Deno.env.get('APP_URL')}/download?payment=success`,
       cancel_url: `${Deno.env.get('APP_URL')}/#pricing`,
       ...(customerEmail ? { customer_email: customerEmail } : {}),
+      ...(paymentMethod === 'wechat_pay' ? { payment_method_options: { wechat_pay: { client: 'web' } } } : {}),
       metadata: {
         plan: plan,
         billing: isBilledYearly ? 'yearly' : 'monthly',
         ...(user ? { user_id: user.id, email: user.email } : {}),
       },
-    });
+    };
+
+    const session = await stripeClient.checkout.sessions.create(sessionConfig);
 
     return Response.json({
       sessionId: session.id,
