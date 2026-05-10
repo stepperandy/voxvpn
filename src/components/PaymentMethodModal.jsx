@@ -2,41 +2,8 @@ import { useState } from 'react';
 import { CreditCard, X, Smartphone } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 
-// WeChat Pay and Alipay logos as inline SVGs
-const WeChatIcon = () => (
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/WeChat_logo.svg/120px-WeChat_logo.svg.png" alt="WeChat Pay" className="w-6 h-6 object-contain" />
-);
-
-const AlipayIcon = () => (
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Alipay_logo.svg/120px-Alipay_logo.svg.png" alt="Alipay" className="w-6 h-6 object-contain" />
-);
-
-const STRIPE_METHODS = [
-  {
-    id: 'card',
-    label: 'Credit / Debit Card',
-    icon: (
-      <div className="flex items-center gap-0.5">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/100px-Visa_Inc._logo.svg.png" alt="Visa" className="h-4 object-contain" />
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/100px-Mastercard-logo.svg.png" alt="Mastercard" className="h-5 object-contain" />
-      </div>
-    ),
-  },
-  {
-    id: 'alipay',
-    label: 'Alipay 支付宝',
-    icon: <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Alipay_logo.svg/200px-Alipay_logo.svg.png" alt="Alipay" className="h-6 object-contain" />,
-  },
-  {
-    id: 'wechat_pay',
-    label: 'WeChat Pay 微信',
-    icon: <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/WeChat_logo.svg/200px-WeChat_logo.svg.png" alt="WeChat Pay" className="h-6 w-6 object-contain" />,
-  },
-];
-
 export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, isAdmin, isBilledYearly }) {
   const [selectedMethod, setSelectedMethod] = useState('stripe');
-  const [stripeSubMethod, setStripeSubMethod] = useState('card');
   const [loading, setLoading] = useState(false);
 
   const handleProceed = async () => {
@@ -55,20 +22,17 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
         else alert('Hubtel error: ' + (res.data?.error || 'Unknown error'));
         return;
       }
-      // Stripe (card, alipay, wechat_pay)
+      // Stripe with card only (payment method selection happens in Stripe gateway)
       const res = await base44.functions.invoke('createStripeCheckout', {
         plan: plan?.name,
         isBilledYearly: !!isBilledYearly,
-        paymentMethod: stripeSubMethod,
+        paymentMethod: 'card',
       });
-      console.log('Stripe response:', res);
       const url = res?.data?.url;
       if (url) {
-        console.log('Redirecting to:', url);
         window.location.href = url;
       } else {
         const errorMsg = res?.data?.error || res?.data?.message || 'Unknown error';
-        console.error('Stripe error:', errorMsg);
         alert('Payment error: ' + errorMsg);
       }
     } finally {
@@ -99,31 +63,14 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
             </label>
           )}
 
-          {/* Stripe — card, Alipay, WeChat all in one */}
-          <div className={`rounded-xl border-2 transition-colors ${selectedMethod === 'stripe' ? 'border-cyan-500 bg-cyan-500/5' : 'border-white/10'}`}>
-            <label className="flex items-start gap-3 p-4 cursor-pointer" onClick={() => setSelectedMethod('stripe')}>
-              <input type="radio" name="payment" value="stripe" checked={selectedMethod === 'stripe'} onChange={() => setSelectedMethod('stripe')} className="mt-1.5" />
-              <div className="flex-1">
-                <p className="text-white font-bold text-sm">Stripe</p>
-                <p className="text-slate-400 text-xs mt-0.5">Card · Alipay · WeChat Pay</p>
-              </div>
-            </label>
-
-            {selectedMethod === 'stripe' && (
-              <div className="px-4 pb-4 grid grid-cols-3 gap-2">
-                {STRIPE_METHODS.map(m => (
-                  <button
-                    key={m.id}
-                    onClick={() => setStripeSubMethod(m.id)}
-                    className={`flex flex-col items-center justify-center gap-2 p-3 rounded-xl border-2 text-center transition-all min-h-[80px] ${stripeSubMethod === m.id ? 'border-cyan-400 bg-cyan-500/10' : 'border-white/10 hover:border-white/20 bg-[#0a1020]'}`}
-                  >
-                    <div className="flex items-center justify-center h-8">{m.icon}</div>
-                    <span className="text-white text-[10px] font-semibold leading-tight">{m.label}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          {/* Stripe */}
+          <label className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-colors ${selectedMethod === 'stripe' ? 'border-cyan-500 bg-cyan-500/5' : 'border-white/10 hover:border-white/20'}`}>
+            <input type="radio" name="payment" value="stripe" checked={selectedMethod === 'stripe'} onChange={() => setSelectedMethod('stripe')} className="mt-1.5" />
+            <div className="flex-1">
+              <p className="text-white font-bold text-sm">Stripe Checkout</p>
+              <p className="text-slate-400 text-xs mt-0.5">Card, Apple Pay, Google Pay, and more</p>
+            </div>
+          </label>
 
           {/* Hubtel */}
           <label className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-colors ${selectedMethod === 'hubtel' ? 'border-orange-500 bg-orange-500/5' : 'border-white/10 hover:border-white/20'}`}>
