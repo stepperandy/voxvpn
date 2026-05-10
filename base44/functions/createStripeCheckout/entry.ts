@@ -45,10 +45,13 @@ Deno.serve(async (req) => {
     const planPrice = prices[plan];
     const amountInCents = Math.round((isBilledYearly ? planPrice.yearly : planPrice.monthly) * 100);
 
+    const appUrl = Deno.env.get('APP_URL');
+    if (!appUrl) {
+      return Response.json({ error: 'APP_URL not configured' }, { status: 500 });
+    }
+
     const stripe = await import('npm:stripe@14.0.0');
     const stripeClient = new stripe.default(Deno.env.get('STRIPE_SECRET_KEY'));
-
-
 
     // Always use payment mode (one-time)
     const sessionConfig = {
@@ -67,8 +70,8 @@ Deno.serve(async (req) => {
           quantity: 1,
         },
       ],
-      success_url: `${Deno.env.get('APP_URL')}/download?payment=success`,
-      cancel_url: `${Deno.env.get('APP_URL')}/pricing`,
+      success_url: `${appUrl}/download?payment=success`,
+      cancel_url: `${appUrl}/pricing`,
       ...(customerEmail ? { customer_email: customerEmail } : {}),
       metadata: {
         plan: plan,
