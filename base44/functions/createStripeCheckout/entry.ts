@@ -8,10 +8,12 @@ const PLAN_PRICES = {
   'Enterprise': { monthly: 29.99, yearly: 239.88 },
 };
 
+const USD_TO_CNY = 7.3; // Approximate exchange rate
+
 Deno.serve(async (req) => {
   try {
     const body = await req.json().catch(() => ({}));
-    const { plan, isBilledYearly } = body;
+    const { plan, isBilledYearly, paymentMethod } = body;
 
     if (!plan || !PLAN_PRICES[plan]) {
       return Response.json({ error: 'Invalid plan' }, { status: 400 });
@@ -21,7 +23,16 @@ Deno.serve(async (req) => {
     const client = new stripe.default(Deno.env.get('STRIPE_SECRET_KEY'));
 
     const planPrice = PLAN_PRICES[plan];
-    const amount = Math.round((isBilledYearly ? planPrice.yearly : planPrice.monthly) * 100);
+    let usdAmount = isBilledYearly ? planPrice.yearly : planPrice.monthly;
+    
+    // Convert to CNY for Alipay and WeChat Pay
+    let currency = 'usd';
+    if (paymentMethod === 'alipay' || paymentMethod === 'wechat_pay') {
+      usdAmount = usdAmount * USD_TO_CNY;
+      currency = 'cny';
+    }
+    
+    const amount = Math.round(usdAmount * 100);
     const origin = req.headers.get('origin') || Deno.env.get('APP_URL') || 'https://voxvpn.net';
 
     const paymentMethods = ['card', 'alipay', 'wechat_pay'];
@@ -33,7 +44,7 @@ Deno.serve(async (req) => {
       line_items: [
         {
           price_data: {
-            currency: 'usd',
+            currency: currency,
             product_data: {
               name: `VoxVPN ${plan} Plan`,
               description: isBilledYearly ? 'Yearly' : 'Monthly',

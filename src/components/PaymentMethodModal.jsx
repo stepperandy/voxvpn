@@ -25,10 +25,11 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
         }
         return;
       }
-      // Stripe with card only (payment method selection happens in Stripe gateway)
+      // Stripe with card, Alipay, or WeChat Pay
       const res = await base44.functions.invoke('createStripeCheckout', {
         plan: plan?.name,
         isBilledYearly: !!isBilledYearly,
+        paymentMethod: selectedMethod,
       });
       const url = res?.data?.url;
       if (url) {
