@@ -10,7 +10,7 @@ const _fetch = globalThis.fetch || (await import('node-fetch').then(m => m.defau
 const apiFetch = _fetch || fetch;
 
 /* global process */
-const BASE44_APP_ID = process.env.BASE44_APP_ID || '';
+const BASE44_APP_ID = process.env.BASE44_APP_ID || '69c84f61d5543b54fe26e1e5';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname  = path.dirname(__filename);
