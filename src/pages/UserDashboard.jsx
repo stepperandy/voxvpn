@@ -71,10 +71,15 @@ export default function UserDashboard() {
     setPortalLoading(true);
     try {
       const res = await base44.functions.invoke('createStripePortal', {});
-      if (res.data?.url) window.open(res.data.url, '_blank');
-      else alert(res.data?.error || 'Could not open billing portal.');
+      if (res.data?.url) {
+        window.open(res.data.url, '_blank');
+      } else {
+        // No Stripe customer found — redirect to pricing/renew page
+        window.location.href = '/pricing';
+      }
     } catch (err) {
-      alert('Error: ' + err.message);
+      // Fallback: redirect to pricing page
+      window.location.href = '/pricing';
     } finally {
       setPortalLoading(false);
     }
