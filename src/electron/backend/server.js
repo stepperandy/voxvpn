@@ -1,225 +1,191 @@
 import express from 'express';
 import cors from 'cors';
-import fs from 'fs';
-import path from 'path';
-import crypto from 'crypto';
 import { fileURLToPath } from 'url';
-
-// Use global fetch (Node 18+) or fall back to node-fetch
-const _fetch = globalThis.fetch || (await import('node-fetch').then(m => m.default).catch(() => null));
-const apiFetch = _fetch || fetch;
+import path from 'path';
 
 /* global process */
-const BASE44_APP_ID = process.env.BASE44_APP_ID || '69c84f61d5543b54fe26e1e5';
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname  = path.dirname(__filename);
 
 const app  = express();
 const PORT = 5000;
-const DB_PATH = path.join(__dirname, 'db.json');
+
+const BASE44_APP_ID = process.env.BASE44_APP_ID || '69c84f61d5543b54fe26e1e5';
+const BASE_FN = `https://api.base44.com/api/apps/${BASE44_APP_ID}/functions`;
 
 app.use(cors());
 app.use(express.json());
 
-// ─── Simple JSON "database" ──────────────────────────────────────────────────
+// ─── Proxy helper ─────────────────────────────────────────────────────────────
+async function callFunction(fnName, body = {}, token = null) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
 
-function readDB() {
-  if (!fs.existsSync(DB_PATH)) {
-    fs.writeFileSync(DB_PATH, JSON.stringify({ users: [], sessions: [] }, null, 2));
-  }
-  return JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
-}
+  const res = await fetch(`${BASE_FN}/${fnName}`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(body),
+  });
 
-function writeDB(data) {
-  fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
-}
-
-function hashPassword(pw) {
-  return crypto.createHash('sha256').update(pw + 'voxvpn_salt').digest('hex');
-}
-
-function generateToken() {
-  return crypto.randomBytes(32).toString('hex');
-}
-
-function getUserByToken(token) {
-  const db = readDB();
-  const session = db.sessions.find(s => s.token === token);
-  if (!session) return null;
-  return db.users.find(u => u.email === session.email) || null;
-}
-
-// ─── Static server list ───────────────────────────────────────────────────────
-
-const SERVERS = [
-  { id: 'us-ny',  city: 'New York',      country: 'United States',  flag: '🇺🇸' },
-  { id: 'us-la',  city: 'Los Angeles',   country: 'United States',  flag: '🇺🇸' },
-  { id: 'us-chi', city: 'Chicago',       country: 'United States',  flag: '🇺🇸' },
-  { id: 'gb-lon', city: 'London',        country: 'United Kingdom', flag: '🇬🇧' },
-  { id: 'de-fra', city: 'Frankfurt',     country: 'Germany',        flag: '🇩🇪' },
-  { id: 'fr-par', city: 'Paris',         country: 'France',         flag: '🇫🇷' },
-  { id: 'nl-ams', city: 'Amsterdam',     country: 'Netherlands',    flag: '🇳🇱' },
-  { id: 'se-sto', city: 'Stockholm',     country: 'Sweden',         flag: '🇸🇪' },
-  { id: 'ch-zur', city: 'Zurich',        country: 'Switzerland',    flag: '🇨🇭' },
-  { id: 'no-osl', city: 'Oslo',          country: 'Norway',         flag: '🇳🇴' },
-  { id: 'ca-tor', city: 'Toronto',       country: 'Canada',         flag: '🇨🇦' },
-  { id: 'au-syd', city: 'Sydney',        country: 'Australia',      flag: '🇦🇺' },
-  { id: 'sg-sgp', city: 'Singapore',     country: 'Singapore',      flag: '🇸🇬' },
-  { id: 'jp-tyo', city: 'Tokyo',         country: 'Japan',          flag: '🇯🇵' },
-  { id: 'hk-hkg', city: 'Hong Kong',     country: 'Hong Kong',      flag: '🇭🇰' },
-  { id: 'in-mum', city: 'Mumbai',        country: 'India',          flag: '🇮🇳' },
-  { id: 'br-sao', city: 'São Paulo',     country: 'Brazil',         flag: '🇧🇷' },
-  { id: 'mx-mex', city: 'Mexico City',   country: 'Mexico',         flag: '🇲🇽' },
-  { id: 'za-jnb', city: 'Johannesburg',  country: 'South Africa',   flag: '🇿🇦' },
-  { id: 'ae-dxb', city: 'Dubai',         country: 'UAE',            flag: '🇦🇪' },
-];
-
-// ─── Routes ───────────────────────────────────────────────────────────────────
-
-// POST /register
-app.post('/register', (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) return res.status(400).json({ error: 'Email and password required.' });
-
-  const db = readDB();
-  if (db.users.find(u => u.email === email)) {
-    return res.status(409).json({ error: 'An account with this email already exists.' });
+  // downloadVpnConfig returns raw text
+  if (fnName === 'downloadVpnConfig') {
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err?.error || `Request failed (${res.status})`);
+    }
+    return { __raw: true, text: await res.text() };
   }
 
-  const user = {
-    email,
-    password_hash: hashPassword(password),
-    plan: null,
-    created_at: new Date().toISOString(),
-  };
-  db.users.push(user);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data?.error || data?.message || `Request failed (${res.status})`);
+  return data;
+}
 
-  const token = generateToken();
-  db.sessions.push({ token, email, created_at: new Date().toISOString() });
-  writeDB(db);
+function getToken(req) {
+  return req.headers['authorization']?.replace('Bearer ', '') || null;
+}
 
-  console.log(`[register] ${email}`);
-  res.json({ token, email, name: email.split('@')[0] });
-});
-
-// POST /login — authenticates against Base44 backend
+// ─── POST /login ──────────────────────────────────────────────────────────────
 app.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, device_id, device_name, device_type } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'Email and password required.' });
 
   try {
-    // Get a Base44 session token by calling the platform login API
-    const loginRes = await apiFetch(`https://api.base44.com/api/apps/${BASE44_APP_ID}/auth/email/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
+    const data = await callFunction('authLogin', { email, password, device_id, device_name, device_type });
 
-    const loginData = await loginRes.json();
-
-    if (!loginRes.ok || !loginData.access_token) {
-      return res.status(401).json({ error: loginData.error || loginData.message || 'Invalid email or password.' });
+    if (!data.success) {
+      return res.status(401).json({ error: data.message || 'Invalid email or password.' });
     }
 
-    const accessToken = loginData.access_token;
-
-    // Fetch user info + subscription using the access token
-    const userRes = await apiFetch(`https://api.base44.com/api/apps/${BASE44_APP_ID}/auth/me`, {
-      headers: { 'Authorization': `Bearer ${accessToken}` },
-    });
-    const userData = await userRes.json();
-
-    // Check subscription
-    const subRes = await apiFetch(`https://api.base44.com/api/apps/${BASE44_APP_ID}/entities/VPNSubscription?filter=${encodeURIComponent(JSON.stringify({ user_email: email }))}`, {
-      headers: { 'Authorization': `Bearer ${accessToken}` },
-    });
-    const subData = await subRes.json();
-    const activeSub = Array.isArray(subData) ? subData.find(s => s.status === 'active') : null;
-
-    // Store session locally for subsequent calls
-    const db = readDB();
-    db.sessions = db.sessions.filter(s => s.email !== email); // remove old sessions
-    db.sessions.push({ token: accessToken, email, created_at: new Date().toISOString() });
-    // Upsert user
-    const idx = db.users.findIndex(u => u.email === email);
-    const userRecord = { email, name: userData.full_name || email.split('@')[0], plan: activeSub?.plan || null };
-    if (idx >= 0) db.users[idx] = { ...db.users[idx], ...userRecord };
-    else db.users.push(userRecord);
-    writeDB(db);
-
-    console.log(`[login] ${email} → Base44 auth success`);
+    console.log(`[login] ${email} → authLogin success`);
     res.json({
-      token: accessToken,
-      email,
-      name: userData.full_name || email.split('@')[0],
-      plan: activeSub?.plan || null,
+      token: data.token,
+      email: data.user?.email || email,
+      name: data.user?.name || email.split('@')[0],
+      plan: data.subscription?.plan || null,
+      subscription: data.subscription || null,
+      device: data.device || null,
+      subscriptionActive: data.subscriptionActive,
     });
   } catch (err) {
     console.error('[login] error:', err.message);
-    res.status(500).json({ error: 'Login failed. Please try again.' });
+    res.status(500).json({ error: err.message || 'Login failed. Please try again.' });
   }
 });
 
-// GET /servers
-app.get('/servers', (req, res) => {
-  res.json({ servers: SERVERS });
-});
-
-// POST /check-access — checks Base44 subscription
-app.post('/check-access', async (req, res) => {
-  const { user_email } = req.body;
-  const token = req.headers['authorization']?.replace('Bearer ', '');
-  if (!user_email) return res.status(400).json({ error: 'user_email required.' });
+// ─── GET /servers ─────────────────────────────────────────────────────────────
+app.get('/servers', async (req, res) => {
+  const token = getToken(req);
+  const { device_id } = req.query;
 
   try {
-    const subRes = await apiFetch(`https://api.base44.com/api/apps/${BASE44_APP_ID}/entities/VPNSubscription?filter=${encodeURIComponent(JSON.stringify({ user_email }))}`, {
-      headers: { 'Authorization': `Bearer ${token}` },
-    });
-    const subData = await subRes.json();
-    const activeSub = Array.isArray(subData) ? subData.find(s => s.status === 'active') : null;
-
-    res.json({ access: !!activeSub, plan: activeSub?.plan || null, email: user_email });
+    const data = await callFunction('getVpnServersForUser', { device_id }, token);
+    res.json({ servers: data.servers || [] });
   } catch (err) {
-    // Fallback: allow access if we can't verify (so app doesn't break)
-    res.json({ access: true, plan: null, email: user_email });
+    console.error('[servers] error:', err.message);
+    // Fallback static list
+    res.json({ servers: [
+      { id: 'us-ny',  region: 'New York',     city: 'New York',     country: 'US', flag: '🇺🇸' },
+      { id: 'gb-lon', region: 'London',        city: 'London',       country: 'GB', flag: '🇬🇧' },
+      { id: 'de-fra', region: 'Frankfurt',     city: 'Frankfurt',    country: 'DE', flag: '🇩🇪' },
+      { id: 'nl-ams', region: 'Amsterdam',     city: 'Amsterdam',    country: 'NL', flag: '🇳🇱' },
+      { id: 'sg-sgp', region: 'Singapore',     city: 'Singapore',    country: 'SG', flag: '🇸🇬' },
+      { id: 'jp-tyo', region: 'Tokyo',         city: 'Tokyo',        country: 'JP', flag: '🇯🇵' },
+      { id: 'au-syd', region: 'Sydney',        city: 'Sydney',       country: 'AU', flag: '🇦🇺' },
+      { id: 'ca-tor', region: 'Toronto',       city: 'Toronto',      country: 'CA', flag: '🇨🇦' },
+      { id: 'fr-par', region: 'Paris',         city: 'Paris',        country: 'FR', flag: '🇫🇷' },
+    ]});
   }
 });
 
-// POST /connect
-app.post('/connect', (req, res) => {
-  const { user_email, server_id } = req.body;
-  if (!user_email || !server_id) return res.status(400).json({ error: 'user_email and server_id required.' });
+// ─── POST /download-config ────────────────────────────────────────────────────
+app.post('/download-config', async (req, res) => {
+  const token = getToken(req);
+  const { device_id, server_id, proto } = req.body;
 
-  const server = SERVERS.find(s => s.id === server_id);
-  if (!server) return res.status(404).json({ error: 'Server not found.' });
-
-  // Simulate a WireGuard config response
-  const config = {
-    success: true,
-    server_id,
-    server_city: server.city,
-    server_country: server.country,
-    assigned_ip: `10.0.${Math.floor(Math.random() * 254) + 1}.${Math.floor(Math.random() * 254) + 1}`,
-    protocol: 'WireGuard',
-    connected_at: new Date().toISOString(),
-  };
-
-  console.log(`[connect] ${user_email} → ${server.city}`);
-  res.json(config);
+  try {
+    const result = await callFunction('downloadVpnConfig', { device_id, server_id, platform: 'windows', proto: proto || 'udp' }, token);
+    if (result.__raw) {
+      res.setHeader('Content-Type', 'text/plain');
+      return res.send(result.text);
+    }
+    res.json(result);
+  } catch (err) {
+    console.error('[download-config] error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// POST /disconnect
-app.post('/disconnect', (req, res) => {
-  const { user_email } = req.body;
-  if (!user_email) return res.status(400).json({ error: 'user_email required.' });
+// ─── POST /session-start ──────────────────────────────────────────────────────
+app.post('/session-start', async (req, res) => {
+  const token = getToken(req);
+  const { device_id, server_id } = req.body;
 
-  console.log(`[disconnect] ${user_email}`);
-  res.json({ success: true, disconnected_at: new Date().toISOString() });
+  try {
+    const data = await callFunction('connectSessionStart', { device_id, server_id }, token);
+    res.json(data);
+  } catch (err) {
+    console.error('[session-start] error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── POST /session-end ────────────────────────────────────────────────────────
+app.post('/session-end', async (req, res) => {
+  const token = getToken(req);
+  const { device_id, server_id, bytes_sent, bytes_received, duration_seconds } = req.body;
+
+  try {
+    const data = await callFunction('connectSessionEnd', { device_id, server_id, bytes_sent, bytes_received, duration_seconds }, token);
+    res.json(data);
+  } catch (err) {
+    console.error('[session-end] error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── POST /heartbeat ──────────────────────────────────────────────────────────
+app.post('/heartbeat', async (req, res) => {
+  const token = getToken(req);
+  const { device_id, server_id } = req.body;
+
+  try {
+    const data = await callFunction('heartbeatPing', { device_id, server_id }, token);
+    res.json(data);
+  } catch (err) {
+    console.error('[heartbeat] error:', err.message);
+    // Don't fail heartbeat on network error — client will keep trying
+    res.json({ ok: true });
+  }
+});
+
+// ─── POST /revoke-device ─────────────────────────────────────────────────────
+app.post('/revoke-device', async (req, res) => {
+  const token = getToken(req);
+  const { device_id } = req.body;
+
+  try {
+    const data = await callFunction('revokeDeviceSession', { device_id }, token);
+    res.json(data);
+  } catch (err) {
+    console.error('[revoke-device] error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── POST /check-access (legacy compat) ──────────────────────────────────────
+app.post('/check-access', async (req, res) => {
+  const token = getToken(req);
+  try {
+    const data = await callFunction('validateSubscription', {}, token);
+    res.json({ access: data.subscriptionActive || data.active || false, plan: data.plan || null });
+  } catch {
+    res.json({ access: true, plan: null });
+  }
 });
 
 // ─── Start ────────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
-  console.log(`\n✅ VoxVPN local backend running at http://localhost:${PORT}`);
-  console.log(`   DB file: ${DB_PATH}\n`);
+  console.log(`\n✅ VoxVPN V1.5 backend running at http://localhost:${PORT}`);
+  console.log(`   Proxying to Base44 App: ${BASE44_APP_ID}\n`);
 });

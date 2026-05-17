@@ -1,21 +1,20 @@
 import { useState } from 'react';
-import { api } from './api';
 import { useAuth } from './AuthContext';
 import { Loader2, Eye, EyeOff, AlertTriangle } from 'lucide-react';
 
-// Generate a stable device_id from available browser/electron fingerprints
+const LOCAL_API = 'http://localhost:5000';
+
+// Generate a stable device_id stored in localStorage
 function getDeviceId() {
   let id = localStorage.getItem('voxvpn_device_id');
   if (!id) {
-    // Combine available entropy into a stable ID
     const raw = [
       navigator.userAgent,
       navigator.hardwareConcurrency,
       screen.width, screen.height,
       Intl.DateTimeFormat().resolvedOptions().timeZone,
-      Math.random().toString(36).slice(2), // salt for uniqueness
+      Math.random().toString(36).slice(2),
     ].join('|');
-    // Simple hash
     let hash = 0;
     for (let i = 0; i < raw.length; i++) {
       hash = ((hash << 5) - hash) + raw.charCodeAt(i);
@@ -28,11 +27,10 @@ function getDeviceId() {
 }
 
 function getDeviceName() {
-  // Use stored name or generate from platform
   return localStorage.getItem('voxvpn_device_name') || `Windows PC (${navigator.platform || 'Desktop'})`;
 }
 
-export default function Login({ onSwitchToSignup }) {
+export default function Login() {
   const { login } = useAuth();
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
@@ -45,33 +43,41 @@ export default function Login({ onSwitchToSignup }) {
     if (!email || !password) { setError('Please fill in all fields.'); return; }
     setLoading(true);
     setError('');
+
     try {
       const device_id   = getDeviceId();
       const device_name = getDeviceName();
 
-      // 1. Authenticate — passes device fingerprint for registration
-      const data = await api.login(email, password, device_id, device_name, 'windows');
+      const res = await fetch(`${LOCAL_API}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, device_id, device_name, device_type: 'windows' }),
+      });
 
-      if (!data.success) throw new Error(data.error || 'Login failed.');
-      if (!data.subscriptionActive) throw new Error('No active subscription. Please renew at voxvpn.net.');
+      const data = await res.json();
 
-      const token = data.token;
+      if (!res.ok || !data.token) {
+        throw new Error(data.error || 'Invalid email or password.');
+      }
 
-      // 2. Store device_name for future sessions
+      if (data.subscriptionActive === false) {
+        throw new Error('No active subscription. Please renew at voxvpn.net.');
+      }
+
       localStorage.setItem('voxvpn_device_name', device_name);
 
-      // 3. Persist session
       login({
-        email,
-        token,
+        email: data.email || email,
+        token: data.token,
         device_id,
         device_name,
-        name: data.user?.full_name || data.name || email.split('@')[0],
-        plan: data.subscription?.plan || null,
+        name: data.name || email.split('@')[0],
+        plan: data.subscription?.plan || data.plan || null,
         hasAccess: true,
       });
+
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Login failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -145,6 +151,17 @@ export default function Login({ onSwitchToSignup }) {
               className="text-cyan-400 hover:text-cyan-300 font-bold transition-colors"
             >
               Get a plan
+            </a>
+          </p>
+
+          <p className="text-center text-slate-600 text-xs mt-3">
+            <a
+              href="https://voxvpn.net/auth-login"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-slate-400 transition-colors"
+            >
+              Forgot password?
             </a>
           </p>
         </div>
