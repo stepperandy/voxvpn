@@ -18,7 +18,9 @@ export default function UsersView() {
 
   const loadUsers = () => {
     setLoading(true);
-    base44.entities.User.list().then(setUsers).finally(() => setLoading(false));
+    base44.functions.invoke('getUsersData', {})
+      .then(res => setUsers(res.data?.users || []))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => { loadUsers(); }, []);
