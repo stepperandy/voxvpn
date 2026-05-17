@@ -179,31 +179,58 @@ Deno.serve(async (req) => {
       }), { status: 500, headers: CORS });
     }
 
-    // ── Step 2: Load subscription + device data via service role ───────────
+    // ── Step 2: Load or auto-create subscription ──────────────────────────
+    // Use the exact email returned by the auth response (canonical case)
     const userEmail = authUser?.email || email;
+    console.log('[authLogin] looking up subscription for:', userEmail);
 
-    const subs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: userEmail });
-    const activeSub = subs.find(s => ['active', 'trial'].includes(s.status)) || null;
-    const subscriptionActive = !!activeSub;
+    let subs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: userEmail });
+    let activeSub = subs.find(s => ['active', 'trial'].includes(s.status)) || null;
+
+    // If no active subscription exists, create a Basic/trial one so the user can log in
+    if (!activeSub) {
+      console.log('[authLogin] no active subscription found — creating default Basic subscription');
+      activeSub = await base44.asServiceRole.entities.VPNSubscription.create({
+        user_email: userEmail,
+        plan: 'Basic',
+        status: 'active',
+        billing_cycle: 'monthly',
+        start_date: new Date().toISOString(),
+        renewal_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        max_devices: 3,
+        price: 0,
+      });
+      console.log('[authLogin] created subscription id:', activeSub.id);
+    }
+
+    // Ensure max_devices is always a positive integer (guard against null/0)
+    if (!activeSub.max_devices || activeSub.max_devices < 1) {
+      await base44.asServiceRole.entities.VPNSubscription.update(activeSub.id, { max_devices: 3 });
+      activeSub = { ...activeSub, max_devices: 3 };
+    }
+
+    const subscriptionActive = true; // guaranteed — we created one above if missing
 
     // ── Step 3: Device fingerprint enforcement ─────────────────────────────
     let deviceRecord = null;
     let deviceLimitExceeded = false;
 
-    if (subscriptionActive && device_id) {
-      const maxDevices = activeSub.max_devices || 1;
+    if (device_id) {
+      const maxDevices = activeSub.max_devices;
       const allDevices = await base44.asServiceRole.entities.LinkedDevice.filter({ subscription_id: activeSub.id });
 
       const knownDevice = allDevices.find(d => d.device_id === device_id);
-      const activeDevices = allDevices.filter(d => d.status === 'active' && d.device_id);
+      // Only count devices with a device_id set (registered via app) as "active"
+      const registeredDevices = allDevices.filter(d => d.device_id && d.device_id.trim() !== '');
 
       if (knownDevice) {
+        // Always allow known devices — just refresh last_connected
         await base44.asServiceRole.entities.LinkedDevice.update(knownDevice.id, {
           status: 'active',
           last_connected: new Date().toISOString(),
         });
         deviceRecord = { ...knownDevice, status: 'active' };
-      } else if (activeDevices.length >= maxDevices) {
+      } else if (registeredDevices.length >= maxDevices) {
         deviceLimitExceeded = true;
       } else {
         deviceRecord = await base44.asServiceRole.entities.LinkedDevice.create({
@@ -220,7 +247,7 @@ Deno.serve(async (req) => {
     if (deviceLimitExceeded) {
       return new Response(JSON.stringify({
         success: false,
-        message: `Device limit reached. Your plan allows ${activeSub.max_devices} device(s). Please revoke another device.`,
+        message: `Device limit reached. Your plan allows ${activeSub.max_devices} device(s). Please revoke another device from the dashboard.`,
         subscriptionActive: true,
         deviceLimitExceeded: true,
       }), { status: 403, headers: CORS });
