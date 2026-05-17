@@ -1,28 +1,73 @@
-// Points to the real VoxVPN backend (same server used by the web app).
-// In production Electron builds, replace this with the actual server URL or
-// read it from an environment variable / config file bundled with the app.
-const BASE_URL = (window.__VOXVPN_API_URL__ || 'http://localhost:5000').replace(/\/$/, '');
+/**
+ * VoxVPN Electron — Direct HTTP API client
+ * All requests go to Base44 backend functions via production endpoints.
+ */
 
-async function request(method, path, body = null, token = null) {
+const BASE = 'https://api.base44.com/api/apps/69c84f61d5543b54fe26e1e5/functions';
+
+async function request(fn, body = {}, token = null) {
   const headers = { 'Content-Type': 'application/json' };
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
-  const opts = { method, headers };
-  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(`${BASE}/${fn}`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(body),
+  });
 
-  const res = await fetch(`${BASE_URL}${path}`, opts);
+  // downloadVpnConfig returns raw .ovpn bytes — handle separately
+  if (fn === 'downloadVpnConfig') {
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err?.error || `Request failed (${res.status})`);
+    }
+    return res.text();
+  }
+
   const data = await res.json();
   if (!res.ok) throw new Error(data?.error || data?.message || `Request failed (${res.status})`);
   return data;
 }
 
 export const api = {
-  // Auth — no token needed
-  login:       (email, password)         => request('POST', '/login',        { email, password }),
+  // Auth
+  login: (email, password, device_id, device_name, device_type = 'windows') =>
+    request('authLogin', { email, password, device_id, device_name, device_type }),
 
-  // All authenticated calls pass the token
-  checkAccess: (token, email)            => request('POST', '/check-access', { user_email: email }, token),
-  servers:     (token)                   => request('GET',  '/servers',      null, token),
-  connect:     (token, email, serverId)  => request('POST', '/connect',      { user_email: email, server_id: serverId }, token),
-  disconnect:  (token, email)            => request('POST', '/disconnect',   { user_email: email }, token),
+  // Subscription
+  validateSubscription: (token) =>
+    request('validateSubscription', {}, token),
+
+  // Servers
+  getServers: (token, device_id) =>
+    request('getVpnServersForUser', { device_id }, token),
+
+  recommendServer: (token, device_id) =>
+    request('recommendServer', { device_id }, token),
+
+  // Config
+  downloadConfig: (token, device_id, server_id, proto = 'udp') =>
+    request('downloadVpnConfig', { device_id, server_id, platform: 'windows', proto }, token),
+
+  // Session lifecycle
+  sessionStart: (token, device_id, server_id) =>
+    request('connectSessionStart', { device_id, server_id }, token),
+
+  sessionEnd: (token, device_id, server_id, bytes_sent = 0, bytes_received = 0, duration_seconds = 0) =>
+    request('connectSessionEnd', { device_id, server_id, bytes_sent, bytes_received, duration_seconds }, token),
+
+  heartbeat: (token, device_id, server_id) =>
+    request('heartbeatPing', { device_id, server_id }, token),
+
+  // Device
+  revokeDevice: (token, device_id) =>
+    request('revokeDeviceSession', { device_id }, token),
+
+  // Password
+  forgotPassword: (email) =>
+    request('forgotPassword', { email }),
+
+  // Version check
+  latestVersion: () =>
+    request('latestVersion', { platform: 'Windows' }),
 };

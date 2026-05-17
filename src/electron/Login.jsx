@@ -1,7 +1,36 @@
 import { useState } from 'react';
 import { api } from './api';
 import { useAuth } from './AuthContext';
-import { Shield, Loader2, Eye, EyeOff, AlertTriangle } from 'lucide-react';
+import { Loader2, Eye, EyeOff, AlertTriangle } from 'lucide-react';
+
+// Generate a stable device_id from available browser/electron fingerprints
+function getDeviceId() {
+  let id = localStorage.getItem('voxvpn_device_id');
+  if (!id) {
+    // Combine available entropy into a stable ID
+    const raw = [
+      navigator.userAgent,
+      navigator.hardwareConcurrency,
+      screen.width, screen.height,
+      Intl.DateTimeFormat().resolvedOptions().timeZone,
+      Math.random().toString(36).slice(2), // salt for uniqueness
+    ].join('|');
+    // Simple hash
+    let hash = 0;
+    for (let i = 0; i < raw.length; i++) {
+      hash = ((hash << 5) - hash) + raw.charCodeAt(i);
+      hash |= 0;
+    }
+    id = 'win-' + Math.abs(hash).toString(16) + '-' + Date.now().toString(36);
+    localStorage.setItem('voxvpn_device_id', id);
+  }
+  return id;
+}
+
+function getDeviceName() {
+  // Use stored name or generate from platform
+  return localStorage.getItem('voxvpn_device_name') || `Windows PC (${navigator.platform || 'Desktop'})`;
+}
 
 export default function Login({ onSwitchToSignup }) {
   const { login } = useAuth();
@@ -17,19 +46,29 @@ export default function Login({ onSwitchToSignup }) {
     setLoading(true);
     setError('');
     try {
-      // 1. Authenticate against real backend
-      const data = await api.login(email, password);
+      const device_id   = getDeviceId();
+      const device_name = getDeviceName();
+
+      // 1. Authenticate — passes device fingerprint for registration
+      const data = await api.login(email, password, device_id, device_name, 'windows');
+
+      if (!data.success) throw new Error(data.error || 'Login failed.');
+      if (!data.subscriptionActive) throw new Error('No active subscription. Please renew at voxvpn.net.');
+
       const token = data.token;
 
-      // 2. Immediately check subscription/access status
-      const access = await api.checkAccess(token, email);
+      // 2. Store device_name for future sessions
+      localStorage.setItem('voxvpn_device_name', device_name);
 
+      // 3. Persist session
       login({
         email,
         token,
-        name: data.name || data.full_name || email.split('@')[0],
-        plan: access.plan || data.plan || null,
-        hasAccess: access.access === true,
+        device_id,
+        device_name,
+        name: data.user?.full_name || data.name || email.split('@')[0],
+        plan: data.subscription?.plan || null,
+        hasAccess: true,
       });
     } catch (err) {
       setError(err.message);
