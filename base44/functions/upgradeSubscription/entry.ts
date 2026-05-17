@@ -17,21 +17,13 @@ const CORS = {
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
-// Match your Stripe price IDs — update these to your actual Stripe price IDs
-const STRIPE_PRICES = {
-  'Basic':      { monthly: 'price_basic_monthly',    yearly: 'price_basic_yearly'    },
-  'Standard':   { monthly: 'price_standard_monthly', yearly: 'price_standard_yearly' },
-  'Advanced':   { monthly: 'price_advanced_monthly', yearly: 'price_advanced_yearly' },
-  'Premium':    { monthly: 'price_premium_monthly',  yearly: 'price_premium_yearly'  },
-  'Enterprise': { monthly: 'price_enterprise_monthly', yearly: 'price_enterprise_yearly' },
-};
-
+// Prices match the pricing page exactly
 const PLAN_PRICES = {
-  'Basic':      { monthly: 5.99,  yearly: 47.99  },
-  'Standard':   { monthly: 9.99,  yearly: 79.99  },
-  'Advanced':   { monthly: 14.99, yearly: 119.99 },
-  'Premium':    { monthly: 19.99, yearly: 159.99 },
-  'Enterprise': { monthly: 49.99, yearly: 399.99 },
+  'Basic':      { monthly: 3.99,  yearly: 2.49  },   // yearly billed as $29.88/yr
+  'Standard':   { monthly: 6.99,  yearly: 4.49  },   // yearly billed as $53.88/yr
+  'Premium':    { monthly: 9.99,  yearly: 6.49  },   // yearly billed as $77.88/yr
+  'Advanced':   { monthly: 14.99, yearly: 9.99  },   // yearly billed as $119.88/yr
+  'Enterprise': { monthly: 29.99, yearly: 19.99 },   // yearly billed as $239.88/yr
 };
 
 const PLAN_ORDER = ['Free Trial', 'Basic', 'Standard', 'Advanced', 'Premium', 'Enterprise'];
@@ -105,22 +97,24 @@ Deno.serve(async (req) => {
       }, { status: 400, headers: CORS });
     }
 
+    // Route through the same createStripeCheckout gateway used on the pricing page
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
-    const priceId = STRIPE_PRICES[target_plan]?.[billing_cycle];
-
-    if (!priceId || priceId.startsWith('price_basic')) {
-      // If price IDs aren't configured, return a redirect to pricing page
-      return Response.json({
-        success: false,
-        redirect_url: `${APP_URL}/pricing?upgrade=1&plan=${encodeURIComponent(target_plan)}&cycle=${billing_cycle}`,
-        message: 'Stripe price IDs not configured. Please set them in the upgradeSubscription function.',
-      }, { headers: CORS });
-    }
 
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       customer_email: user.email,
-      line_items: [{ price: priceId, quantity: 1 }],
+      line_items: [{
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: `VoxVPN ${target_plan}`,
+            description: `VoxVPN ${target_plan} plan — billed ${billing_cycle}`,
+          },
+          unit_amount: Math.round(targetPrice * 100),
+          recurring: { interval: billing_cycle === 'yearly' ? 'year' : 'month' },
+        },
+        quantity: 1,
+      }],
       metadata: {
         user_email: user.email,
         plan: target_plan,
