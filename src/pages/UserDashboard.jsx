@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
+import { useLocation } from 'react-router-dom';
 import {
   Shield, Download, RefreshCw, Loader2, AlertCircle, CheckCircle2,
   CreditCard, HeadphonesIcon, Clock, XCircle, Calendar, LogOut, User
@@ -38,6 +39,8 @@ export default function UserDashboard() {
   const [subscription, setSubscription] = useState(null);
   const [loading, setLoading] = useState(true);
   const [portalLoading, setPortalLoading] = useState(false);
+  const location = useLocation();
+  const justPaid = new URLSearchParams(location.search).get('payment') === 'success';
 
   useEffect(() => {
     const init = async () => {
@@ -107,6 +110,18 @@ export default function UserDashboard() {
       <Navbar />
 
       <div className="pt-28 pb-24 px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto">
+
+        {/* Payment success banner */}
+        {justPaid && (
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-3 px-5 py-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 mb-6">
+            <CheckCircle2 size={22} className="text-emerald-400 flex-shrink-0" />
+            <div>
+              <p className="text-white font-bold text-sm">Payment successful! 🎉</p>
+              <p className="text-emerald-300 text-xs mt-0.5">Your subscription is now active. A setup email has been sent to your inbox. Download VoxVPN below to get started.</p>
+            </div>
+          </motion.div>
+        )}
 
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">

@@ -21,8 +21,8 @@ export default function PaymentSuccess() {
   ];
 
   useEffect(() => {
-    // Redirect all users to the download page which handles plan-based gating
-    window.location.href = '/download?payment=success';
+    // Redirect to dashboard with success flag so they see the welcome banner
+    window.location.href = '/dashboard?payment=success';
   }, []);
 
   const handleDownload = async (deviceId) => {

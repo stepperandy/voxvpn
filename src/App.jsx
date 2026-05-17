@@ -90,6 +90,7 @@ const Blog = lazy(() => import('./pages/Blog.jsx'));
 const BlogPost = lazy(() => import('./pages/BlogPost.jsx'));
 const Press = lazy(() => import('./pages/Press.jsx'));
 const Pricing = lazy(() => import('./pages/Pricing.jsx'));
+const PaymentFailed = lazy(() => import('./pages/PaymentFailed.jsx'));
 
 const PageTransition = ({ children }) => (
   <motion.div
@@ -165,6 +166,7 @@ const AuthenticatedApp = ({ isMobileDevice }) => {
           <Route path="/account-mobile" element={<PageTransition><AccountMobile /></PageTransition>} />
           <Route path="/delete-account" element={<PageTransition><DeleteAccount /></PageTransition>} />
           <Route path="/payment-success" element={<PageTransition><PaymentSuccess /></PageTransition>} />
+          <Route path="/payment-failed" element={<PageTransition><PaymentFailed /></PageTransition>} />
           <Route path="/review" element={<ReviewDemo />} />
           <Route path="/setup-guide" element={<PageTransition><OsSetupGuide /></PageTransition>} />
           <Route path="/vpn-login" element={<PageTransition><VpnLogin /></PageTransition>} />

@@ -77,7 +77,7 @@ Deno.serve(async (req) => {
         email: userEmail || '',
       },
       success_url: `${origin}/payment-success`,
-      cancel_url: `${origin}/pricing`,
+      cancel_url: `${origin}/payment-failed`,
     };
 
     // Attach customer email so Stripe and webhook can identify the buyer

@@ -209,7 +209,7 @@ Deno.serve(async (req) => {
         await base44.asServiceRole.integrations.Core.SendEmail({
           to: customerEmail,
           subject: '⚠️ VoxVPN payment failed — action required',
-          body: `We were unable to process your VoxVPN subscription payment. Please update your payment method to restore full VPN access.\n\nVisit: ${Deno.env.get('APP_URL')}/dashboard\n\nIf you need help, contact support@voxdigits.com`,
+          body: `We were unable to process your VoxVPN subscription payment.\n\nNo charge has been made to your account. Please try again with a different payment method or contact your bank.\n\n👉 Try again: ${Deno.env.get('APP_URL')}/pricing\n\nIf you believe this is an error or need help, contact us at support@voxdigits.com\n\nThank you,\nThe VoxVPN Team`,
         });
 
         console.log(`Payment failed for ${customerEmail}`);
