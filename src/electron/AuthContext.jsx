@@ -12,8 +12,14 @@ export function AuthProvider({ children }) {
     setUser(userData);
   };
 
-  const logout = () => {
+  const logout = async () => {
     localStorage.removeItem('voxvpn_user');
+    // Clear secure token from OS keychain
+    if (window.electronVPN?.clearToken) {
+      await window.electronVPN.clearToken();
+    } else {
+      localStorage.removeItem('voxvpn_token');
+    }
     setUser(null);
   };
 

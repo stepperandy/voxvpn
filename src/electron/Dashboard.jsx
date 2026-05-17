@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { Shield, Loader2, WifiOff, Lock, CheckCircle2, AlertTriangle, Minus, X, Search, LogOut } from 'lucide-react';
+import { Shield, Loader2, WifiOff, Lock, CheckCircle2, AlertTriangle, Minus, X, Search, LogOut, Download } from 'lucide-react';
 import { api } from './api';
 import { useAuth } from './AuthContext';
 
@@ -16,11 +16,20 @@ export default function Dashboard() {
   const [log, setLog]               = useState('');
   const [forceLogout, setForceLogout] = useState(''); // message shown when heartbeat forces disconnect
 
+  const [updateInfo, setUpdateInfo] = useState(null); // { latest, downloadUrl }
+
   const listRef       = useRef(null);
   const heartbeatRef  = useRef(null);
-  const sessionStart  = useRef(null); // timestamp when connected
-  const activeServer  = useRef(null); // server object in use during active session
+  const sessionStart  = useRef(null);
+  const activeServer  = useRef(null);
   const vpn = window.electronVPN;
+
+  // Check for updates on mount
+  useEffect(() => {
+    vpn?.checkUpdate?.().then(res => {
+      if (res?.hasUpdate) setUpdateInfo(res);
+    }).catch(() => {});
+  }, []);
 
   // ── Load servers on mount ─────────────────────────────────────────────────
   useEffect(() => {
@@ -198,6 +207,19 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* Update available banner */}
+      {updateInfo && (
+        <div className="mx-4 mt-3 flex items-center gap-2 px-3 py-2 rounded-xl border border-cyan-500/30 bg-cyan-500/10 text-cyan-400 text-xs">
+          <Download size={13} className="flex-shrink-0" />
+          <span className="flex-1">V{updateInfo.latest} available</span>
+          {updateInfo.downloadUrl && (
+            <a href={updateInfo.downloadUrl} target="_blank" rel="noreferrer"
+              className="font-bold underline hover:text-cyan-300">Download</a>
+          )}
+          <button onClick={() => setUpdateInfo(null)} className="ml-1 hover:text-cyan-200">✕</button>
+        </div>
+      )}
+
       {/* Force-logout banner */}
       {forceLogout && (
         <div className="mx-4 mt-3 flex items-start gap-2 px-3 py-2.5 rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-400 text-xs">
@@ -311,7 +333,7 @@ export default function Dashboard() {
 
         {/* User info */}
         {user && (
-          <p className="text-slate-700 text-xs">{user.email} · {user.plan || 'VoxVPN'}</p>
+          <p className="text-slate-700 text-xs">{user.email} · {user.plan || 'VoxVPN'} · v2.0.0</p>
         )}
       </div>
 

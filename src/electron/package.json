@@ -1,7 +1,7 @@
 {
   "name": "voxvpn",
-  "version": "1.0.0",
-  "description": "VoxVPN Desktop Client",
+  "version": "2.0.0",
+  "description": "VoxVPN Desktop Client V2",
   "main": "electron/main.js",
   "private": true,
   "scripts": {
@@ -14,7 +14,7 @@
   "build": {
     "appId": "net.voxvpn.app",
     "productName": "VoxVPN",
-    "copyright": "Copyright © 2025 VoxVPN",
+    "copyright": "Copyright © 2025–2026 VoxVPN",
     "directories": {
       "output": "installer/windows/output"
     },

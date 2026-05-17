@@ -18,4 +18,13 @@ contextBridge.exposeInMainWorld('electronVPN', {
 
   // Cleanup
   off: (channel) => ipcRenderer.removeAllListeners(channel),
+
+  // Secure token storage (OS-encrypted via safeStorage)
+  saveToken:  (token) => ipcRenderer.invoke('token-save', token),
+  loadToken:  ()      => ipcRenderer.invoke('token-load'),
+  clearToken: ()      => ipcRenderer.invoke('token-clear'),
+
+  // Version / update check
+  getVersion:   () => ipcRenderer.invoke('get-version'),
+  checkUpdate:  () => ipcRenderer.invoke('check-update'),
 });

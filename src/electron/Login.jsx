@@ -66,6 +66,13 @@ export default function Login() {
 
       localStorage.setItem('voxvpn_device_name', device_name);
 
+      // Persist token securely via main process (OS-encrypted)
+      if (window.electronVPN?.saveToken) {
+        await window.electronVPN.saveToken(data.token);
+      } else {
+        localStorage.setItem('voxvpn_token', data.token);
+      }
+
       login({
         email: data.email || email,
         token: data.token,
