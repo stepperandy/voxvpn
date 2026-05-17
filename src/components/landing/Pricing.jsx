@@ -5,136 +5,127 @@ import PaymentMethodModal from '../PaymentMethodModal';
 
 const PLANS = [
   {
-    name: 'Basic',
-    monthlyPrice: 3.99,
-    yearlyPrice: 2.49,
-    yearlyTotal: 29.88,
-    devices: 1,
+    name: '1 Month',
+    period: '1 Month',
+    days: '30 Days Unlimited',
+    price: 2.59,
+    pricePerMonth: 2.59,
     badge: null,
     color: 'border-white/5 bg-[#0d1120]',
     btnClass: 'border border-slate-700 hover:border-cyan-500 text-white hover:text-cyan-400',
     popular: false,
+    savingsPercent: 0,
     features: [
-      '1 Device',
-      '20 Server Locations',
       'Unlimited Bandwidth',
       'AES-256 Encryption',
       'No-Logs Policy',
-      'VoxVPN Protocol',
-    ],
-    priceId: { monthly: 'price_basic_monthly', yearly: 'price_basic_yearly' },
-  },
-  {
-    name: 'Standard',
-    monthlyPrice: 6.99,
-    yearlyPrice: 4.49,
-    yearlyTotal: 53.88,
-    devices: 3,
-    badge: null,
-    color: 'border-white/5 bg-[#0d1120]',
-    btnClass: 'border border-slate-700 hover:border-cyan-500 text-white hover:text-cyan-400',
-    popular: false,
-    features: [
-      '3 Devices',
-      '20+ Server Locations',
-      'Unlimited Bandwidth',
-      'AES-256 Encryption',
-      'No-Logs Policy',
-      'VoxVPN Protocol',
+      'All Server Locations',
       'Kill Switch',
     ],
-    priceId: { monthly: 'price_standard_monthly', yearly: 'price_standard_yearly' },
+    priceId: 'price_1month',
   },
   {
-    name: 'Premium',
-    monthlyPrice: 9.99,
-    yearlyPrice: 6.49,
-    yearlyTotal: 77.88,
-    devices: 5,
+    name: '3 Months',
+    period: '3 Months',
+    days: '90 Days Unlimited',
+    price: 6.99,
+    pricePerMonth: 2.33,
+    badge: null,
+    color: 'border-white/5 bg-[#0d1120]',
+    btnClass: 'border border-slate-700 hover:border-cyan-500 text-white hover:text-cyan-400',
+    popular: false,
+    savingsPercent: 10,
+    features: [
+      'Unlimited Bandwidth',
+      'AES-256 Encryption',
+      'No-Logs Policy',
+      'All Server Locations',
+      'Kill Switch',
+      'Split Tunneling',
+    ],
+    priceId: 'price_3months',
+  },
+  {
+    name: '6 Months',
+    period: '6 Months',
+    days: '180 Days Unlimited',
+    price: 13.99,
+    pricePerMonth: 2.33,
     badge: 'Most Popular',
     badgeColor: 'bg-cyan-500 text-black',
     color: 'border-2 border-cyan-500 bg-[#0d1a20] shadow-lg shadow-cyan-500/10',
     btnClass: 'bg-cyan-500 hover:bg-cyan-400 text-black',
     popular: true,
+    savingsPercent: 10,
     features: [
-      '5 Devices',
-      '20+ Server Locations',
       'Unlimited Bandwidth',
       'AES-256 Encryption',
       'No-Logs Policy',
-      'VoxVPN Protocol',
+      'All Server Locations',
       'Kill Switch',
       'Split Tunneling',
       'DNS Leak Protection',
       'Priority Support',
     ],
-    priceId: { monthly: 'price_premium_monthly', yearly: 'price_premium_yearly' },
+    priceId: 'price_6months',
   },
   {
-    name: 'Advanced',
-    monthlyPrice: 14.99,
-    yearlyPrice: 9.99,
-    yearlyTotal: 119.88,
-    devices: 10,
+    name: '1 Year',
+    period: '1 Year',
+    days: '365 Days Unlimited',
+    price: 24.99,
+    pricePerMonth: 2.08,
     badge: 'Best Value',
     badgeColor: 'bg-emerald-500 text-black',
     color: 'border-white/5 bg-[#0d1120]',
     btnClass: 'border border-slate-700 hover:border-cyan-500 text-white hover:text-cyan-400',
     popular: false,
+    savingsPercent: 20,
     features: [
-      '10 Devices',
-      '20 Server Locations',
       'Unlimited Bandwidth',
       'AES-256 Encryption',
       'No-Logs Policy',
-      'VoxVPN Protocol',
+      'All Server Locations',
       'Kill Switch',
       'Split Tunneling',
-      'DNS Leak Protection',
+      'DNS & IPv6 Leak Protection',
       'Dedicated IP Address',
       '24/7 Priority Support',
-      'Double VPN (Multi-hop)',
     ],
-    priceId: { monthly: 'price_advanced_monthly', yearly: 'price_advanced_yearly' },
+    priceId: 'price_1year',
   },
   {
-    name: 'Enterprise',
-    monthlyPrice: 29.99,
-    yearlyPrice: 19.99,
-    yearlyTotal: 239.88,
-    devices: 'Unlimited',
+    name: '2 Years',
+    period: '2 Years',
+    days: '730 Days Unlimited',
+    price: 45.99,
+    pricePerMonth: 1.92,
     badge: null,
-    color: 'border-violet-500/30 bg-[#120d1a] shadow-lg shadow-violet-500/5',
-    btnClass: 'bg-violet-600 hover:bg-violet-500 text-white',
+    color: 'border-white/5 bg-[#0d1120]',
+    btnClass: 'border border-slate-700 hover:border-cyan-500 text-white hover:text-cyan-400',
     popular: false,
+    savingsPercent: 26,
     features: [
-      'Unlimited Devices',
-      'All 20 Server Locations',
       'Unlimited Bandwidth',
       'AES-256 Encryption',
       'No-Logs Policy',
-      'VoxVPN Protocol',
+      'All Server Locations',
       'Kill Switch',
       'Split Tunneling',
       'DNS & IPv6 Leak Protection',
       'Static Dedicated IP',
-      'Dedicated Account Manager',
       'Double VPN (Multi-hop)',
-      'Custom DNS Settings',
-      'Team Management Dashboard',
-      'SLA Guarantee',
+      'Dedicated Account Manager',
     ],
-    priceId: { monthly: 'price_enterprise_monthly', yearly: 'price_enterprise_yearly' },
+    priceId: 'price_2years',
   },
 ];
 
-function PlanCard({ plan, yearly, isAdmin, onPaymentMethodSelect }) {
+function PlanCard({ plan, isAdmin, onPaymentMethodSelect }) {
   const [loading, setLoading] = useState(false);
-  const price = yearly ? plan.yearlyPrice : plan.monthlyPrice;
-  const priceId = yearly ? plan.priceId.yearly : plan.priceId.monthly;
 
   const handleCheckout = () => {
-    onPaymentMethodSelect(plan, priceId, yearly);
+    onPaymentMethodSelect(plan, plan.priceId, false);
   };
 
   return (
@@ -147,16 +138,15 @@ function PlanCard({ plan, yearly, isAdmin, onPaymentMethodSelect }) {
 
       <div className="mb-4">
         <h3 className="text-white font-bold text-base mb-0.5">{plan.name}</h3>
-        <p className="text-slate-600 text-xs">{plan.devices} {typeof plan.devices === 'number' ? 'device' + (plan.devices > 1 ? 's' : '') : 'devices'}</p>
+        <p className="text-slate-600 text-xs">{plan.days}</p>
       </div>
 
       <div className="flex items-baseline gap-1 mb-1">
-        <span className="text-3xl font-extrabold text-white">${price}</span>
-        <span className="text-slate-500 text-xs">/mo</span>
+        <span className="text-3xl font-extrabold text-white">${plan.price}</span>
       </div>
       <p className="text-slate-600 text-xs mb-5">
-        {yearly ? `Billed $${plan.yearlyTotal}/year` : 'Billed monthly'}
-        {yearly && <span className="ml-2 text-emerald-400 font-semibold">Save {Math.round((1 - plan.yearlyPrice / plan.monthlyPrice) * 100)}%</span>}
+        ${plan.pricePerMonth}/mo
+        {plan.savingsPercent > 0 && <span className="ml-2 text-cyan-400 font-semibold">Save {plan.savingsPercent}% vs monthly</span>}
       </p>
 
       <button
@@ -164,7 +154,7 @@ function PlanCard({ plan, yearly, isAdmin, onPaymentMethodSelect }) {
         disabled={loading}
         className={`w-full py-2.5 rounded-lg text-sm font-bold mb-5 transition-all disabled:opacity-50 ${plan.btnClass}`}
       >
-        {loading ? 'Processing...' : `Get ${plan.name}`}
+        {loading ? 'Processing...' : `Get ${plan.period}`}
       </button>
 
       <ul className="space-y-2.5 flex-1">
@@ -180,13 +170,11 @@ function PlanCard({ plan, yearly, isAdmin, onPaymentMethodSelect }) {
 }
 
 export default function Pricing() {
-  const [yearly, setYearly] = useState(false);
   const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [selectedPriceId, setSelectedPriceId] = useState(null);
-  const [selectedYearly, setSelectedYearly] = useState(false);
 
   useEffect(() => {
     base44.auth.me()
@@ -197,10 +185,9 @@ export default function Pricing() {
       .catch(() => {});
   }, []);
 
-  const handlePaymentMethodSelect = (plan, priceId, isYearly) => {
+  const handlePaymentMethodSelect = (plan, priceId) => {
     setSelectedPlan(plan);
     setSelectedPriceId(priceId);
-    setSelectedYearly(isYearly);
     setModalOpen(true);
   };
 
@@ -219,7 +206,8 @@ export default function Pricing() {
       // Regular Stripe checkout
       const res = await base44.functions.invoke('createStripeCheckout', {
         plan: selectedPlan.name,
-        isBilledYearly: selectedYearly,
+        price: selectedPlan.price,
+        period: selectedPlan.period,
       });
       if (res.data?.url) {
         setModalOpen(false);
@@ -254,25 +242,9 @@ export default function Pricing() {
           <p className="text-slate-400 text-sm">All plans include AES-256 encryption and a strict no-logs policy. Cancel anytime.</p>
         </div>
 
-        {/* Toggle */}
-        <div className="flex justify-center mb-10">
-          <div className="flex items-center gap-1 bg-[#0d1120] border border-white/10 rounded-full p-1">
-            <button
-              onClick={() => setYearly(false)}
-              className={`px-5 py-2 rounded-full text-sm font-bold transition-all ${!yearly ? 'bg-cyan-500 text-black' : 'text-slate-400 hover:text-white'}`}
-            >
-              Monthly
-            </button>
-            <button
-              onClick={() => setYearly(true)}
-              className={`px-5 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-2 ${yearly ? 'bg-cyan-500 text-black' : 'text-slate-400 hover:text-white'}`}
-            >
-              Yearly
-              <span className={`text-xs font-black px-2 py-0.5 rounded-full ${yearly ? 'bg-black/20 text-black' : 'bg-emerald-500/20 text-emerald-400'}`}>
-                <Zap size={10} className="inline mr-0.5" />Save up to 33%
-              </span>
-            </button>
-          </div>
+        {/* Pricing info */}
+        <div className="text-center mb-10">
+          <p className="text-slate-400 text-sm">Prices shown in <span className="font-semibold text-white">USD</span> <a href="#" className="text-cyan-400 hover:underline">(refresh)</a></p>
         </div>
 
         {/* Plans grid */}
@@ -281,7 +253,6 @@ export default function Pricing() {
             <PlanCard 
               key={plan.name} 
               plan={plan} 
-              yearly={yearly}
               isAdmin={isAdmin}
               onPaymentMethodSelect={handlePaymentMethodSelect}
             />
@@ -294,7 +265,6 @@ export default function Pricing() {
           onClose={() => setModalOpen(false)}
           plan={selectedPlan}
           isAdmin={isAdmin}
-          isBilledYearly={selectedYearly}
           onProceed={handlePaymentProceed}
         />
 
