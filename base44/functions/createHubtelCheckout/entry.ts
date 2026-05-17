@@ -22,7 +22,10 @@ Deno.serve(async (req) => {
     }
 
     let user = null;
-    try { user = await base44.auth.me(); } catch (_) {}
+    const authHeader = req.headers.get('authorization');
+    if (authHeader) {
+      try { user = await base44.auth.me(); } catch (_) {}
+    }
 
     const planPrice = PLAN_PRICES[plan];
     const amountUSD = isBilledYearly ? planPrice.yearly : planPrice.monthly;
