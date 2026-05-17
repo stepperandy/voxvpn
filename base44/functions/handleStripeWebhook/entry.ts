@@ -66,7 +66,7 @@ Deno.serve(async (req) => {
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
       const { plan, billing, user_id, email } = session.metadata || {};
-      const customerEmail = email || session.customer_email;
+      const customerEmail = email || session.customer_email || session.customer_details?.email;
 
       if (!customerEmail) {
         console.error('No email found in session');

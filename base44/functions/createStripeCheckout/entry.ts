@@ -21,12 +21,20 @@ const CURRENCY_RATES = {
 
 Deno.serve(async (req) => {
   try {
+    const base44 = createClientFromRequest(req);
     const body = await req.json().catch(() => ({}));
     const { plan, isBilledYearly, paymentMethod, currencyCode, countryCode } = body;
 
     if (!plan || !PLAN_PRICES[plan]) {
       return Response.json({ error: 'Invalid plan' }, { status: 400 });
     }
+
+    // Get the authenticated user's email so the webhook can provision the subscription
+    let userEmail = null;
+    try {
+      const user = await base44.auth.me();
+      userEmail = user?.email || null;
+    } catch (_) {}
 
     const stripe = await import('npm:stripe@14.0.0');
     const client = new stripe.default(Deno.env.get('STRIPE_SECRET_KEY'));
@@ -43,9 +51,8 @@ Deno.serve(async (req) => {
     const origin = req.headers.get('origin') || Deno.env.get('APP_URL') || 'https://voxvpn.net';
 
     const paymentMethods = ['card', 'alipay', 'wechat_pay'];
-    // USD supports Alipay and WeChat Pay via Stripe
     
-    const session = await client.checkout.sessions.create({
+    const sessionParams = {
       mode: 'payment',
       payment_method_types: paymentMethods,
       line_items: [
@@ -64,9 +71,21 @@ Deno.serve(async (req) => {
       payment_method_options: {
         wechat_pay: { client: 'web' },
       },
+      metadata: {
+        plan: plan,
+        billing: isBilledYearly ? 'yearly' : 'monthly',
+        email: userEmail || '',
+      },
       success_url: `${origin}/payment-success`,
       cancel_url: `${origin}/pricing`,
-    });
+    };
+
+    // Attach customer email so Stripe and webhook can identify the buyer
+    if (userEmail) {
+      sessionParams.customer_email = userEmail;
+    }
+
+    const session = await client.checkout.sessions.create(sessionParams);
 
     return Response.json({ sessionId: session.id, url: session.url });
   } catch (error) {
