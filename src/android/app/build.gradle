@@ -3,6 +3,7 @@ apply plugin: 'kotlin-android'
 
 android {
     compileSdk 34
+
     defaultConfig {
         applicationId "net.voxvpn.mobile"
         minSdkVersion 24
@@ -10,10 +11,13 @@ android {
         versionCode 2
         versionName "2.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
         ndk {
+            // Include all ABIs so the OpenVPN native engine works on all Android devices
             abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
         }
     }
+
     buildTypes {
         debug {
             debuggable true
@@ -24,14 +28,29 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
+
     kotlinOptions {
         jvmTarget = '17'
     }
-    // Required for ICS-OpenVPN native libs
+
+    // CRITICAL: Do NOT compress .ovpn files — Android must be able to open them from assets
+    aaptOptions {
+        noCompress 'ovpn', 'conf', 'crt', 'key', 'pem'
+    }
+
+    packagingOptions {
+        jniLibs {
+            // Required for ICS-OpenVPN native .so libraries
+            useLegacyPackaging true
+        }
+    }
+
+    // Build separate APKs per ABI (optional, keeps APK size small)
     splits {
         abi {
             enable true
@@ -40,31 +59,22 @@ android {
             universalApk true
         }
     }
-    packagingOptions {
-        jniLibs {
-            useLegacyPackaging true
-        }
-    }
 }
 
 dependencies {
+    // Capacitor Android bridge
     implementation 'com.getcapacitor:capacitor-android:6.1.0'
+
+    // AndroidX
     implementation 'androidx.core:core-ktx:1.12.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    
-    // ICS-OpenVPN core — provides real OpenVPN tunnel
-    // Add as git submodule or AAR:
-    // implementation project(':ics-openvpn:main')
-    // OR use the prebuilt AAR (see README below):
-    implementation(name: 'ics-openvpn-main-release', ext: 'aar')
-    
-    // VPN status/communication
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
     implementation 'androidx.preference:preference-ktx:1.2.1'
-}
 
-repositories {
-    flatDir {
-        dirs 'libs'
-    }
+    // ICS-OpenVPN — the real OpenVPN engine for Android
+    // Added via git submodule: git submodule add https://github.com/schwabe/ics-openvpn.git android/ics-openvpn
+    // Then in android/settings.gradle add:
+    //   include ':ics-openvpn:main'
+    //   project(':ics-openvpn:main').projectDir = new File('ics-openvpn/main')
+    implementation project(':ics-openvpn:main')
 }

@@ -1,12 +1,8 @@
 package net.voxvpn.mobile
 
 import android.app.Activity
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.net.VpnService
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.getcapacitor.JSObject
 import com.getcapacitor.Plugin
 import com.getcapacitor.PluginCall
@@ -16,32 +12,34 @@ import de.blinkt.openvpn.VpnProfile
 import de.blinkt.openvpn.core.ConfigParser
 import de.blinkt.openvpn.core.OpenVPNService
 import de.blinkt.openvpn.core.ProfileManager
+import de.blinkt.openvpn.core.VPNLaunchHelper
 import de.blinkt.openvpn.core.VpnStatus
-import de.blinkt.openvpn.core.VpnStatus.StateListener
 import java.io.InputStreamReader
+import java.io.StringReader
 
 /**
  * VoxVpnPlugin — Capacitor bridge between the React UI and ICS-OpenVPN.
  *
- * JS usage (from React):
- *   import { Plugins } from '@capacitor/core';
- *   const { VoxVpnPlugin } = Plugins;
- *   await VoxVpnPlugin.connect({ config: 'us-ny' });
- *   await VoxVpnPlugin.disconnect();
- *   const status = await VoxVpnPlugin.getStatus();
+ * Flow:
+ *  1. JS calls connect({ config: "us-ny" })
+ *  2. We open assets/configs/us-ny.ovpn, parse it with ConfigParser
+ *  3. Save the VpnProfile to ProfileManager (ICS-OpenVPN requires this)
+ *  4. VPNLaunchHelper.startOpenVpn() → creates the TUN device → routes ALL traffic
+ *  5. VpnStatus.StateListener fires LEVEL_CONNECTED → we resolve the JS call
+ *  6. JS calls disconnect() → OpenVPNService.DISCONNECT_VPN → TUN torn down
  */
 @CapacitorPlugin(name = "VoxVpnPlugin")
-class VoxVpnPlugin : Plugin(), StateListener {
+class VoxVpnPlugin : Plugin(), VpnStatus.StateListener {
 
     companion object {
         private const val VPN_REQUEST_CODE = 24601
         private const val CONFIG_DIR = "configs"
     }
 
-    private var pendingConnectCall: PluginCall? = null
-    private var currentConfigName: String? = null
+    private var pendingCall: PluginCall? = null
+    private var pendingConfigName: String? = null
 
-    // ── Lifecycle ────────────────────────────────────────────────────────────
+    // ── Lifecycle ─────────────────────────────────────────────────────────────
 
     override fun load() {
         VpnStatus.addStateListener(this)
@@ -52,7 +50,7 @@ class VoxVpnPlugin : Plugin(), StateListener {
         super.handleOnDestroy()
     }
 
-    // ── VpnStatus.StateListener ──────────────────────────────────────────────
+    // ── VpnStatus.StateListener ───────────────────────────────────────────────
 
     override fun updateState(
         state: String?,
@@ -61,146 +59,145 @@ class VoxVpnPlugin : Plugin(), StateListener {
         level: VpnStatus.ConnectionStatus?,
         intent: Intent?
     ) {
-        val isConnected = level == VpnStatus.ConnectionStatus.LEVEL_CONNECTED
-        val isConnecting = level == VpnStatus.ConnectionStatus.LEVEL_CONNECTING_NO_SERVER_REPLY_YET ||
-                level == VpnStatus.ConnectionStatus.LEVEL_CONNECTING_SERVER_REPLIED
-        val isDisconnected = level == VpnStatus.ConnectionStatus.LEVEL_NOTCONNECTED ||
-                level == VpnStatus.ConnectionStatus.LEVEL_AUTH_FAILED
+        val connected = level == VpnStatus.ConnectionStatus.LEVEL_CONNECTED
+        val connecting = level == VpnStatus.ConnectionStatus.LEVEL_CONNECTING_NO_SERVER_REPLY_YET
+                || level == VpnStatus.ConnectionStatus.LEVEL_CONNECTING_SERVER_REPLIED
+        val failed = level == VpnStatus.ConnectionStatus.LEVEL_AUTH_FAILED
+                || level == VpnStatus.ConnectionStatus.LEVEL_NONETWORK
 
-        val statusObj = JSObject().apply {
+        val evt = JSObject().apply {
             put("state", state ?: "DISCONNECTED")
-            put("connected", isConnected)
-            put("connecting", isConnecting)
-            put("level", level?.name ?: "NOTCONNECTED")
+            put("connected", connected)
+            put("connecting", connecting)
+            put("level", level?.name ?: "LEVEL_NOTCONNECTED")
             put("message", logmessage ?: "")
         }
 
-        // Notify JS listeners
-        notifyListeners("vpnStatus", statusObj)
+        // Push status to all JS listeners in real time
+        notifyListeners("vpnStatus", evt)
 
-        // Resolve pending connect call once connected/failed
-        pendingConnectCall?.let { call ->
+        // Resolve / reject the pending connect() call
+        val call = pendingCall
+        if (call != null) {
             when {
-                isConnected -> {
-                    call.resolve(statusObj)
-                    pendingConnectCall = null
+                connected -> {
+                    call.resolve(evt)
+                    pendingCall = null
                 }
-                isDisconnected && state != "CONNECTED" -> {
-                    // Only reject if we were actually connecting
-                    pendingConnectCall = null
+                failed -> {
+                    call.reject("VPN connection failed: ${logmessage ?: level?.name}")
+                    pendingCall = null
                 }
             }
         }
     }
 
-    override fun setConnectedVPN(uuid: String?) {}
+    override fun setConnectedVPN(uuid: String?) { /* not needed */ }
 
-    // ── Plugin Methods ───────────────────────────────────────────────────────
+    // ── Plugin Methods ────────────────────────────────────────────────────────
 
     /**
      * connect({ config: "us-ny" })
-     * Loads the .ovpn file from assets/configs/<config>.ovpn and starts OpenVPN.
+     *
+     * Reads assets/configs/<config>.ovpn, parses it, saves the profile,
+     * then calls VPNLaunchHelper.startOpenVpn() which starts the real tunnel.
      */
     @PluginMethod
     fun connect(call: PluginCall) {
         val configName = call.getString("config") ?: run {
-            call.reject("config parameter is required")
+            call.reject("config is required")
             return
         }
 
-        // Check/request VPN permission
-        val intent = VpnService.prepare(context)
-        if (intent != null) {
-            // Need to ask user for VPN permission
-            pendingConnectCall = call
-            currentConfigName = configName
-            startActivityForResult(call, intent, VPN_REQUEST_CODE)
+        // Android requires explicit user consent for VPN
+        val permIntent = VpnService.prepare(activity)
+        if (permIntent != null) {
+            pendingCall = call
+            pendingConfigName = configName
+            startActivityForResult(call, permIntent, VPN_REQUEST_CODE)
             return
         }
 
-        // Already have permission — connect immediately
-        startOpenVpn(call, configName)
+        launchTunnel(call, configName)
     }
 
     /**
      * disconnect()
-     * Sends stop signal to OpenVPN service.
+     *
+     * Sends DISCONNECT_VPN to OpenVPNService → tears down TUN → restores normal routing.
      */
     @PluginMethod
     fun disconnect(call: PluginCall) {
-        val stopIntent = Intent(context, OpenVPNService::class.java).apply {
+        val i = Intent(context, OpenVPNService::class.java).apply {
             action = OpenVPNService.DISCONNECT_VPN
         }
-        context.startService(stopIntent)
-        
-        val result = JSObject().apply {
+        context.startService(i)
+        call.resolve(JSObject().apply {
             put("success", true)
             put("state", "DISCONNECTED")
-        }
-        call.resolve(result)
+        })
     }
 
     /**
      * getStatus()
-     * Returns current VPN connection level.
      */
     @PluginMethod
     fun getStatus(call: PluginCall) {
-        val level = VpnStatus.getLastConnectedVPN()
-        val result = JSObject().apply {
-            put("state", VpnStatus.getLastConnectedVPN() ?: "DISCONNECTED")
-            put("connected", VpnStatus.isVPNActive())
-            put("level", level ?: "NOTCONNECTED")
-        }
-        call.resolve(result)
+        val active = VpnStatus.isVPNActive()
+        call.resolve(JSObject().apply {
+            put("connected", active)
+            put("state", if (active) "CONNECTED" else "DISCONNECTED")
+        })
     }
 
-    // ── Activity Result (VPN Permission) ────────────────────────────────────
+    // ── VPN permission result ─────────────────────────────────────────────────
 
     override fun handleOnActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.handleOnActivityResult(requestCode, resultCode, data)
-        if (requestCode == VPN_REQUEST_CODE) {
-            val configName = currentConfigName
-            val call = pendingConnectCall
-            if (resultCode == Activity.RESULT_OK && configName != null && call != null) {
-                startOpenVpn(call, configName)
-            } else {
-                call?.reject("VPN permission denied by user")
-                pendingConnectCall = null
-                currentConfigName = null
-            }
+        if (requestCode != VPN_REQUEST_CODE) return
+
+        val call = pendingCall
+        val configName = pendingConfigName
+        pendingCall = null
+        pendingConfigName = null
+
+        if (resultCode == Activity.RESULT_OK && call != null && configName != null) {
+            launchTunnel(call, configName)
+        } else {
+            call?.reject("VPN permission denied by user")
         }
     }
 
-    // ── Internal ─────────────────────────────────────────────────────────────
+    // ── Internal ──────────────────────────────────────────────────────────────
 
-    private fun startOpenVpn(call: PluginCall, configName: String) {
+    private fun launchTunnel(call: PluginCall, configName: String) {
         try {
-            // Load .ovpn config from assets/configs/
+            // 1. Read the .ovpn file from assets
             val assetPath = "$CONFIG_DIR/$configName.ovpn"
-            val inputStream = context.assets.open(assetPath)
-            val reader = InputStreamReader(inputStream)
+            val ovpnText = context.assets.open(assetPath).bufferedReader().readText()
 
+            // 2. Parse with ICS-OpenVPN ConfigParser
             val cp = ConfigParser()
-            cp.parseConfig(reader)
+            cp.parseConfig(StringReader(ovpnText))
 
+            // 3. Convert to VpnProfile
             val profile: VpnProfile = cp.convertProfile()
             profile.mName = configName
 
-            // Save to ProfileManager (ICS-OpenVPN requires this)
-            ProfileManager.getInstance(context).addProfile(profile)
-            ProfileManager.getInstance(context).saveProfileList(context)
-            ProfileManager.getInstance(context).saveProfile(context, profile)
+            // 4. Persist to ProfileManager (ICS-OpenVPN reads it from here when starting)
+            val pm = ProfileManager.getInstance(context)
+            pm.addProfile(profile)
+            pm.saveProfileList(context)
+            pm.saveProfile(context, profile)
 
-            // Launch OpenVPN
-            val startIntent = Intent(context, OpenVPNService::class.java).apply {
-                action = Intent.ACTION_MAIN
-                putExtra(OpenVPNService.EXTRA_PROFILE_UUID, profile.uuidString)
-            }
-            context.startService(startIntent)
+            // 5. Set as the "last used" profile so VPNLaunchHelper can find it
+            ProfileManager.setConntectedVpnProfile(context, profile)
 
-            // Keep call pending — will resolve when StateListener fires CONNECTED
-            pendingConnectCall = call
+            // 6. Keep the call pending — StateListener will resolve it when CONNECTED
+            pendingCall = call
+
+            // 7. Launch — VPNLaunchHelper handles the Intent + foreground service correctly
+            VPNLaunchHelper.startOpenVpn(profile, context)
 
         } catch (e: Exception) {
             call.reject("Failed to start VPN: ${e.message}")

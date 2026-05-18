@@ -1,153 +1,137 @@
-# VoxVPN Android — Real OpenVPN Integration Guide
+# VoxVPN Android — Real OpenVPN Tunnel Integration
 
-## Architecture
+## How It Works (End-to-End)
 
 ```
-React UI (ServerList.jsx)
-    ↓  calls
-lib/vpnNativePlugin.js  (registerPlugin 'VoxVpnPlugin')
-    ↓  bridges to
-VoxVpnPlugin.kt         (Capacitor plugin)
-    ↓  calls
-ICS-OpenVPN core        (de.blinkt.openvpn — OpenVPNService)
-    ↓  runs
-Real OpenVPN tunnel     (TUN device, routes all traffic)
+User taps Connect in React UI
+        ↓
+VoxVpnNative.connect({ config: "us-ny" })       [lib/vpnNativePlugin.js]
+        ↓
+VoxVpnPlugin.connect()                          [VoxVpnPlugin.kt — Capacitor bridge]
+        ↓  reads assets/configs/us-ny.ovpn
+ConfigParser.parseConfig() → VpnProfile
+        ↓  saves profile to ProfileManager
+VPNLaunchHelper.startOpenVpn(profile, context)  [ICS-OpenVPN]
+        ↓
+OpenVPNService (foreground service)
+        ↓  creates TUN device via Android VpnService API
+All device traffic → TUN → OpenVPN tunnel → your server
+        ↓
+VpnStatus.StateListener fires LEVEL_CONNECTED
+        ↓
+notifyListeners("vpnStatus") → React UI updates to "PROTECTED"
+
+User taps Disconnect
+        ↓
+VoxVpnNative.disconnect()
+        ↓
+OpenVPNService.DISCONNECT_VPN intent
+        ↓
+TUN device torn down → normal routing restored → IP returns to carrier
 ```
 
 ---
 
-## Step 1 — Add ICS-OpenVPN as a Submodule
+## One-Time Setup (Run Once)
 
+```bash
+# From your project root:
+bash android/setup-openvpn.sh
+```
+
+This script:
+1. Adds ICS-OpenVPN as a git submodule
+2. Copies your .ovpn files to the Android assets folder
+3. Builds the web bundle and syncs Capacitor
+4. Builds the debug APK
+
+---
+
+## Manual Steps (if you prefer)
+
+### 1. Add ICS-OpenVPN submodule
 ```bash
 cd android
 git submodule add https://github.com/schwabe/ics-openvpn.git ics-openvpn
 git submodule update --init --recursive
 ```
 
-## Step 2 — Configure settings.gradle
-
-Edit `android/settings.gradle`:
-
-```groovy
-include ':app'
-include ':ics-openvpn:main'
-project(':ics-openvpn:main').projectDir = new File('ics-openvpn/main')
-```
-
-## Step 3 — Update app/build.gradle dependency
-
-In `android/app/build.gradle`, replace the AAR line with:
-
-```groovy
-implementation project(':ics-openvpn:main')
-```
-
-## Step 4 — Place .ovpn configs
-
-Copy all 20 .ovpn files to:
-```
-android/app/src/main/assets/configs/
-```
-
-Required files (matching SERVER_CONFIG_MAP in lib/vpnNativePlugin.js):
-- us-ny.ovpn        → New York, USA
-- us-la.ovpn        → Los Angeles, USA
-- chicago.ovpn      → Chicago, USA
-- gb-lon.ovpn       → London, UK
-- de-fra.ovpn       → Frankfurt, Germany
-- fr-par.ovpn       → Paris, France
-- nl-ams.ovpn       → Amsterdam, Netherlands
-- ch-zur.ovpn       → Zurich, Switzerland
-- se-sto.ovpn       → Stockholm, Sweden
-- no-osl.ovpn       → Oslo, Norway
-- jp-tyo.ovpn       → Tokyo, Japan
-- sg-sgp.ovpn       → Singapore
-- hk-hkg.ovpn       → Hong Kong
-- au-syd.ovpn       → Sydney, Australia
-- ca-tor.ovpn       → Toronto, Canada
-- br-sao.ovpn       → São Paulo, Brazil
-- za-jnb.ovpn       → Johannesburg, South Africa
-- in-mum.ovpn       → Mumbai, India
-- mx-mex.ovpn       → Mexico City, Mexico
-- ae-dxb.ovpn       → Dubai, UAE
-
-Your .ovpn files already exist at: assets/configs/ — just copy them to the Android assets folder.
-
-## Step 5 — Build Debug APK
-
+### 2. Copy .ovpn configs
 ```bash
-# Build web assets first
+mkdir -p android/app/src/main/assets/configs
+cp assets/configs/*.ovpn android/app/src/main/assets/configs/
+```
+
+### 3. Build
+```bash
 npm run build
-
-# Sync Capacitor
 npx cap sync android
-
-# Build debug APK
-cd android
-./gradlew assembleDebug
-
-# APK output: android/app/build/outputs/apk/debug/app-debug.apk
+cd android && ./gradlew assembleDebug
 ```
 
-## Step 6 — Build Release AAB (Google Play)
+APK: `android/app/build/outputs/apk/debug/app-debug.apk`
+Install: `adb install -r android/app/build/outputs/apk/debug/app-debug.apk`
+
+---
+
+## Release Build (Google Play)
 
 ```bash
-# Set up keystore (one time)
-keytool -genkey -v -keystore voxvpn.keystore \
-  -alias voxvpn -keyalg RSA -keysize 2048 -validity 10000
-
-# Build release AAB
 cd android
 ./gradlew bundleRelease \
   -Pandroid.injected.signing.store.file=../voxvpn.keystore \
-  -Pandroid.injected.signing.store.password=YOUR_STORE_PASS \
+  -Pandroid.injected.signing.store.password=STORE_PASS \
   -Pandroid.injected.signing.key.alias=voxvpn \
-  -Pandroid.injected.signing.key.password=YOUR_KEY_PASS
-
-# AAB output: android/app/build/outputs/bundle/release/app-release.aab
+  -Pandroid.injected.signing.key.password=KEY_PASS
 ```
 
-Or add to `android/app/build.gradle`:
-```groovy
-android {
-    signingConfigs {
-        release {
-            storeFile file('../voxvpn.keystore')
-            storePassword System.getenv('KEYSTORE_PASS')
-            keyAlias 'voxvpn'
-            keyPassword System.getenv('KEY_PASS')
-        }
-    }
-    buildTypes {
-        release {
-            signingConfig signingConfigs.release
-        }
-    }
-}
+AAB: `android/app/build/outputs/bundle/release/app-release.aab`
+
+---
+
+## What Makes the Tunnel Real
+
+| Concern | How It's Handled |
+|---------|-----------------|
+| IP change | `redirect-gateway def1` in .ovpn routes all traffic via server |
+| DNS | `dhcp-option DNS` in .ovpn sets the VPN DNS (e.g. 1.1.1.1) |
+| Kill switch | Android VpnService blocks all non-tunnel traffic while connected |
+| Disconnect | `DISCONNECT_VPN` intent → TUN torn down → carrier IP restored |
+| Auth | `.ovpn` file contains inline `<cert>`, `<key>`, `<ca>` — no password needed |
+
+---
+
+## Required .ovpn Directives
+
+Each .ovpn file must contain:
 ```
-
-## How the Real VPN Works
-
-1. **User taps Connect** → React calls `VoxVpnNative.connect({ config: 'us-ny' })`
-2. **VoxVpnPlugin.kt** → opens `assets/configs/us-ny.ovpn` → parses with `ConfigParser`
-3. **Profile saved** → `ProfileManager.addProfile(profile)` 
-4. **OpenVPNService started** → ICS-OpenVPN creates TUN device, connects to server
-5. **All device traffic** → routed through TUN → VPN tunnel → OpenVPN server
-6. **Status callbacks** → `VpnStatus.StateListener.updateState()` → `notifyListeners('vpnStatus')` → React UI updates
-7. **Disconnect** → `OpenVPNService.DISCONNECT_VPN` → TUN torn down → traffic resumes normally
-
-## DNS
-
-ICS-OpenVPN automatically applies the `dhcp-option DNS` directives from the .ovpn file.
-Ensure your .ovpn configs include:
-```
+client
+dev tun
+proto udp          # or tcp
+remote <server-ip> <port>
+redirect-gateway def1 bypass-dhcp
 dhcp-option DNS 1.1.1.1
 dhcp-option DNS 8.8.8.8
+<ca>
+... CA cert ...
+</ca>
+<cert>
+... client cert ...
+</cert>
+<key>
+... client private key ...
+</key>
 ```
+
+---
 
 ## Troubleshooting
 
-- **"No such file" error**: Confirm .ovpn filenames match exactly (case-sensitive)
-- **Auth failed**: Check if .ovpn needs `auth-user-pass` — add credentials to profile: `profile.mUsername` / `profile.mPassword`
-- **No internet through VPN**: Check `redirect-gateway def1` is in .ovpn config
-- **Build fails**: Run `./gradlew :ics-openvpn:main:assembleRelease` first to build the library
+| Symptom | Fix |
+|---------|-----|
+| Build error `project :ics-openvpn:main not found` | Run `git submodule update --init --recursive` |
+| "Failed to start VPN: config not found" | Check file exists at `android/app/src/main/assets/configs/<name>.ovpn` |
+| Connected but IP doesn't change | Add `redirect-gateway def1` to your .ovpn |
+| DNS not resolving | Add `dhcp-option DNS 1.1.1.1` to your .ovpn |
+| AUTH_FAILED | Your server requires username/password — set `profile.mUsername` / `profile.mPassword` in `VoxVpnPlugin.kt` before calling `VPNLaunchHelper.startOpenVpn()` |
+| Android 14 crash | `foregroundServiceType="connectedDevice"` is already set in AndroidManifest.xml |
