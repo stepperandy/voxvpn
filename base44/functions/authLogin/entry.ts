@@ -187,20 +187,14 @@ Deno.serve(async (req) => {
     let subs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: userEmail });
     let activeSub = subs.find(s => ['active', 'trial'].includes(s.status)) || null;
 
-    // If no active subscription exists, create a Basic/trial one so the user can log in
+    // Block login if no active/trial subscription exists
     if (!activeSub) {
-      console.log('[authLogin] no active subscription found — creating default Basic subscription');
-      activeSub = await base44.asServiceRole.entities.VPNSubscription.create({
-        user_email: userEmail,
-        plan: 'Basic',
-        status: 'active',
-        billing_cycle: 'monthly',
-        start_date: new Date().toISOString(),
-        renewal_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-        max_devices: 3,
-        price: 0,
-      });
-      console.log('[authLogin] created subscription id:', activeSub.id);
+      console.log('[authLogin] no active subscription found for:', userEmail);
+      return new Response(JSON.stringify({
+        success: false,
+        message: 'No active subscription found. Please purchase a VoxVPN plan at voxvpn.net to access the app.',
+        subscriptionActive: false,
+      }), { status: 403, headers: CORS });
     }
 
     // Ensure max_devices is always a positive integer (guard against null/0)
@@ -209,7 +203,7 @@ Deno.serve(async (req) => {
       activeSub = { ...activeSub, max_devices: 3 };
     }
 
-    const subscriptionActive = true; // guaranteed — we created one above if missing
+    const subscriptionActive = true;
 
     // ── Step 3: Device fingerprint enforcement ─────────────────────────────
     let deviceRecord = null;
