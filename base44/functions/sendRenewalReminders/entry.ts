@@ -44,21 +44,25 @@ The VoxVPN Team`,
         continue;
       }
 
-      // ── Send reminder 3 days before expiry ──
-      if (daysUntilRenewal <= 3) {
+      // ── Send reminder ONLY on exactly day 5 or day 3 before expiry ──
+      if (daysUntilRenewal === 5 || daysUntilRenewal === 3) {
+        const urgency = daysUntilRenewal === 3 ? '🚨 URGENT: ' : '⏰ ';
         await base44.asServiceRole.integrations.Core.SendEmail({
           to: sub.user_email,
-          subject: `⏰ VoxVPN expires in ${daysUntilRenewal} day${daysUntilRenewal !== 1 ? 's' : ''} — renew now`,
+          subject: `${urgency}VoxVPN expires in ${daysUntilRenewal} days — renew now`,
           body: `Hello,
 
-Your VoxVPN ${sub.plan} plan expires on ${renewal.toDateString()} (in ${daysUntilRenewal} day${daysUntilRenewal !== 1 ? 's' : ''}).
+${daysUntilRenewal === 3 ? '🚨 URGENT REMINDER' : '⏰ Friendly Reminder'}: Your VoxVPN ${sub.plan} plan expires on ${renewal.toDateString()} — that's in just ${daysUntilRenewal} days.
 
-To keep your VPN access uninterrupted, please renew before it expires:
+${daysUntilRenewal === 3
+  ? 'Your VPN access will be automatically suspended when it expires. Please renew immediately to avoid any interruption.'
+  : 'Renew early to ensure uninterrupted VPN protection.'}
 
 👉 Renew Now: ${appUrl}/pricing
 
 Plan: ${sub.plan}
 Billing: ${sub.billing_cycle === 'yearly' ? 'Yearly' : 'Monthly'}
+Expiry Date: ${renewal.toDateString()}
 
 Questions? Contact support@voxdigits.com
 
