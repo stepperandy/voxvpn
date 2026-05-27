@@ -126,7 +126,12 @@ export default function DownloadPage() {
 
   const handleDesktopDownload = () => {
     const url = desktopRelease?.download_url || 'https://github.com/stepperandy/voxvpn/releases/download/v2.0.0/VoxVPN-Setup-v2.0.exe';
-    window.top.location.href = url;
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'VoxVPN-Setup.exe';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
   const handleDownload = () => handleDesktopDownload();

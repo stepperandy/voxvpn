@@ -12,6 +12,15 @@ import {
 
 const INSTALLER_URL = 'https://github.com/stepperandy/voxvpn/releases/download/v2.0.0/VoxVPN-Setup-v2.0.exe';
 
+function triggerDownload(url) {
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'VoxVPN-Setup.exe';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
 const STATUS_CONFIG = {
   active:    { label: 'Active',    color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/30', dot: 'bg-emerald-400' },
   trial:     { label: 'Trial',     color: 'text-cyan-400',    bg: 'bg-cyan-500/10 border-cyan-500/30',       dot: 'bg-cyan-400' },
@@ -218,7 +227,7 @@ export default function UserDashboard() {
           {/* Download button */}
           {hasAccess ? (
             <button
-              onClick={() => { window.top.location.href = downloadUrl; }}
+              onClick={() => triggerDownload(downloadUrl)}
               className="flex items-center justify-center gap-3 py-4 rounded-xl font-black text-black text-base transition-all w-full"
               style={{ background: 'linear-gradient(135deg, #00d4ff, #0080ff)', boxShadow: '0 6px 24px rgba(0,212,255,0.25)' }}>
               <Download size={20} />
