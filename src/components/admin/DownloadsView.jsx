@@ -327,7 +327,13 @@ export default function DownloadsView() {
                   {d.file_url && (
                     <a href={d.file_url} target="_blank" rel="noopener noreferrer"
                       className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold hover:bg-cyan-500/20 transition-all">
-                      <Download size={12} /> Download
+                      <Download size={12} /> View URL
+                    </a>
+                  )}
+                  {d.platform === 'Windows' && d.is_active && (
+                    <a href="/api/functions/downloadInstaller" download="VoxVPN-Setup.exe"
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold hover:bg-emerald-500/20 transition-all">
+                      <Download size={12} /> Test Installer
                     </a>
                   )}
                 </div>
