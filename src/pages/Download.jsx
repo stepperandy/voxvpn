@@ -111,23 +111,9 @@ export default function DownloadPage() {
   const [desktopRelease, setDesktopRelease] = useState(null);
   const [desktopLoading, setDesktopLoading] = useState(true);
 
-  // Load latest Windows desktop release from latestVersion function
-  useEffect(() => {
-    base44.functions.invoke('latestVersion', { platform: 'Windows' })
-      .then(res => setDesktopRelease(res.data || null))
-      .catch(() => setDesktopRelease({
-        version: '2.0.0',
-        download_url: 'https://github.com/stepperandy/voxvpn/releases/download/v2.0.0/VoxVPN-Setup-v2.0.exe',
-        description: 'VoxVPN Desktop V2.0 for Windows',
-        released_at: '2026-05-17T00:00:00.000Z',
-      }))
-      .finally(() => setDesktopLoading(false));
-  }, []);
-
   const handleDesktopDownload = () => {
-    const url = desktopRelease?.download_url || 'https://github.com/stepperandy/voxvpn/releases/download/v2.0.0/VoxVPN-Setup-v2.0.exe';
     const a = document.createElement('a');
-    a.href = url;
+    a.href = '/api/functions/downloadInstaller';
     a.download = 'VoxVPN-Setup.exe';
     document.body.appendChild(a);
     a.click();

@@ -7,14 +7,12 @@ import Footer from '@/components/landing/Footer';
 import { useLocation } from 'react-router-dom';
 import {
   Shield, Download, RefreshCw, Loader2, AlertCircle, CheckCircle2,
-  CreditCard, HeadphonesIcon, Clock, XCircle, Calendar, LogOut, User
+  CreditCard, HeadphonesIcon, Clock, XCircle, LogOut, User
 } from 'lucide-react';
 
-const INSTALLER_URL = 'https://github.com/stepperandy/voxvpn/releases/download/v2.0.0/VoxVPN-Setup-v2.0.exe';
-
-function triggerDownload(url) {
+function triggerDownload() {
   const a = document.createElement('a');
-  a.href = url;
+  a.href = '/api/functions/downloadInstaller';
   a.download = 'VoxVPN-Setup.exe';
   document.body.appendChild(a);
   a.click();
@@ -72,7 +70,6 @@ export default function UserDashboard() {
           || null;
         setSubscription(best);
 
-        // If user just paid via Hubtel but has no active subscription yet, auto-provision
         if (justPaid && (!best || !['active', 'trial'].includes(best?.status))) {
           try {
             await base44.functions.invoke('recoverPaidUser', {
@@ -80,7 +77,6 @@ export default function UserDashboard() {
               plan: pendingPlan || best?.plan || 'Standard',
               billing_cycle: 'monthly',
             });
-            // Re-fetch subscription
             const subs2 = await base44.entities.VPNSubscription.filter({ user_email: me.email });
             const best2 = subs2?.find(s => s.status === 'active') || subs2?.[0] || null;
             setSubscription(best2);
@@ -102,11 +98,9 @@ export default function UserDashboard() {
       if (res.data?.url) {
         window.open(res.data.url, '_blank');
       } else {
-        // No Stripe customer found — redirect to pricing/renew page
         window.location.href = '/pricing';
       }
-    } catch (err) {
-      // Fallback: redirect to pricing page
+    } catch {
       window.location.href = '/pricing';
     } finally {
       setPortalLoading(false);
@@ -124,7 +118,6 @@ export default function UserDashboard() {
     );
   }
 
-  const downloadUrl = subscription?.download_link || INSTALLER_URL;
   const hasAccess = canDownload(subscription);
   const renewalDate = subscription?.renewal_date
     ? new Date(subscription.renewal_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
@@ -164,7 +157,7 @@ export default function UserDashboard() {
 
         {/* Subscription card */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
-          className="rounded-2xl border border-white/8 bg-[#0d1420] p-6 mb-5"
+          className="rounded-2xl border bg-[#0d1420] p-6 mb-5"
           style={{ borderColor: hasAccess ? 'rgba(0,212,255,0.2)' : 'rgba(255,255,255,0.05)', boxShadow: hasAccess ? '0 0 30px rgba(0,212,255,0.05)' : 'none' }}>
 
           <div className="flex items-start justify-between gap-4 mb-5 flex-wrap">
@@ -215,7 +208,7 @@ export default function UserDashboard() {
           {/* No subscription */}
           {!subscription && (
             <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/5 border border-amber-500/20 text-amber-400 text-xs font-semibold mb-4">
-              <AlertCircle size={12} /> You don't have an active subscription. Choose a plan to get started.
+              <AlertCircle size={12} /> You don&apos;t have an active subscription. Choose a plan to get started.
             </div>
           )}
         </motion.div>
@@ -227,14 +220,14 @@ export default function UserDashboard() {
           {/* Download button */}
           {hasAccess ? (
             <button
-              onClick={() => triggerDownload(downloadUrl)}
+              onClick={triggerDownload}
               className="flex items-center justify-center gap-3 py-4 rounded-xl font-black text-black text-base transition-all w-full"
               style={{ background: 'linear-gradient(135deg, #00d4ff, #0080ff)', boxShadow: '0 6px 24px rgba(0,212,255,0.25)' }}>
               <Download size={20} />
               Download VoxVPN v2.0
             </button>
           ) : (
-            <div className="flex items-center justify-center gap-3 py-4 rounded-xl font-black text-slate-600 text-base border border-white/5 bg-white/2 cursor-not-allowed select-none">
+            <div className="flex items-center justify-center gap-3 py-4 rounded-xl font-black text-slate-600 text-base border border-white/5 cursor-not-allowed select-none">
               <Download size={20} />
               Download VoxVPN v2.0
             </div>
@@ -257,7 +250,7 @@ export default function UserDashboard() {
           )}
         </motion.div>
 
-        {/* Upgrade Plan button — always visible */}
+        {/* Upgrade Plan button */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}
           className="mb-5">
           <Link to="/pricing"
@@ -297,11 +290,11 @@ export default function UserDashboard() {
         {/* If not active — plan upsell */}
         {!hasAccess && (
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-            className="rounded-2xl border border-[#00d4ff]/20 p-6 text-center"
+            className="rounded-2xl border border-cyan-500/20 p-6 text-center"
             style={{ background: 'linear-gradient(135deg, rgba(0,212,255,0.05), rgba(0,80,160,0.05))' }}>
             <Shield size={32} className="mx-auto mb-3" style={{ color: '#00d4ff' }} />
             <h3 className="text-white font-black text-lg mb-1">Get Protected Today</h3>
-            <p className="text-slate-400 text-sm mb-4">Choose a plan and get instant access to VoxVPN for Windows, Android, iOS & macOS.</p>
+            <p className="text-slate-400 text-sm mb-4">Choose a plan and get instant access to VoxVPN for Windows, Android, iOS &amp; macOS.</p>
             <Link to="/pricing"
               className="inline-block px-8 py-3 rounded-xl font-bold text-black text-sm transition-all"
               style={{ background: '#00d4ff' }}>
