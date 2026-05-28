@@ -11,12 +11,16 @@ import {
 } from 'lucide-react';
 
 async function triggerDownload() {
-  const res = await fetch('/api/functions/downloadInstaller');
+  const downloads = await base44.entities.Download.filter({ platform: 'Windows', is_active: true });
+  const latest = downloads?.sort((a, b) => new Date(b.created_date) - new Date(a.created_date))?.[0];
+  const fileUrl = latest?.file_url;
+  if (!fileUrl) { alert('No installer available. Please contact support.'); return; }
+  const res = await fetch(fileUrl);
   const blob = await res.blob();
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'VoxVPN-Setup-v2.0.exe';
+  a.download = fileUrl.split('/').pop() || 'VoxVPN-Setup-v2.0.exe';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
