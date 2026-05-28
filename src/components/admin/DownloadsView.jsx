@@ -233,13 +233,23 @@ export default function DownloadsView() {
             <p className="text-slate-500 text-xs">Windows · Direct Download</p>
           </div>
         </div>
-        <a
-          href="/api/functions/downloadInstaller"
-          download="VoxVPN-Setup.exe"
+        <button
+          onClick={async () => {
+            const res = await fetch('/api/functions/downloadInstaller');
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'VoxVPN-Setup-v2.0.exe';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          }}
           className="flex items-center gap-2 px-5 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-sm rounded-xl transition-all flex-shrink-0"
         >
           <Download size={15} /> Download Installer
-        </a>
+        </button>
       </div>
 
       {/* Top controls */}
