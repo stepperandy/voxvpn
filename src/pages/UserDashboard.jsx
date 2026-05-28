@@ -10,18 +10,13 @@ import {
   CreditCard, HeadphonesIcon, Clock, XCircle, LogOut, User
 } from 'lucide-react';
 
-async function triggerDownload() {
-  const baseUrl = window.location.origin;
-  const resp = await fetch(`${baseUrl}/api/functions/downloadInstaller`, { method: 'GET' });
-  if (!resp.ok) { alert('Installer not available. Please contact support.'); return; }
-  const blob = await resp.blob();
-  const url = URL.createObjectURL(blob);
+function triggerDownload() {
   const a = document.createElement('a');
-  a.href = url;
+  a.href = '/api/functions/downloadInstaller';
   a.download = 'VoxVPN-Setup.exe';
   document.body.appendChild(a);
   a.click();
-  setTimeout(() => { URL.revokeObjectURL(url); document.body.removeChild(a); }, 1000);
+  document.body.removeChild(a);
 }
 
 const STATUS_CONFIG = {
