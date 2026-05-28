@@ -71,6 +71,10 @@ export const api = {
   latestVersion: () =>
     request('latestVersion', { platform: 'Windows' }),
 
+  // Speed test
+  runSpeedTest: (token, device_id) =>
+    request('runSpeedTest', { device_id }, token),
+
   // Direct installer URL (fallback if latestVersion has no download_url)
   INSTALLER_URL: 'https://github.com/stepperandy/voxvpn/releases/download/v2.0.0/VoxVPN-Setup-v2.0.exe',
 };
