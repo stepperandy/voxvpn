@@ -217,14 +217,21 @@ export default function UserDashboard() {
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
           className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
 
-          {/* Download button — always available */}
-          <button
-            onClick={triggerDownload}
-            className="flex items-center justify-center gap-3 py-4 rounded-xl font-black text-black text-base transition-all w-full"
-            style={{ background: 'linear-gradient(135deg, #00d4ff, #0080ff)', boxShadow: '0 6px 24px rgba(0,212,255,0.25)' }}>
-            <Download size={20} />
-            Download VoxVPN v2.0
-          </button>
+          {/* Download button — active subscribers only */}
+          {hasAccess ? (
+            <button
+              onClick={triggerDownload}
+              className="flex items-center justify-center gap-3 py-4 rounded-xl font-black text-black text-base transition-all w-full"
+              style={{ background: 'linear-gradient(135deg, #00d4ff, #0080ff)', boxShadow: '0 6px 24px rgba(0,212,255,0.25)' }}>
+              <Download size={20} />
+              Download VoxVPN v2.0
+            </button>
+          ) : (
+            <div className="flex items-center justify-center gap-3 py-4 rounded-xl font-black text-slate-600 text-base border border-white/5 cursor-not-allowed select-none">
+              <Download size={20} />
+              Download VoxVPN v2.0
+            </div>
+          )}
 
           {/* Billing / Renew */}
           {subscription ? (
