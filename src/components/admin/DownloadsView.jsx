@@ -355,10 +355,21 @@ export default function DownloadsView() {
                     </a>
                   )}
                   {d.file_url && (
-                    <a href={d.file_url} target="_blank" rel="noopener noreferrer"
+                    <button onClick={async () => {
+                      const res = await fetch(d.file_url);
+                      const blob = await res.blob();
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = d.file_url.split('/').pop() || d.name;
+                      document.body.appendChild(a);
+                      a.click();
+                      document.body.removeChild(a);
+                      URL.revokeObjectURL(url);
+                    }}
                       className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold hover:bg-cyan-500/20 transition-all">
                       <Download size={12} /> DOWNLOAD
-                    </a>
+                    </button>
                   )}
                 </div>
 
