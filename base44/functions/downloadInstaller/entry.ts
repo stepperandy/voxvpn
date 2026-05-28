@@ -10,8 +10,8 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Get download URL from DB or fallback
-  let downloadUrl = 'https://github.com/voxdigits/voxvpn-desktop/releases/latest/download/VoxVPN-Setup.exe';
+  // Get download URL from DB
+  let downloadUrl = 'https://github.com/stepperandy/voxvpn/releases/download/v2.0.0/VoxVPN-Setup-v2.0.exe';
 
   try {
     const base44 = createClientFromRequest(req);
