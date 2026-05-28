@@ -325,14 +325,14 @@ export default function DownloadsView() {
                     </a>
                   )}
                   {d.file_url && (
-                    <button onClick={() => {
-                      const a = document.createElement('a');
-                      a.href = d.file_url;
-                      a.download = d.file_url.split('/').pop() || d.name;
-                      a.target = '_blank';
-                      document.body.appendChild(a);
-                      a.click();
-                      document.body.removeChild(a);
+                    <button onClick={async () => {
+                      let url = d.file_url;
+                      // Handle private Base44 file URIs
+                      if (!url.startsWith('http')) {
+                        const res = await base44.integrations.Core.CreateFileSignedUrl({ file_uri: url });
+                        url = res.signed_url;
+                      }
+                      window.open(url, '_blank');
                     }}
                       className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold hover:bg-cyan-500/20 transition-all">
                       <Download size={12} /> DOWNLOAD
