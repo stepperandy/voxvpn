@@ -102,7 +102,7 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
                 <p className="text-white font-bold text-sm">WeChat Pay</p>
                 <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-500/20 text-green-400 font-bold">CN</span>
               </div>
-              <p className="text-slate-400 text-xs mt-0.5">Fast & secure mobile payment</p>
+              <p className="text-slate-400 text-xs mt-0.5">Fast &amp; secure mobile payment</p>
             </div>
           </label>
 
