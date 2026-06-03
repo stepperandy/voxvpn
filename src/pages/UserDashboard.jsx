@@ -7,7 +7,8 @@ import Footer from '@/components/landing/Footer';
 import { useLocation } from 'react-router-dom';
 import {
   Shield, Download, RefreshCw, Loader2, AlertCircle, CheckCircle2,
-  CreditCard, HeadphonesIcon, Clock, XCircle, LogOut, User
+  CreditCard, HeadphonesIcon, Clock, XCircle, LogOut, User, Calendar,
+  Smartphone, Monitor, Zap
 } from 'lucide-react';
 
 function triggerDownload() {
@@ -155,28 +156,33 @@ export default function UserDashboard() {
           </div>
         </motion.div>
 
-        {/* Subscription card */}
+        {/* Subscription Status Card */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
           className="rounded-2xl border bg-[#0d1420] p-6 mb-5"
           style={{ borderColor: hasAccess ? 'rgba(0,212,255,0.2)' : 'rgba(255,255,255,0.05)', boxShadow: hasAccess ? '0 0 30px rgba(0,212,255,0.05)' : 'none' }}>
 
+          {/* Plan header */}
           <div className="flex items-start justify-between gap-4 mb-5 flex-wrap">
             <div>
-              <p className="text-slate-500 text-xs uppercase tracking-widest mb-1">Subscription</p>
+              <p className="text-slate-500 text-xs uppercase tracking-widest mb-1">Your Subscription</p>
               <h2 className="text-2xl font-black text-white">{subscription?.plan || 'No Plan'}</h2>
             </div>
             <StatusBadge status={subscription?.status || 'expired'} />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+          {/* Key info tiles */}
+          <div className="grid grid-cols-3 gap-3 mb-4">
             <div className="rounded-xl bg-[#0a1020] border border-white/5 p-3">
               <p className="text-slate-600 text-[10px] uppercase tracking-wider mb-1">Plan</p>
               <p className="text-white font-bold text-sm">{subscription?.plan || '—'}</p>
             </div>
             <div className="rounded-xl bg-[#0a1020] border border-white/5 p-3">
-              <p className="text-slate-600 text-[10px] uppercase tracking-wider mb-1">
-                {subscription?.status === 'expired' || subscription?.status === 'cancelled' ? 'Expired' : 'Renews'}
-              </p>
+              <div className="flex items-center gap-1 mb-1">
+                <Calendar size={9} className="text-slate-600" />
+                <p className="text-slate-600 text-[10px] uppercase tracking-wider">
+                  {subscription?.status === 'expired' || subscription?.status === 'cancelled' ? 'Expired' : 'Renews'}
+                </p>
+              </div>
               <p className="text-white font-bold text-sm">{renewalDate || '—'}</p>
             </div>
             <div className="rounded-xl bg-[#0a1020] border border-white/5 p-3">
@@ -185,17 +191,33 @@ export default function UserDashboard() {
             </div>
           </div>
 
-          {/* Expiry warning */}
+          {/* Days remaining progress bar */}
           {subscription?.renewal_date && hasAccess && (() => {
             const daysLeft = Math.ceil((new Date(subscription.renewal_date) - Date.now()) / (1000 * 60 * 60 * 24));
-            if (daysLeft <= 7 && daysLeft > 0) {
-              return (
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/5 border border-amber-500/20 text-amber-400 text-xs font-semibold mb-4">
-                  <Clock size={12} /> Your subscription expires in {daysLeft} day{daysLeft !== 1 ? 's' : ''}. Renew now to avoid interruption.
+            const totalDays = subscription.billing_cycle === 'yearly' ? 365 : 30;
+            const pct = Math.max(0, Math.min(100, (daysLeft / totalDays) * 100));
+            const urgent = daysLeft <= 7;
+            return (
+              <div className="mb-4 p-3 rounded-xl bg-[#0a1020] border border-white/5">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-slate-500 text-xs flex items-center gap-1.5">
+                    <Clock size={11} /> Time remaining
+                  </span>
+                  <span className={`text-xs font-bold ${urgent ? 'text-amber-400' : 'text-white'}`}>
+                    {daysLeft > 0 ? `${daysLeft} day${daysLeft !== 1 ? 's' : ''} left` : 'Expired'}
+                  </span>
                 </div>
-              );
-            }
-            return null;
+                <div className="h-2 rounded-full bg-white/5 overflow-hidden">
+                  <div className="h-full rounded-full transition-all duration-700"
+                    style={{ width: `${pct}%`, background: urgent ? 'linear-gradient(90deg,#f59e0b,#ef4444)' : 'linear-gradient(90deg,#00d4ff,#0080ff)' }} />
+                </div>
+                {urgent && daysLeft > 0 && (
+                  <p className="text-amber-400 text-xs font-semibold mt-2 flex items-center gap-1">
+                    <AlertCircle size={10} /> Renew soon to avoid service interruption.
+                  </p>
+                )}
+              </div>
+            );
           })()}
 
           {/* Expired notice */}
@@ -211,54 +233,73 @@ export default function UserDashboard() {
               <AlertCircle size={12} /> You don&apos;t have an active subscription. Choose a plan to get started.
             </div>
           )}
-        </motion.div>
 
-        {/* Action buttons */}
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-          className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
-
-          {/* Download button — active subscribers only */}
-          {hasAccess ? (
-            <button
-              onClick={triggerDownload}
-              className="flex items-center justify-center gap-3 py-4 rounded-xl font-black text-black text-base transition-all w-full"
-              style={{ background: 'linear-gradient(135deg, #00d4ff, #0080ff)', boxShadow: '0 6px 24px rgba(0,212,255,0.25)' }}>
-              <Download size={20} />
-              Download VoxVPN v2.0
-            </button>
-          ) : (
-            <div className="flex items-center justify-center gap-3 py-4 rounded-xl font-black text-slate-600 text-base border border-white/5 cursor-not-allowed select-none">
-              <Download size={20} />
-              Download VoxVPN v2.0
-            </div>
-          )}
-
-          {/* Billing / Renew */}
-          {subscription ? (
-            <button onClick={openBillingPortal} disabled={portalLoading}
-              className="flex items-center justify-center gap-2 py-4 rounded-xl border font-bold text-sm transition-all disabled:opacity-50"
-              style={{ borderColor: 'rgba(0,212,255,0.3)', color: '#00d4ff', background: 'rgba(0,212,255,0.05)' }}>
-              {portalLoading ? <Loader2 size={16} className="animate-spin" /> : <CreditCard size={16} />}
-              {hasAccess ? 'Manage Billing' : 'Renew Subscription'}
-            </button>
-          ) : (
+          {/* Billing actions inline */}
+          <div className="flex gap-3 pt-2 border-t border-white/5 flex-wrap">
+            {subscription ? (
+              <button onClick={openBillingPortal} disabled={portalLoading}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-semibold transition-all disabled:opacity-50"
+                style={{ borderColor: 'rgba(0,212,255,0.3)', color: '#00d4ff', background: 'rgba(0,212,255,0.05)' }}>
+                {portalLoading ? <Loader2 size={14} className="animate-spin" /> : <CreditCard size={14} />}
+                {hasAccess ? 'Manage Billing' : 'Renew Subscription'}
+              </button>
+            ) : (
+              <Link to="/pricing"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-semibold transition-all"
+                style={{ borderColor: 'rgba(0,212,255,0.3)', color: '#00d4ff', background: 'rgba(0,212,255,0.05)' }}>
+                <RefreshCw size={14} /> Choose a Plan
+              </Link>
+            )}
             <Link to="/pricing"
-              className="flex items-center justify-center gap-2 py-4 rounded-xl border font-bold text-sm transition-all"
-              style={{ borderColor: 'rgba(0,212,255,0.3)', color: '#00d4ff', background: 'rgba(0,212,255,0.05)' }}>
-              <RefreshCw size={16} /> Choose a Plan
+              className="flex items-center gap-2 px-4 py-2 rounded-xl border border-amber-500/30 text-amber-400 text-sm font-semibold hover:bg-amber-500/10 transition-all"
+              style={{ background: 'rgba(251,191,36,0.05)' }}>
+              <Zap size={14} /> Upgrade Plan
             </Link>
-          )}
+          </div>
         </motion.div>
 
-        {/* Upgrade Plan button */}
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}
-          className="mb-5">
-          <Link to="/pricing"
-            className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl font-bold text-sm transition-all border border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
-            style={{ background: 'rgba(251,191,36,0.05)' }}>
-            <RefreshCw size={15} /> Upgrade / Change Plan
-          </Link>
-        </motion.div>
+        {/* Installer Downloads — active subscribers only */}
+        {hasAccess && (
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+            className="rounded-2xl border border-white/5 bg-[#0d1420] p-6 mb-5">
+            <div className="flex items-center gap-2 mb-4">
+              <Download size={16} className="text-cyan-400" />
+              <h3 className="text-white font-bold text-base">Download VoxVPN</h3>
+              <span className="ml-auto text-xs text-slate-500">v2.0.0</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Windows */}
+              <button
+                onClick={triggerDownload}
+                className="flex items-center gap-4 p-4 rounded-xl border border-cyan-500/20 bg-cyan-500/5 hover:bg-cyan-500/10 transition-all group text-left">
+                <div className="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center flex-shrink-0">
+                  <Monitor size={18} className="text-cyan-400" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-white font-bold text-sm">Windows Installer</p>
+                  <p className="text-slate-500 text-xs">Windows 10 / 11 · .exe</p>
+                </div>
+                <Download size={14} className="text-cyan-400 group-hover:scale-110 transition-transform flex-shrink-0" />
+              </button>
+
+              {/* Android APK */}
+              <a
+                href="http:///apps/voxvpn.apk"
+                download="voxvpn.apk"
+                className="flex items-center gap-4 p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10 transition-all group text-left">
+                <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                  <Smartphone size={18} className="text-emerald-400" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-white font-bold text-sm">Android App</p>
+                  <p className="text-slate-500 text-xs">Android 8.0+ · .apk</p>
+                </div>
+                <Download size={14} className="text-emerald-400 group-hover:scale-110 transition-transform flex-shrink-0" />
+              </a>
+            </div>
+            <p className="text-slate-700 text-xs text-center mt-3">All downloads are verified and signed</p>
+          </motion.div>
+        )}
 
         {/* Secondary actions */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
