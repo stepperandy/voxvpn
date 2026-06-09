@@ -1,14 +1,28 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Download, Monitor, Smartphone, Loader2, Key, Copy, CheckCircle2, Shield, RefreshCw } from 'lucide-react';
+import { Download, Monitor, Smartphone, Loader2, Key, Copy, CheckCircle2, Shield, RefreshCw, Tag, HardDrive } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-async function triggerDownload(platform) {
-  // Get the signed URL + intended filename from backend
+async function fetchInstallerMeta(platform) {
   const res = await base44.functions.invoke('secureDownload', { platform });
-  const { url, filename } = res.data;
-  if (!url) throw new Error('No download URL returned');
-  // Fetch as blob so we can force the correct .exe / .apk filename
+  const { url, filename, version } = res.data;
+  if (!url) throw new Error('No download URL');
+  // Try to get file size via HEAD request
+  let fileSize = null;
+  try {
+    const head = await fetch(url, { method: 'HEAD' });
+    const bytes = parseInt(head.headers.get('content-length') || '0', 10);
+    if (bytes > 0) {
+      fileSize = bytes > 1024 * 1024
+        ? `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+        : `${(bytes / 1024).toFixed(0)} KB`;
+    }
+  } catch (_) { /* size optional */ }
+  return { url, filename, version, fileSize };
+}
+
+async function triggerDownload(platform) {
+  const { url, filename } = await fetchInstallerMeta(platform);
   const blobRes = await fetch(url);
   if (!blobRes.ok) throw new Error('File fetch failed: ' + blobRes.status);
   const blob = await blobRes.blob();
@@ -22,11 +36,50 @@ async function triggerDownload(platform) {
   setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
 }
 
+const INSTALLERS = [
+  {
+    platform: 'Windows',
+    label: 'Windows',
+    subtitle: 'Windows 10 / 11 · 64-bit',
+    ext: '.exe',
+    icon: Monitor,
+    color: '#00d4ff',
+    borderColor: 'rgba(0,212,255,0.25)',
+    bgColor: 'rgba(0,212,255,0.06)',
+    hoverBg: 'rgba(0,212,255,0.12)',
+    iconBg: 'rgba(0,212,255,0.12)',
+    iconBorder: 'rgba(0,212,255,0.3)',
+  },
+  {
+    platform: 'Android',
+    label: 'Android',
+    subtitle: 'Android 8.0+ · All devices',
+    ext: '.apk',
+    icon: Smartphone,
+    color: '#34A853',
+    borderColor: 'rgba(52,168,83,0.25)',
+    bgColor: 'rgba(52,168,83,0.06)',
+    hoverBg: 'rgba(52,168,83,0.12)',
+    iconBg: 'rgba(52,168,83,0.12)',
+    iconBorder: 'rgba(52,168,83,0.3)',
+  },
+];
+
 export default function DownloadsSection() {
   const [dlState, setDlState] = useState({ Windows: 'idle', Android: 'idle' });
+  const [meta, setMeta] = useState({ Windows: null, Android: null });
   const [tokenData, setTokenData] = useState(null);
   const [tokenLoading, setTokenLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  // Pre-fetch metadata (version + size) for both installers on mount
+  useEffect(() => {
+    INSTALLERS.forEach(({ platform }) => {
+      fetchInstallerMeta(platform)
+        .then(m => setMeta(prev => ({ ...prev, [platform]: m })))
+        .catch(() => {});
+    });
+  }, []);
 
   const handleDownload = async (platform) => {
     setDlState(s => ({ ...s, [platform]: 'loading' }));
@@ -70,59 +123,86 @@ export default function DownloadsSection() {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 }}
-      className="rounded-2xl border border-white/5 bg-[#0d1420] overflow-hidden mb-5"
+      className="rounded-2xl overflow-hidden mb-5"
+      style={{ border: '1px solid rgba(0,212,255,0.15)', background: 'linear-gradient(135deg, #0d1420, #060c1a)', boxShadow: '0 0 40px rgba(0,212,255,0.06)' }}
     >
       {/* Header */}
-      <div className="flex items-center gap-2 px-6 py-4 border-b border-white/5">
-        <Download size={16} className="text-cyan-400" />
+      <div className="flex items-center gap-3 px-6 py-4 border-b border-white/5">
+        <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'rgba(0,212,255,0.1)', border: '1px solid rgba(0,212,255,0.2)' }}>
+          <Download size={14} style={{ color: '#00d4ff' }} />
+        </div>
         <h3 className="text-white font-bold text-base">Download VoxVPN</h3>
-        <span className="ml-auto text-xs text-slate-600 font-mono">v2.0</span>
+        <div className="ml-auto flex items-center gap-2">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold" style={{ background: 'rgba(0,212,255,0.08)', border: '1px solid rgba(0,212,255,0.2)', color: '#00d4ff' }}>
+            <Tag size={9} /> LATEST
+          </span>
+        </div>
       </div>
 
       <div className="p-6 space-y-4">
-        {/* Download buttons */}
+        {/* Installer buttons */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {/* Windows */}
-          <button
-            onClick={() => handleDownload('Windows')}
-            disabled={dlState.Windows !== 'idle'}
-            className="flex items-center gap-4 p-4 rounded-xl border border-cyan-500/20 bg-cyan-500/5 hover:bg-cyan-500/10 transition-all group text-left disabled:opacity-70"
-          >
-            <div className="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center flex-shrink-0">
-              <Monitor size={18} className="text-cyan-400" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-white font-bold text-sm">Windows</p>
-              <p className="text-slate-500 text-xs">Windows 10 / 11 · .exe</p>
-            </div>
-            {dlState.Windows === 'loading' && <Loader2 size={16} className="text-cyan-400 animate-spin flex-shrink-0" />}
-            {dlState.Windows === 'done' && <CheckCircle2 size={16} className="text-emerald-400 flex-shrink-0" />}
-            {dlState.Windows === 'idle' && <Download size={14} className="text-cyan-400 group-hover:scale-110 transition-transform flex-shrink-0" />}
-          </button>
+          {INSTALLERS.map(({ platform, label, subtitle, ext, icon: Icon, color, borderColor, bgColor, hoverBg, iconBg, iconBorder }) => {
+            const m = meta[platform];
+            const state = dlState[platform];
+            return (
+              <button
+                key={platform}
+                onClick={() => handleDownload(platform)}
+                disabled={state !== 'idle'}
+                className="flex items-center gap-4 p-4 rounded-2xl text-left transition-all disabled:opacity-70 group"
+                style={{ border: `1px solid ${borderColor}`, background: bgColor }}
+                onMouseEnter={e => e.currentTarget.style.background = hoverBg}
+                onMouseLeave={e => e.currentTarget.style.background = bgColor}
+              >
+                {/* Icon */}
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: iconBg, border: `1px solid ${iconBorder}` }}>
+                  <Icon size={22} style={{ color }} />
+                </div>
 
-          {/* Android */}
-          <button
-            onClick={() => handleDownload('Android')}
-            disabled={dlState.Android !== 'idle'}
-            className="flex items-center gap-4 p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10 transition-all group text-left disabled:opacity-70"
-          >
-            <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
-              <Smartphone size={18} className="text-emerald-400" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-white font-bold text-sm">Android</p>
-              <p className="text-slate-500 text-xs">Android 8.0+ · .apk</p>
-            </div>
-            {dlState.Android === 'loading' && <Loader2 size={16} className="text-emerald-400 animate-spin flex-shrink-0" />}
-            {dlState.Android === 'done' && <CheckCircle2 size={16} className="text-emerald-400 flex-shrink-0" />}
-            {dlState.Android === 'idle' && <Download size={14} className="text-emerald-400 group-hover:scale-110 transition-transform flex-shrink-0" />}
-          </button>
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-white font-black text-sm">{label} <span className="font-mono text-[10px] opacity-50">{ext}</span></p>
+                  <p className="text-slate-500 text-xs mt-0.5">{subtitle}</p>
+
+                  {/* Version + size badges */}
+                  <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                    {m?.version ? (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)' }}>
+                        <Tag size={8} /> v{m.version}
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)' }}>
+                        <Tag size={8} /> v2.0.0
+                      </span>
+                    )}
+                    {m?.fileSize && (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)' }}>
+                        <HardDrive size={8} /> {m.fileSize}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* State icon */}
+                <div className="flex-shrink-0">
+                  {state === 'loading' && <Loader2 size={18} style={{ color }} className="animate-spin" />}
+                  {state === 'done' && <CheckCircle2 size={18} className="text-emerald-400" />}
+                  {state === 'idle' && (
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center transition-all group-hover:scale-110" style={{ background: iconBg, border: `1px solid ${iconBorder}` }}>
+                      <Download size={14} style={{ color }} />
+                    </div>
+                  )}
+                </div>
+              </button>
+            );
+          })}
         </div>
 
         {/* Account Linking */}
-        <div className="rounded-xl border border-violet-500/20 bg-violet-500/5 p-4">
+        <div className="rounded-xl p-4" style={{ border: '1px solid rgba(139,92,246,0.2)', background: 'rgba(139,92,246,0.05)' }}>
           <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-lg bg-violet-500/15 border border-violet-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.2)' }}>
               <Key size={14} className="text-violet-400" />
             </div>
             <div className="flex-1 min-w-0">
@@ -131,15 +211,15 @@ export default function DownloadsSection() {
                 After installing, open the app and enter this one-time token to automatically sign in — no password needed.
               </p>
 
-              {/* Token display */}
               {tokenData && !tokenExpired && (
                 <div className="mt-3 space-y-2">
                   <div className="flex items-center gap-2">
-                    <code className="flex-1 px-3 py-2 rounded-lg bg-[#060910] border border-violet-500/20 text-violet-300 text-xs font-mono tracking-wider truncate">
+                    <code className="flex-1 px-3 py-2 rounded-lg text-violet-300 text-xs font-mono tracking-wider truncate" style={{ background: '#060c1a', border: '1px solid rgba(139,92,246,0.2)' }}>
                       {tokenData.token}
                     </code>
                     <button onClick={copyToken}
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-violet-500/15 border border-violet-500/25 text-violet-300 text-xs font-semibold hover:bg-violet-500/25 transition-all flex-shrink-0">
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-violet-300 text-xs font-semibold transition-all flex-shrink-0"
+                      style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.25)' }}>
                       {copied ? <CheckCircle2 size={12} /> : <Copy size={12} />}
                       {copied ? 'Copied!' : 'Copy'}
                     </button>
@@ -162,7 +242,8 @@ export default function DownloadsSection() {
                 <button
                   onClick={generateToken}
                   disabled={tokenLoading}
-                  className="mt-3 flex items-center gap-2 px-4 py-2 rounded-lg bg-violet-500/15 border border-violet-500/25 text-violet-300 text-xs font-semibold hover:bg-violet-500/25 transition-all disabled:opacity-50"
+                  className="mt-3 flex items-center gap-2 px-4 py-2 rounded-lg text-violet-300 text-xs font-semibold transition-all disabled:opacity-50"
+                  style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.25)' }}
                 >
                   {tokenLoading ? <Loader2 size={12} className="animate-spin" /> : <Key size={12} />}
                   {tokenLoading ? 'Generating...' : 'Generate Login Token'}
@@ -172,7 +253,7 @@ export default function DownloadsSection() {
           </div>
         </div>
 
-        <p className="text-slate-700 text-xs text-center">Downloads are secure, verified and tied to your subscription</p>
+        <p className="text-slate-700 text-xs text-center">Downloads are secure, verified and tied to your active subscription</p>
       </div>
     </motion.div>
   );
