@@ -8,24 +8,9 @@ import { useLocation } from 'react-router-dom';
 import {
   Shield, Download, RefreshCw, Loader2, AlertCircle, CheckCircle2,
   CreditCard, HeadphonesIcon, Clock, XCircle, LogOut, User, Calendar,
-  Smartphone, Monitor, Zap
+  Zap
 } from 'lucide-react';
-
-async function triggerDownload(platform = 'Windows') {
-  try {
-    const res = await base44.functions.invoke('secureDownload', { platform });
-    const url = res.data?.url;
-    if (!url) { alert('Download not available. Please contact support.'); return; }
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = res.data?.filename || (platform === 'Android' ? 'VoxVPN.apk' : 'VoxVPN-Setup.exe');
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  } catch {
-    alert('Download failed. Please try again or contact support.');
-  }
-}
+import DownloadsSection from '@/components/dashboard/DownloadsSection';
 
 const STATUS_CONFIG = {
   active:    { label: 'Active',    color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/30', dot: 'bg-emerald-400' },
@@ -266,46 +251,7 @@ export default function UserDashboard() {
         </motion.div>
 
         {/* Installer Downloads — active subscribers only */}
-        {hasAccess && (
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-            className="rounded-2xl border border-white/5 bg-[#0d1420] p-6 mb-5">
-            <div className="flex items-center gap-2 mb-4">
-              <Download size={16} className="text-cyan-400" />
-              <h3 className="text-white font-bold text-base">Download VoxVPN</h3>
-              <span className="ml-auto text-xs text-slate-500">v2.0.0</span>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {/* Windows */}
-              <button
-                onClick={triggerDownload}
-                className="flex items-center gap-4 p-4 rounded-xl border border-cyan-500/20 bg-cyan-500/5 hover:bg-cyan-500/10 transition-all group text-left">
-                <div className="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center flex-shrink-0">
-                  <Monitor size={18} className="text-cyan-400" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-white font-bold text-sm">Windows Installer</p>
-                  <p className="text-slate-500 text-xs">Windows 10 / 11 · .exe</p>
-                </div>
-                <Download size={14} className="text-cyan-400 group-hover:scale-110 transition-transform flex-shrink-0" />
-              </button>
-
-              {/* Android APK */}
-              <button
-                onClick={() => triggerDownload('Android')}
-                className="flex items-center gap-4 p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10 transition-all group text-left w-full">
-                <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
-                  <Smartphone size={18} className="text-emerald-400" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-white font-bold text-sm">Android App</p>
-                  <p className="text-slate-500 text-xs">Android 8.0+ · .apk</p>
-                </div>
-                <Download size={14} className="text-emerald-400 group-hover:scale-110 transition-transform flex-shrink-0" />
-              </button>
-            </div>
-            <p className="text-slate-700 text-xs text-center mt-3">All downloads are verified and signed</p>
-          </motion.div>
-        )}
+        {hasAccess && <DownloadsSection />}
 
         {/* Secondary actions */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}

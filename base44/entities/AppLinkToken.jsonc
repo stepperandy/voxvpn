@@ -1,0 +1,34 @@
+{
+  "name": "AppLinkToken",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "User ID this token belongs to"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "User email"
+    },
+    "token": {
+      "type": "string",
+      "description": "The one-time link token"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Token expiry"
+    },
+    "used": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the token has been consumed"
+    }
+  },
+  "required": [
+    "user_id",
+    "user_email",
+    "token",
+    "expires_at"
+  ]
+}
