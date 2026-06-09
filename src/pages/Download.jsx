@@ -111,13 +111,25 @@ export default function DownloadPage() {
   const [desktopRelease, setDesktopRelease] = useState(null);
   const [desktopLoading, setDesktopLoading] = useState(true);
 
-  const handleDesktopDownload = () => {
-    const a = document.createElement('a');
-    a.href = '/api/functions/downloadInstaller';
-    a.download = 'VoxVPN-Setup.exe';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDesktopDownload = async () => {
+    setDownloading(true);
+    try {
+      const res = await base44.functions.invoke('secureDownload', { platform: 'Windows' });
+      const url = res.data?.url;
+      if (!url) { alert('Installer not available. Please contact support.'); return; }
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = res.data?.filename || 'VoxVPN-Setup.exe';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } catch (err) {
+      alert('Download failed: ' + (err.message || 'Please try again.'));
+    } finally {
+      setDownloading(false);
+    }
   };
 
   const handleDownload = () => handleDesktopDownload();
@@ -308,12 +320,12 @@ export default function DownloadPage() {
                     {/* Download Button */}
                     <button
                       onClick={handleDesktopDownload}
-                      disabled={desktopLoading}
+                      disabled={downloading}
                       className="flex items-center gap-3 px-8 py-4 rounded-xl font-black text-base text-black transition-all shadow-2xl disabled:opacity-50 flex-shrink-0 w-full sm:w-auto justify-center"
                       style={{ background: 'linear-gradient(135deg, #00d4ff, #00b8e6)', boxShadow: '0 8px 30px rgba(0,212,255,0.35)' }}
                     >
-                      {desktopLoading ? <Loader2 size={20} className="animate-spin" /> : <Download size={20} />}
-                      Download .exe
+                      {downloading ? <Loader2 size={20} className="animate-spin" /> : <Download size={20} />}
+                      {downloading ? 'Preparing...' : 'Download .exe'}
                     </button>
                   </div>
 
@@ -379,15 +391,22 @@ export default function DownloadPage() {
                          </div>
                        </div>
 
-                       <a
-                         href="https://voxvpn.net/downloads/voxvpn.apk"
-                         download="voxvpn.apk"
+                       <button
+                         onClick={async () => {
+                           const res = await base44.functions.invoke('secureDownload', { platform: 'Android' });
+                           const url = res.data?.url;
+                           if (!url) { alert('APK not available yet.'); return; }
+                           const a = document.createElement('a');
+                           a.href = url;
+                           a.download = res.data?.filename || 'VoxVPN.apk';
+                           document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                         }}
                          className="flex items-center gap-3 px-8 py-4 rounded-xl font-black text-base text-black transition-all shadow-2xl flex-shrink-0 w-full sm:w-auto justify-center"
                          style={{ background: 'linear-gradient(135deg, #34A853, #2d8659)', boxShadow: '0 8px 30px rgba(52,168,83,0.35)' }}
                        >
                          <Download size={20} />
                          Download .APK
-                       </a>
+                       </button>
                      </div>
                    </div>
                  </motion.div>
