@@ -40,7 +40,8 @@ export default function SecureFilesView() {
       // Rename to .bin so the platform accepts any file type
       const safeName = file.name.replace(/\.(exe|apk)$/i, '.bin');
       const renamedFile = new File([file], safeName, { type: 'application/octet-stream' });
-      const { file_url } = await base44.integrations.Core.UploadPrivateFile({ file: renamedFile });
+      const { file_uri } = await base44.integrations.Core.UploadPrivateFile({ file: renamedFile });
+      const file_url = file_uri;
       const typeMeta = FILE_TYPES.find(t => t.id === fileTypeId);
       // Store original filename in name field so download button uses it
       await base44.entities.Download.create({
