@@ -43,9 +43,16 @@ export default function SecureFilesView() {
       const { file_uri } = await base44.integrations.Core.UploadPrivateFile({ file: renamedFile });
       const file_url = file_uri; // file_uri is already in correct mp/private/... format
       const typeMeta = FILE_TYPES.find(t => t.id === fileTypeId);
-      // Store original filename in name field so download button uses it
+      // Ensure filename has correct extension (.exe or .apk)
+      let finalName = file.name;
+      if (fileTypeId === 'windows_exe' && !finalName.toLowerCase().endsWith('.exe')) {
+        finalName = finalName.replace(/\.[^.]*$/, '.exe');
+      } else if (fileTypeId === 'android_apk' && !finalName.toLowerCase().endsWith('.apk')) {
+        finalName = finalName.replace(/\.[^.]*$/, '.apk');
+      }
+      
       await base44.entities.Download.create({
-        name: file.name, // original name e.g. VoxVPN-Setup-v2.0.exe
+        name: finalName,
         platform: fileTypeId === 'windows_exe' ? 'Windows' : fileTypeId === 'android_apk' ? 'Android' : 'Linux',
         file_url,
         version: new Date().toISOString().split('T')[0],
