@@ -7,12 +7,8 @@ async function triggerDownload(platform) {
   const res = await base44.functions.invoke('secureDownload', { platform });
   const url = res.data?.url;
   if (!url) throw new Error('No download URL returned');
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = res.data?.filename || (platform === 'Android' ? 'VoxVPN.apk' : 'VoxVPN-Setup.exe');
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+  // Open in new tab — bypasses React router and works for external/direct URLs
+  window.open(url, '_blank');
 }
 
 export default function DownloadsSection() {
