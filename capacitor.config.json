@@ -1,0 +1,14 @@
+{
+  "appId": "com.voxvpn.app",
+  "appName": "VoxVPN",
+  "webDir": "dist",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 3000,
+      "backgroundColor": "#1a1a2e"
+    }
+  },
+  "server": {
+    "androidScheme": "https"
+  }
+}
