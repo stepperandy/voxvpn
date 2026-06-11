@@ -23,17 +23,15 @@ async function fetchInstallerMeta(platform) {
 
 async function triggerDownload(platform) {
   const { url, filename } = await fetchInstallerMeta(platform);
-  const blobRes = await fetch(url);
-  if (!blobRes.ok) throw new Error('File fetch failed: ' + blobRes.status);
-  const blob = await blobRes.blob();
-  const blobUrl = URL.createObjectURL(blob);
+  // Open in new tab — works for all URL types (external CDN, GitHub, signed URLs) without CORS issues
   const a = document.createElement('a');
-  a.href = blobUrl;
+  a.href = url;
   a.download = filename;
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
 }
 
 const INSTALLERS = [

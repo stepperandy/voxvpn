@@ -120,17 +120,14 @@ export default function DownloadPage() {
       const { url, filename } = res.data;
       if (!url) throw new Error('No download URL');
       // Fetch as blob to trigger instant download without navigation
-      const blobRes = await fetch(url);
-      if (!blobRes.ok) throw new Error('Fetch failed: ' + blobRes.status);
-      const blob = await blobRes.blob();
-      const blobUrl = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = blobUrl;
+      a.href = url;
       a.download = filename || (platform === 'Android' ? 'VoxVPN.apk' : 'VoxVPN-Setup.exe');
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
     } catch (err) {
       alert('Download failed: ' + (err.message || 'Please try again.'));
     } finally {
