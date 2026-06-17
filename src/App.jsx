@@ -91,6 +91,7 @@ const BlogPost = lazy(() => import('./pages/BlogPost.jsx'));
 const Press = lazy(() => import('./pages/Press.jsx'));
 const Pricing = lazy(() => import('./pages/Pricing.jsx'));
 const PaymentFailed = lazy(() => import('./pages/PaymentFailed.jsx'));
+const AndroidDownload = lazy(() => import('./pages/AndroidDownload.jsx'));
 
 const PageTransition = ({ children }) => (
   <motion.div
@@ -199,6 +200,7 @@ const AuthenticatedApp = ({ isMobileDevice }) => {
           <Route path="/blog/:slug" element={<PageTransition><BlogPost /></PageTransition>} />
           <Route path="/press" element={<PageTransition><Press /></PageTransition>} />
           <Route path="/pricing" element={<PageTransition><Pricing /></PageTransition>} />
+          <Route path="/android-download" element={<PageTransition><AndroidDownload /></PageTransition>} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </Suspense>
