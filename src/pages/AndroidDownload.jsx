@@ -3,7 +3,7 @@ import Footer from '@/components/landing/Footer';
 import { motion } from 'framer-motion';
 import { Download, Shield, Globe, Zap, CheckCircle2, Clock, Smartphone, Monitor, Apple } from 'lucide-react';
 
-const APK_URL = '/downloads/VoxVPN-v1.0-APK.apk';
+const APK_URL = 'https://github.com/stepperandy/voxvpn/releases/download/V1.0/VoxVPN-v1.0.apk';
 
 const features = [
   { icon: Shield, label: 'OpenVPN Protocol', desc: 'Military-grade AES-256 encryption' },

@@ -60,7 +60,7 @@ const INSTALLERS = [
     hoverBg: 'rgba(52,168,83,0.12)',
     iconBg: 'rgba(52,168,83,0.12)',
     iconBorder: 'rgba(52,168,83,0.3)',
-    directUrl: '/downloads/VoxVPN-v1.0-APK.apk',
+    directUrl: 'https://github.com/stepperandy/voxvpn/releases/download/V1.0/VoxVPN-v1.0.apk',
     directFilename: 'VoxVPN-v1.0-APK.apk',
     directVersion: '1.0',
   },
