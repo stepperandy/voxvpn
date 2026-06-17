@@ -280,59 +280,61 @@ export default function DownloadsSection() {
           })}
         </div>
 
-        {/* Account Linking */}
-        <div className="rounded-xl p-4" style={{ border: '1px solid rgba(139,92,246,0.2)', background: 'rgba(139,92,246,0.05)' }}>
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.2)' }}>
-              <Key size={14} className="text-violet-400" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-white font-bold text-sm mb-0.5">Link Desktop App to Your Account</p>
-              <p className="text-slate-400 text-xs leading-relaxed">
-                After installing, open the app and enter this one-time token to automatically sign in — no password needed.
-              </p>
+        {/* Account Linking — desktop only */}
+        {(!detectedPlatform || detectedPlatform === 'Windows' || detectedPlatform === 'macOS') && (
+          <div className="rounded-xl p-4" style={{ border: '1px solid rgba(139,92,246,0.2)', background: 'rgba(139,92,246,0.05)' }}>
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.2)' }}>
+                <Key size={14} className="text-violet-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-white font-bold text-sm mb-0.5">Link Desktop App to Your Account</p>
+                <p className="text-slate-400 text-xs leading-relaxed">
+                  After installing, open the app and enter this one-time token to automatically sign in — no password needed.
+                </p>
 
-              {tokenData && !tokenExpired && (
-                <div className="mt-3 space-y-2">
-                  <div className="flex items-center gap-2">
-                    <code className="flex-1 px-3 py-2 rounded-lg text-violet-300 text-xs font-mono tracking-wider truncate" style={{ background: '#060c1a', border: '1px solid rgba(139,92,246,0.2)' }}>
-                      {tokenData.token}
-                    </code>
-                    <button onClick={copyToken}
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-violet-300 text-xs font-semibold transition-all flex-shrink-0"
-                      style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.25)' }}>
-                      {copied ? <CheckCircle2 size={12} /> : <Copy size={12} />}
-                      {copied ? 'Copied!' : 'Copy'}
-                    </button>
+                {tokenData && !tokenExpired && (
+                  <div className="mt-3 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <code className="flex-1 px-3 py-2 rounded-lg text-violet-300 text-xs font-mono tracking-wider truncate" style={{ background: '#060c1a', border: '1px solid rgba(139,92,246,0.2)' }}>
+                        {tokenData.token}
+                      </code>
+                      <button onClick={copyToken}
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-violet-300 text-xs font-semibold transition-all flex-shrink-0"
+                        style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.25)' }}>
+                        {copied ? <CheckCircle2 size={12} /> : <Copy size={12} />}
+                        {copied ? 'Copied!' : 'Copy'}
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs">
+                      <Shield size={10} className="text-violet-400" />
+                      <span className="text-violet-400/70">Single-use · expires in {minutesLeft} min</span>
+                      <button onClick={generateToken} className="ml-auto text-violet-400 hover:text-violet-300 transition-colors flex items-center gap-1">
+                        <RefreshCw size={10} /> New token
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1.5 text-xs">
-                    <Shield size={10} className="text-violet-400" />
-                    <span className="text-violet-400/70">Single-use · expires in {minutesLeft} min</span>
-                    <button onClick={generateToken} className="ml-auto text-violet-400 hover:text-violet-300 transition-colors flex items-center gap-1">
-                      <RefreshCw size={10} /> New token
-                    </button>
-                  </div>
-                </div>
-              )}
+                )}
 
-              {tokenExpired && (
-                <p className="text-amber-400 text-xs mt-2">Token expired. Generate a new one.</p>
-              )}
+                {tokenExpired && (
+                  <p className="text-amber-400 text-xs mt-2">Token expired. Generate a new one.</p>
+                )}
 
-              {!tokenData && (
-                <button
-                  onClick={generateToken}
-                  disabled={tokenLoading}
-                  className="mt-3 flex items-center gap-2 px-4 py-2 rounded-lg text-violet-300 text-xs font-semibold transition-all disabled:opacity-50"
-                  style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.25)' }}
-                >
-                  {tokenLoading ? <Loader2 size={12} className="animate-spin" /> : <Key size={12} />}
-                  {tokenLoading ? 'Generating...' : 'Generate Login Token'}
-                </button>
-              )}
+                {!tokenData && (
+                  <button
+                    onClick={generateToken}
+                    disabled={tokenLoading}
+                    className="mt-3 flex items-center gap-2 px-4 py-2 rounded-lg text-violet-300 text-xs font-semibold transition-all disabled:opacity-50"
+                    style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.25)' }}
+                  >
+                    {tokenLoading ? <Loader2 size={12} className="animate-spin" /> : <Key size={12} />}
+                    {tokenLoading ? 'Generating...' : 'Generate Login Token'}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         <p className="text-slate-700 text-xs text-center">Downloads are secure, verified and tied to your active subscription</p>
       </div>
