@@ -51,14 +51,14 @@ Deno.serve(async (req) => {
       // Non-fatal — full_name/verification update is best-effort
     }
 
-    // Create a VPN subscription record (expired until they pay)
+    // Create a VPN subscription record (7-day free trial on signup, activated on payment)
     await base44.asServiceRole.entities.VPNSubscription.create({
       user_email: email,
-      plan: 'Basic',
-      status: 'expired',
-      billing_cycle: 'monthly',
+      plan: 'Free Trial',
+      status: 'trial',
+      billing_cycle: 'trial',
       start_date: new Date().toISOString(),
-      renewal_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      renewal_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       max_devices: 1,
       price: 0,
     });
