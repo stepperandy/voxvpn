@@ -10,7 +10,7 @@ const CORS = {
 const APP_ID = Deno.env.get('BASE44_APP_ID');
 const BASE44_API = 'https://base44.app/api';
 
-async function passwordLogin(email, password) {
+async function tryPasswordLogin(email, password) {
   const res = await fetch(`${BASE44_API}/apps/${APP_ID}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -19,7 +19,18 @@ async function passwordLogin(email, password) {
   const text = await res.text();
   let data = null;
   try { data = JSON.parse(text); } catch {}
+  console.log('[vpnLogin] auth attempt status:', res.status, text.slice(0, 300));
   return { ok: res.ok, status: res.status, data, text };
+}
+
+function getServiceToken(req) {
+  return (
+    req.headers.get('x-service-token') ||
+    req.headers.get('base44-service-token') ||
+    req.headers.get('x-base44-service-token') ||
+    Deno.env.get('BASE44_SERVICE_TOKEN') ||
+    null
+  );
 }
 
 Deno.serve(async (req) => {
@@ -37,19 +48,78 @@ Deno.serve(async (req) => {
       }), { status: 400, headers: CORS });
     }
 
-    // Step 1: Authenticate against Base44
-    const attempt = await passwordLogin(email, password);
+    // Step 1: Try password login
+    let attempt = await tryPasswordLogin(email, password);
+    let token = null;
+    let authUser = null;
 
-    if (!attempt.ok) {
-      return new Response(JSON.stringify({
-        success: false,
-        message: 'Invalid login or inactive subscription',
-      }), { status: 401, headers: CORS });
+    if (attempt.ok) {
+      token = attempt.data?.access_token || attempt.data?.token || null;
+      authUser = attempt.data?.user || null;
+
+    } else {
+      const errLower = attempt.text.toLowerCase();
+      const isWrongPassword = errLower.includes('invalid email or password') || errLower.includes('invalid credentials');
+      const isUnverified = errLower.includes('verif') || errLower.includes('confirm');
+
+      if (isWrongPassword) {
+        return new Response(JSON.stringify({
+          success: false,
+          message: 'Invalid email or password.',
+        }), { status: 401, headers: CORS });
+      }
+
+      // Handle unverified email — auto-verify using service token OTP method
+      if (isUnverified) {
+        const users = await base44.asServiceRole.entities.User.filter({ email });
+        if (!users || users.length === 0) {
+          return new Response(JSON.stringify({ success: false, message: 'Invalid email or password.' }), { status: 401, headers: CORS });
+        }
+
+        const userId = users[0].id;
+
+        await fetch(`${BASE44_API}/apps/${APP_ID}/auth/resend-otp`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+
+        const serviceToken = getServiceToken(req);
+        if (serviceToken) {
+          const userRes = await fetch(`${BASE44_API}/apps/${APP_ID}/entities/User/${userId}`, {
+            headers: { 'Authorization': `Bearer ${serviceToken}`, 'X-App-Id': APP_ID },
+          });
+          if (userRes.ok) {
+            const userData = await userRes.json();
+            const otpCode = userData.otp_code || null;
+            if (otpCode) {
+              await fetch(`${BASE44_API}/apps/${APP_ID}/auth/verify-otp`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, otp_code: otpCode }),
+              });
+            }
+          }
+        }
+
+        attempt = await tryPasswordLogin(email, password);
+        if (!attempt.ok) {
+          return new Response(JSON.stringify({
+            success: false,
+            message: 'Login failed. Please verify your email first.',
+          }), { status: 401, headers: CORS });
+        }
+
+        token = attempt.data?.access_token || attempt.data?.token || null;
+        authUser = attempt.data?.user || users[0];
+
+      } else {
+        return new Response(JSON.stringify({
+          success: false,
+          message: attempt.data?.message || attempt.data?.detail || 'Login failed.',
+        }), { status: 401, headers: CORS });
+      }
     }
-
-    const token = attempt.data?.access_token || attempt.data?.token || null;
-    const authUser = attempt.data?.user || null;
-    const userEmail = authUser?.email || email;
 
     if (!token) {
       return new Response(JSON.stringify({
@@ -59,22 +129,23 @@ Deno.serve(async (req) => {
     }
 
     // Step 2: Check active subscription
+    const userEmail = authUser?.email || email;
     const subs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: userEmail });
     const activeSub = subs?.find(s => ['active', 'trial'].includes(s.status)) || null;
 
     if (!activeSub) {
       return new Response(JSON.stringify({
         success: false,
-        message: 'Invalid login or inactive subscription',
+        message: 'No active subscription found. Please purchase a VoxVPN plan at voxvpn.net.',
       }), { status: 403, headers: CORS });
     }
 
-    // Step 3: Check subscription expiry timer
+    // Step 3: Check expiry
     if (activeSub.renewal_date && new Date(activeSub.renewal_date) < new Date()) {
       await base44.asServiceRole.entities.VPNSubscription.update(activeSub.id, { status: 'expired' });
       return new Response(JSON.stringify({
         success: false,
-        message: 'Subscription expired. Please renew at voxvpn.net.',
+        message: `Subscription expired on ${new Date(activeSub.renewal_date).toLocaleDateString()}. Please renew at voxvpn.net.`,
       }), { status: 403, headers: CORS });
     }
 
