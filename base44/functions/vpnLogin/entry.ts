@@ -8,7 +8,7 @@ const CORS = {
 };
 
 const APP_ID = Deno.env.get('BASE44_APP_ID');
-const BASE44_API = 'https://base44.app/api';
+const BASE44_API = 'https://api.base44.com/api';
 
 async function tryPasswordLogin(email, password) {
   const res = await fetch(`${BASE44_API}/apps/${APP_ID}/auth/login`, {
