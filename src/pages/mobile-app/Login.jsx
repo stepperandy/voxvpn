@@ -65,7 +65,7 @@ export default function Login() {
             }}
           >
             <img
-              src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/5e71f2d6f_image.png"
+              src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/13431de73_VoxICON.png"
               alt="VoxVPN"
               className="w-12 h-auto"
               style={{ filter: 'drop-shadow(0 0 10px rgba(0,212,255,0.85))' }}

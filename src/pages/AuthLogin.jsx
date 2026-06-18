@@ -184,13 +184,16 @@ export default function AuthLogin() {
         {/* Logo + header */}
         <div className="text-center mb-8">
           <div className="relative inline-flex items-center justify-center mb-4">
-            <div className="pulse-ring w-14 h-14 rounded-full border-2 border-cyan-400/30 absolute" />
-            <div className="w-14 h-14 rounded-full bg-cyan-500/10 border border-cyan-500/40 flex items-center justify-center">
-              <Shield size={26} className="text-cyan-400" />
-            </div>
+          <div className="pulse-ring w-20 h-20 rounded-full border-2 border-cyan-400/30 absolute" />
+          <img
+            src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/13431de73_VoxICON.png"
+            alt="VoxVPN"
+            className="w-16 h-16 rounded-2xl"
+            style={{ filter: 'drop-shadow(0 0 14px rgba(0,212,255,0.5))' }}
+          />
           </div>
           <h1 className="text-3xl font-black tracking-tight mb-1">
-            Vox<span className="text-cyan-400">VPN</span>
+          Vox<span className="text-cyan-400">VPN</span>
           </h1>
           <p className="text-slate-400 text-sm">Sign in to your account</p>
         </div>

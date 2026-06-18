@@ -76,7 +76,7 @@ export default function Navbar() {
             {/* Logo — 100% bigger */}
             <Link to="/" className="flex-shrink-0">
               <img
-                src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/5e71f2d6f_image.png"
+                src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/13431de73_VoxICON.png"
                 alt="VoxVPN"
                 className="h-20 w-auto"
               />
