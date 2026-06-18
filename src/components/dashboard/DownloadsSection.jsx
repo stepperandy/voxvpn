@@ -28,16 +28,9 @@ async function fetchInstallerMeta(platform) {
 }
 
 async function triggerDownload(platform) {
-  const { url, filename } = await fetchInstallerMeta(platform);
-  // Open in new tab — works for all URL types (external CDN, GitHub, signed URLs) without CORS issues
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.target = '_blank';
-  a.rel = 'noopener noreferrer';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+  const { url } = await fetchInstallerMeta(platform);
+  // Use window.open — bypasses GitHub redirect issues and forces direct download
+  window.open(url, '_blank', 'noopener,noreferrer');
 }
 
 const ALL_INSTALLERS = [
@@ -68,9 +61,7 @@ const ALL_INSTALLERS = [
     hoverBg: 'rgba(52,168,83,0.12)',
     iconBg: 'rgba(52,168,83,0.12)',
     iconBorder: 'rgba(52,168,83,0.3)',
-    directUrl: 'https://github.com/stepperandy/voxvpn/releases/download/V1.0/VoxVPN-v1.0.apk',
-    directFilename: 'VoxVPN-v1.0-APK.apk',
-    directVersion: '1.0',
+
   },
   {
     platform: 'iOS',
@@ -127,10 +118,10 @@ export default function DownloadsSection() {
   const [copied, setCopied] = useState(false);
   const [expiredError, setExpiredError] = useState(null);
 
-  // Pre-fetch metadata (version + size) — skip direct-URL and coming-soon installers
+  // Pre-fetch metadata (version + size) — skip coming-soon installers
   useEffect(() => {
-    INSTALLERS.forEach(({ platform, directUrl, comingSoon }) => {
-      if (directUrl || comingSoon) return;
+    INSTALLERS.forEach(({ platform, comingSoon }) => {
+      if (comingSoon) return;
       fetchInstallerMeta(platform)
         .then(m => setMeta(prev => ({ ...prev, [platform]: m })))
         .catch(() => {});
@@ -141,20 +132,7 @@ export default function DownloadsSection() {
     setDlState(s => ({ ...s, [platform]: 'loading' }));
     setExpiredError(null);
     try {
-      const installer = INSTALLERS.find(i => i.platform === platform);
-      // Android: direct URL, no backend needed
-      if (installer?.directUrl) {
-        const a = document.createElement('a');
-        a.href = installer.directUrl;
-        a.download = installer.directFilename;
-        a.target = '_blank';
-        a.rel = 'noopener noreferrer';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      } else {
-        await triggerDownload(platform);
-      }
+      await triggerDownload(platform);
       setDlState(s => ({ ...s, [platform]: 'done' }));
       setTimeout(() => setDlState(s => ({ ...s, [platform]: 'idle' })), 3000);
     } catch (err) {
@@ -283,7 +261,7 @@ export default function DownloadsSection() {
                   {/* Version + size badges */}
                   <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                     <span className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)' }}>
-                      <Tag size={8} /> v{m?.version || directVersion || '2.0.0'}
+                      <Tag size={8} /> v{m?.version || '2.0.0'}
                     </span>
                     {m?.fileSize && (
                       <span className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)' }}>
