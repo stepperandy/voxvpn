@@ -72,20 +72,27 @@ Deno.serve(async (req) => {
       });
     }
 
-    // External/GitHub URL — follow redirects to get the final CDN URL, return it to client
-    // GitHub releases require GET (not HEAD) to resolve the redirect chain
-    const headRes = await fetch(fileUri, {
+    // External/GitHub URL — stream the file directly so users never see GitHub
+    // GitHub releases require GET to follow the redirect chain to the CDN
+    const fileRes = await fetch(fileUri, {
       method: 'GET',
       headers: { 'User-Agent': 'VoxVPN-Download-Proxy/1.0' },
       redirect: 'follow',
     });
-    const finalUrl = headRes.url || fileUri;
+    if (!fileRes.ok) throw new Error(`GitHub fetch failed: ${fileRes.status}`);
 
-    return Response.json({
-      url: finalUrl,
-      filename,
-      version,
-    }, { headers: corsHeaders });
+    const ext = platform === 'Android' ? 'apk' : 'exe';
+    const dlFilename = filename.endsWith(`.${ext}`) ? filename : `${filename}.${ext}`;
+
+    // Stream the binary directly with download headers
+    return new Response(fileRes.body, {
+      status: 200,
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/octet-stream',
+        'Content-Disposition': `attachment; filename="${dlFilename}"`,
+      },
+    });
 
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500, headers: corsHeaders });

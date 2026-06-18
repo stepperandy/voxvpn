@@ -34,15 +34,36 @@ export default function PublicDownload() {
     setDlState('loading');
     await trackDownload('attempted');
     try {
-      // Use secureDownload to get the resolved CDN URL
-      const res = await base44.functions.invoke('secureDownload', { platform: 'Android' });
-      const url = res.data?.url || APK_DIRECT_URL;
-      window.open(url, '_blank', 'noopener,noreferrer');
+      // Try authenticated download first (streams file directly, no GitHub page)
+      const token = localStorage.getItem('base44_access_token');
+      const appUrl = window.location.origin;
+      const res = await fetch(`${appUrl}/functions/secureDownload`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ platform: 'Android' }),
+      });
+      if (res.ok) {
+        const blob = await res.blob();
+        const blobUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = 'VoxVPN.apk';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(blobUrl);
+      } else {
+        // Fallback to direct URL for unauthenticated users
+        window.open(APK_DIRECT_URL, '_blank', 'noopener,noreferrer');
+      }
       await trackDownload('success');
       setDlState('done');
       setTimeout(() => setDlState('idle'), 4000);
     } catch (err) {
-      // Fallback to direct URL if secureDownload fails (unauthenticated)
+      // Fallback to direct URL on error
       window.open(APK_DIRECT_URL, '_blank', 'noopener,noreferrer');
       await trackDownload('success');
       setDlState('done');

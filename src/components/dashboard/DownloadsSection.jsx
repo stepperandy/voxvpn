@@ -27,17 +27,37 @@ async function trackDownload(platform, status, errorMessage = null) {
 }
 
 async function triggerDownload(platform) {
-  const res = await base44.functions.invoke('secureDownload', { platform });
-  if (res.data?.expired) {
-    const err = new Error(res.data.error || 'Subscription expired.');
-    err.expired = true;
-    throw err;
+  // Direct fetch to get binary stream (base44.functions.invoke expects JSON)
+  const token = localStorage.getItem('base44_access_token');
+  const appUrl = window.location.origin;
+  const res = await fetch(`${appUrl}/functions/secureDownload`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({ platform }),
+  });
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}));
+    if (errData.expired) {
+      const err = new Error(errData.error || 'Subscription expired.');
+      err.expired = true;
+      throw err;
+    }
+    throw new Error(errData.error || `Download failed: ${res.status}`);
   }
-  if (res.data?.error) throw new Error(res.data.error);
-  // Backend returns a direct CDN URL — open it so the browser downloads natively
-  const { url } = res.data;
-  if (!url) throw new Error('No download URL returned.');
-  window.open(url, '_blank', 'noopener,noreferrer');
+  // Stream the binary blob and trigger download
+  const blob = await res.blob();
+  const blobUrl = window.URL.createObjectURL(blob);
+  const filename = platform === 'Android' ? 'VoxVPN.apk' : 'VoxVPN-Setup.exe';
+  const a = document.createElement('a');
+  a.href = blobUrl;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  window.URL.revokeObjectURL(blobUrl);
 }
 
 const ALL_INSTALLERS = [
