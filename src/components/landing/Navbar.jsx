@@ -72,7 +72,7 @@ export default function Navbar() {
       {/* Main nav */}
       <nav className="bg-[#080c18]/95 backdrop-blur-md border-b border-white/5">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10">
-          <div className="flex items-center h-[72px] gap-4">
+          <div className="flex items-center h-[88px] gap-4">
             {/* Logo — 100% bigger */}
             <Link to="/" className="flex-shrink-0">
               <img
