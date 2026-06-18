@@ -13,23 +13,12 @@ async function fetchInstallerMeta(platform) {
   }
   const { url, filename, version } = res.data;
   if (!url) throw new Error('No download URL');
-  // Try to get file size via HEAD request
-  let fileSize = null;
-  try {
-    const head = await fetch(url, { method: 'HEAD' });
-    const bytes = parseInt(head.headers.get('content-length') || '0', 10);
-    if (bytes > 0) {
-      fileSize = bytes > 1024 * 1024
-        ? `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-        : `${(bytes / 1024).toFixed(0)} KB`;
-    }
-  } catch (_) { /* size optional */ }
-  return { url, filename, version, fileSize };
+  return { url, filename, version };
 }
 
 async function triggerDownload(platform) {
   const { url } = await fetchInstallerMeta(platform);
-  // Use window.open — bypasses GitHub redirect issues and forces direct download
+  // window.open follows GitHub redirects natively and triggers the file save dialog
   window.open(url, '_blank', 'noopener,noreferrer');
 }
 

@@ -12,17 +12,15 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
-    // Authenticate user
     const user = await base44.auth.me();
     if (!user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401, headers: corsHeaders });
     }
 
-    // Parse platform from request body
     const body = await req.json().catch(() => ({}));
-    const platform = body.platform || 'Windows'; // 'Windows' or 'Android'
+    const platform = body.platform || 'Windows';
 
-    // For non-admins, verify active subscription with expiry timer
+    // For non-admins, verify active subscription with expiry check
     if (user.role !== 'admin') {
       const subs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: user.email });
       const active = subs?.find(s => ['active', 'trial'].includes(s.status));
@@ -31,9 +29,7 @@ Deno.serve(async (req) => {
         return Response.json({ error: 'No active subscription. Please purchase a VoxVPN plan to download.' }, { status: 403, headers: corsHeaders });
       }
 
-      // Enforce subscription timer — block if renewal_date has passed
       if (active.renewal_date && new Date(active.renewal_date) < new Date()) {
-        // Mark it expired
         await base44.asServiceRole.entities.VPNSubscription.update(active.id, { status: 'expired' });
         return Response.json({
           error: `Your subscription expired on ${new Date(active.renewal_date).toLocaleDateString()}. Please renew to continue downloading.`,
@@ -44,43 +40,29 @@ Deno.serve(async (req) => {
     }
 
     // Get the latest active download entry for this platform
-    const downloads = await base44.asServiceRole.entities.Download.filter({
-      platform,
-      is_active: true,
-    });
-
-    // Prefer entries with [SECURE] notes (uploaded to private storage), fall back to any
+    const downloads = await base44.asServiceRole.entities.Download.filter({ platform, is_active: true });
     const sorted = downloads?.sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
-    const secureEntry = sorted?.find(d => d.notes?.startsWith('[SECURE]')) || sorted?.[0];
+    const entry = sorted?.find(d => d.notes?.startsWith('[SECURE]')) || sorted?.[0];
 
-    if (!secureEntry?.file_url) {
-      return Response.json({ error: 'No installer available' }, { status: 404, headers: corsHeaders });
+    if (!entry?.file_url) {
+      return Response.json({ error: 'No installer available for this platform.' }, { status: 404, headers: corsHeaders });
     }
 
-    const fileUri = secureEntry.file_url;
+    const fileUri = entry.file_url;
+    const filename = entry.name || (platform === 'Android' ? 'VoxVPN.apk' : 'VoxVPN-Setup.exe');
+    const version = entry.version || '2.0.0';
 
-    const originalName = secureEntry.name || (platform === 'Android' ? 'VoxVPN.apk' : 'VoxVPN-Setup.exe');
-
-    // If it's a private URI (not http), generate a signed URL and return it with filename
+    // If it's a private storage URI, generate a signed URL
     if (!fileUri.startsWith('http')) {
       const signed = await base44.asServiceRole.integrations.Core.CreateFileSignedUrl({
         file_uri: fileUri,
         expires_in: 300,
       });
-      return Response.json({
-        url: signed.signed_url,
-        filename: originalName,
-        version: secureEntry.version,
-        expires_in: 300,
-      }, { headers: corsHeaders });
+      return Response.json({ url: signed.signed_url, filename, version }, { headers: corsHeaders });
     }
 
-    // External URL (GitHub, etc.) — return it directly with proper filename
-    return Response.json({
-      url: fileUri,
-      filename: originalName,
-      version: secureEntry.version,
-    }, { headers: corsHeaders });
+    // External URL — return it directly (browser will follow redirects natively)
+    return Response.json({ url: fileUri, filename, version }, { headers: corsHeaders });
 
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500, headers: corsHeaders });

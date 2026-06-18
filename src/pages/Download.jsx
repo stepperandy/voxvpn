@@ -108,34 +108,17 @@ export default function DownloadPage() {
   const [activePlatform, setActivePlatform] = useState('windows');
   const justPaid = new URLSearchParams(window.location.search).get('payment') === 'success';
 
-  const [desktopRelease, setDesktopRelease] = useState(null);
-  const [desktopLoading, setDesktopLoading] = useState(true);
-
   const [downloading, setDownloading] = useState(false);
-
-  const ANDROID_APK_URL = 'https://github.com/stepperandy/voxvpn/releases/download/V1.0/VoxVPN-v1.0.apk';
 
   const handleDownload = async (platform = 'Windows') => {
     setDownloading(true);
     try {
-      let url, filename;
-      if (platform === 'Android') {
-        url = ANDROID_APK_URL;
-        filename = 'VoxVPN-v1.0.apk';
-      } else {
-        const res = await base44.functions.invoke('secureDownload', { platform });
-        url = res.data?.url;
-        filename = res.data?.filename || 'VoxVPN-Setup.exe';
-        if (!url) throw new Error('No download URL');
-      }
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      const res = await base44.functions.invoke('secureDownload', { platform });
+      if (res.data?.expired) throw new Error(res.data.error || 'Subscription expired.');
+      const url = res.data?.url;
+      if (!url) throw new Error('No download URL available.');
+      // window.open follows redirects natively and triggers the browser's file save dialog
+      window.open(url, '_blank', 'noopener,noreferrer');
     } catch (err) {
       alert('Download failed: ' + (err.message || 'Please try again.'));
     } finally {
@@ -294,8 +277,7 @@ export default function DownloadPage() {
                       <Star size={10} /> Official Installer
                     </span>
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-slate-400 text-xs font-mono">
-                      <Tag size={10} />
-                      {desktopLoading ? '…' : `v${desktopRelease?.version || '2.0.0'}`}
+                      <Tag size={10} /> v2.0.0
                     </span>
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold">
                       <CheckCircle2 size={10} /> Latest
@@ -313,16 +295,14 @@ export default function DownloadPage() {
                     <div className="flex-1">
                       <h2 className="text-2xl font-black text-white mb-1">VoxVPN Desktop for Windows</h2>
                       <p className="text-slate-400 text-sm mb-3">
-                        {desktopRelease?.description || 'One-click VPN client. Military-grade encryption. No config files needed.'}
+                        One-click VPN client. Military-grade encryption. No config files needed.
                       </p>
                       <div className="flex flex-wrap gap-3 text-xs text-slate-500">
                         <span className="flex items-center gap-1"><Shield size={11} className="text-emerald-400" /> AES-256</span>
                         <span>·</span>
                         <span>Windows 10 / 11 · 64-bit</span>
                         <span>·</span>
-                        {desktopRelease?.released_at && (
-                          <span>Released {new Date(desktopRelease.released_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
-                        )}
+
                       </div>
                     </div>
 
