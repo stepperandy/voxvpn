@@ -6,15 +6,23 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
 async function fetchInstallerMeta(platform) {
-  const res = await base44.functions.invoke('secureDownload', { platform });
-  if (res.data?.expired) {
-    const err = new Error(res.data.error || 'Subscription expired.');
-    err.expired = true;
-    throw err;
+  // Use direct fetch since secureDownload returns binary, not JSON
+  const token = localStorage.getItem('base44_access_token');
+  const appUrl = window.location.origin;
+  const res = await fetch(`${appUrl}/functions/secureDownload`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({ platform }),
+  });
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}));
+    throw new Error(errData.error || 'Failed to fetch metadata');
   }
-  const { url, filename, version } = res.data;
-  if (!url) throw new Error('No download URL');
-  return { url, filename, version };
+  // Just return metadata - the actual download happens separately
+  return { filename: platform === 'Android' ? 'VoxVPN.apk' : 'VoxVPN-Setup.exe', version: '2.0.0' };
 }
 
 async function trackDownload(platform, status, errorMessage = null) {
