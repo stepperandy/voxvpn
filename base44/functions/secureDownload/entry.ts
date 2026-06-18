@@ -73,9 +73,9 @@ Deno.serve(async (req) => {
     }
 
     // External/GitHub URL — follow redirects to get the final CDN URL, return it to client
-    // (Streaming 60MB+ through serverless corrupts the binary due to timeouts)
+    // GitHub releases require GET (not HEAD) to resolve the redirect chain
     const headRes = await fetch(fileUri, {
-      method: 'HEAD',
+      method: 'GET',
       headers: { 'User-Agent': 'VoxVPN-Download-Proxy/1.0' },
       redirect: 'follow',
     });
