@@ -27,7 +27,6 @@ async function trackDownload(platform, status, errorMessage = null) {
 }
 
 async function triggerDownload(platform) {
-  // Use secureDownload to get the file URL (validates subscription), then open directly
   const res = await base44.functions.invoke('secureDownload', { platform });
   if (res.data?.expired) {
     const err = new Error(res.data.error || 'Subscription expired.');
@@ -35,9 +34,15 @@ async function triggerDownload(platform) {
     throw err;
   }
   if (res.data?.error) throw new Error(res.data.error);
-  const { url } = res.data;
+  const { url, filename } = res.data;
   if (!url) throw new Error('No download URL returned.');
-  window.open(url, '_blank');
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename || (platform === 'Android' ? 'VoxVPN.apk' : 'VoxVPN-Setup.exe');
+  a.target = '_blank';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
 
 const ALL_INSTALLERS = [

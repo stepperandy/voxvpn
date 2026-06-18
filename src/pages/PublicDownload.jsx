@@ -44,9 +44,15 @@ async function doDownload(platform) {
     throw err;
   }
   if (res.data?.error) throw new Error(res.data.error);
-  const { url } = res.data;
+  const { url, filename } = res.data;
   if (!url) throw new Error('No download URL returned.');
-  window.open(url, '_blank');
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename || (platform === 'Android' ? 'VoxVPN.apk' : 'VoxVPN-Setup.exe');
+  a.target = '_blank';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
 
 export default function PublicDownload() {
