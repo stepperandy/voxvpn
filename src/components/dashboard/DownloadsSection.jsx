@@ -17,9 +17,19 @@ async function fetchInstallerMeta(platform) {
 }
 
 async function triggerDownload(platform) {
-  const { url } = await fetchInstallerMeta(platform);
-  // window.open follows GitHub redirects natively and triggers the file save dialog
-  window.open(url, '_blank', 'noopener,noreferrer');
+  const { url, filename } = await fetchInstallerMeta(platform);
+  // Fetch as blob so the browser saves the file instead of navigating
+  const response = await fetch(url);
+  if (!response.ok) throw new Error('Download failed: ' + response.status);
+  const blob = await response.blob();
+  const blobUrl = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = blobUrl;
+  a.download = filename || (platform === 'Android' ? 'VoxVPN.apk' : 'VoxVPN-Setup.exe');
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
 }
 
 const ALL_INSTALLERS = [
