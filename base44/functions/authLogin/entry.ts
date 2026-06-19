@@ -60,61 +60,12 @@ Deno.serve(async (req) => {
       authUser = authResult.user || null;
       console.log('[authLogin] SDK login OK, token:', !!token);
     } catch (authErr) {
-      const msg = authErr.message || '';
-      console.log('[authLogin] SDK login failed:', msg);
-      
-      // Fallback: Check if user has an ACTIVE VPNSubscription (legacy user or admin without Base44 password)
-      const existingSubs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: email });
-      const activeSub = existingSubs?.find(s => ['active', 'trial'].includes(s.status));
-      
-      if (activeSub) {
-        // User has active subscription - create Base44 account if needed, or just generate token
-        console.log('[authLogin] Found active subscription for:', email);
-        try {
-          // Try to create account via emailSignup (will fail if user exists, which is ok)
-          const signupRes = await base44.functions.invoke('emailSignup', { full_name: email.split('@')[0], email, password });
-          if (signupRes.data?.success) {
-            const authResult = await base44.auth.loginViaEmailPassword(email, password);
-            token = authResult.access_token || null;
-            authUser = authResult.user || null;
-            console.log('[authLogin] Created and logged in, token:', !!token);
-          } else if (signupRes.data?.error?.includes('already exists')) {
-            // User exists but password doesn't match - for subscription holders, generate token anyway
-            const platformUsers = await base44.asServiceRole.entities.User.filter({ email });
-            if (platformUsers?.length > 0) {
-              // User exists in Base44 - use service role to generate a token
-              token = await base44.auth.createToken({ user_id: platformUsers[0].id });
-              authUser = platformUsers[0];
-              console.log('[authLogin] Generated service token for existing user, token:', !!token);
-            } else {
-              throw new Error('User not found');
-            }
-          } else {
-            throw new Error(signupRes.data?.error || 'Signup failed');
-          }
-        } catch (createErr) {
-          console.log('[authLogin] Fallback account creation failed:', createErr.message);
-          // Last resort: check if user exists and has active subscription, generate token
-          const platformUsers = await base44.asServiceRole.entities.User.filter({ email });
-          if (platformUsers?.length > 0 && activeSub) {
-            token = await base44.auth.createToken({ user_id: platformUsers[0].id });
-            authUser = platformUsers[0];
-            console.log('[authLogin] Generated service token for subscription holder, token:', !!token);
-          } else {
-            return new Response(JSON.stringify({
-              success: false,
-              message: 'Invalid email or password. If you have an active subscription, contact support.',
-              subscriptionActive: false,
-            }), { status: 401, headers: CORS });
-          }
-        }
-      } else {
-        return new Response(JSON.stringify({
-          success: false,
-          message: 'Invalid email or password.',
-          subscriptionActive: false,
-        }), { status: 401, headers: CORS });
-      }
+      console.log('[authLogin] SDK login failed:', authErr.message || '');
+      return new Response(JSON.stringify({
+        success: false,
+        message: 'Invalid email or password.',
+        subscriptionActive: false,
+      }), { status: 401, headers: CORS });
     }
 
     if (!token) {
