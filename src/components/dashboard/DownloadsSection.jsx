@@ -165,7 +165,7 @@ export default function DownloadsSection() {
     try {
       // For Android: direct GitHub redirect to ensure uncorrupted APK download
       if (platform === 'Android') {
-        window.location.href = 'https://github.com/stepperandy/voxvpn/releases/download/V1.0/VoxVPN-V1.0.apk';
+        window.location.href = 'https://github.com/stepperandy/voxvpn/releases/download/V1.0/main-ui-ovpn2-debug.apk';
       } else {
         // For other platforms: use backend proxy
         const token = localStorage.getItem('base44_access_token');
