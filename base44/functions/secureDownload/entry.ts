@@ -86,6 +86,14 @@ Deno.serve(async (req) => {
     
     // Verify we got binary content, not HTML
     const contentType = fileRes.headers.get('content-type');
+    const contentLength = fileRes.headers.get('content-length');
+    console.log('[secureDownload] GitHub response:', {
+      status: fileRes.status,
+      contentType,
+      contentLength,
+      url: fileUri,
+    });
+    
     if (contentType && contentType.includes('text/html')) {
       throw new Error('GitHub returned HTML instead of APK file. Check the release URL.');
     }
@@ -101,6 +109,8 @@ Deno.serve(async (req) => {
         ...corsHeaders,
         'Content-Type': downloadContentType,
         'Content-Disposition': `attachment; filename="${dlFilename}"`,
+        'X-Original-Content-Length': contentLength || 'unknown',
+        'X-Original-URL': fileUri,
       },
     });
 
