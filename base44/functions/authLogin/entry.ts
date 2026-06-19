@@ -58,11 +58,33 @@ Deno.serve(async (req) => {
     } catch (authErr) {
       const msg = authErr.message || '';
       console.log('[authLogin] SDK login failed:', msg);
-      return new Response(JSON.stringify({
-        success: false,
-        message: 'Invalid email or password.',
-        subscriptionActive: false,
-      }), { status: 401, headers: CORS });
+      
+      // Fallback: Check if user has a VPNSubscription but no Base44 account (legacy website signup)
+      const existingSubs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: email });
+      if (existingSubs && existingSubs.length > 0) {
+        // User has subscription but no Base44 account - create one
+        console.log('[authLogin] Found legacy subscription, creating Base44 account for:', email);
+        try {
+          const newUser = await base44.users.create({ email, password, emailVerified: true });
+          const authResult = await base44.auth.loginViaEmailPassword(email, password);
+          token = authResult.access_token || null;
+          authUser = authResult.user || null;
+          console.log('[authLogin] Created Base44 account and logged in, token:', !!token);
+        } catch (createErr) {
+          console.log('[authLogin] Failed to create fallback account:', createErr.message);
+          return new Response(JSON.stringify({
+            success: false,
+            message: 'Invalid email or password.',
+            subscriptionActive: false,
+          }), { status: 401, headers: CORS });
+        }
+      } else {
+        return new Response(JSON.stringify({
+          success: false,
+          message: 'Invalid email or password.',
+          subscriptionActive: false,
+        }), { status: 401, headers: CORS });
+      }
     }
 
     if (!token) {
