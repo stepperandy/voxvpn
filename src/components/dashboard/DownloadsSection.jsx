@@ -142,18 +142,21 @@ const ALL_INSTALLERS = [
 
 function detectPlatform() {
   const ua = navigator.userAgent.toLowerCase();
+  // Check mobile/Android first — most specific
   if (/android/.test(ua)) return 'Android';
   if (/iphone|ipad|ipod/.test(ua)) return 'iOS';
-  if (/macintosh|mac os x/.test(ua) && !/iphone|ipad/.test(ua)) return 'macOS';
-  if (/win/.test(ua)) return 'Windows';
-  return null; // unknown / desktop fallback
+  // Only return desktop platforms if clearly not a mobile device
+  if (/macintosh|mac os x/.test(ua) && !/iphone|ipad|mobile/.test(ua)) return 'macOS';
+  if (/windows nt/.test(ua) && !/iemobile|windows phone/.test(ua)) return 'Windows';
+  // Unknown — treat as mobile/Android to avoid showing Windows installer on phones
+  return 'Android';
 }
 
 export default function DownloadsSection({ isAdmin = false }) {
   const detectedPlatform = detectPlatform();
   const INSTALLERS = isAdmin
     ? ALL_INSTALLERS.filter(i => !i.comingSoon)
-    : ALL_INSTALLERS.filter(i => !i.comingSoon && i.osKeys.includes((detectedPlatform || 'windows').toLowerCase()));
+    : ALL_INSTALLERS.filter(i => !i.comingSoon && i.osKeys.includes(detectedPlatform.toLowerCase()));
 
   const [dlState, setDlState] = useState({});
   const [meta, setMeta] = useState({});
