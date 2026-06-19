@@ -78,7 +78,7 @@ Deno.serve(async (req) => {
           // User already exists - just tell them to use correct password
           return new Response(JSON.stringify({
             success: false,
-            message: 'Invalid password. If you forgot your password, use "Forgot password" to reset it.',
+            message: 'Wrong password. Use the same password as your web dashboard, or tap "Forgot password" to reset.',
             subscriptionActive: false,
             userExists: true,
           }), { status: 401, headers: CORS });
