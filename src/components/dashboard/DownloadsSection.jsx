@@ -186,7 +186,7 @@ export default function DownloadsSection({ isAdmin = false }) {
         return;
       }
       if (platform === 'Android-Mirror') {
-        window.location.href = 'https://firebasestorage.googleapis.com/v0/b/voxvpn-1-apk.firebasestorage.app/o/VoxVPN-v1.0.1.apk?alt=media';
+        window.location.href = 'https://firebasestorage.googleapis.com/v0/b/voxvpn-1-apk.firebasestorage.app/o/VoxVPN-v1.0.1.apk?alt=media&token=58a0f442-d7e1-4c5c-a0ee-42360097e516';
         await trackDownload('Android', 'success');
         setDlState(s => ({ ...s, [platform]: 'done' }));
         setTimeout(() => setDlState(s => ({ ...s, [platform]: 'idle' })), 3000);
