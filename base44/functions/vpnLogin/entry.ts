@@ -56,30 +56,22 @@ Deno.serve(async (req) => {
 
     console.log(`[vpnLogin] Found ${subs?.length || 0} subscriptions for ${userEmail}`);
 
-    // Auto-create pending record if none exists
+    // Auto-create trial subscription if none exists
     if (!activeSub) {
       activeSub = await base44.asServiceRole.entities.VPNSubscription.create({
         user_email: userEmail,
         plan: 'Free Trial',
-        status: 'pending_payment',
+        status: 'trial',
         billing_cycle: 'trial',
         start_date: new Date().toISOString(),
         renewal_date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
         max_devices: 1,
         price: 0,
-        notes: 'Auto-created on first login attempt.',
+        notes: 'Auto-trial: 5 days free access from first login.',
       });
     }
 
     console.log(`[vpnLogin] Subscription status: ${activeSub.status}, plan: ${activeSub.plan}`);
-
-    // Block pending_payment
-    if (activeSub.status === 'pending_payment') {
-      return new Response(JSON.stringify({
-        success: false,
-        message: 'Your trial is reserved. Please subscribe at voxvpn.net to activate VPN access.',
-      }), { status: 403, headers: CORS });
-    }
 
     // Check expiry
     if (activeSub.renewal_date && new Date(activeSub.renewal_date) < new Date()) {
