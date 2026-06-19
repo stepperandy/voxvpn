@@ -1,9 +1,9 @@
 import { Download, Smartphone, Shield, Lock, Zap, Star, AlertTriangle, Settings, LogIn, Wifi } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const APK_VERSION = '2.0.0';
-const APK_FILENAME = 'VoxVPN-v2.0.0.apk';
-const APK_DIRECT_URL = null; // New release pending — URL will be updated on launch
+const APK_VERSION = '1.0.1';
+const APK_FILENAME = 'VoxVPN-v1.0.1.apk';
+const APK_DIRECT_URL = 'https://github.com/stepperandy/voxvpn/releases/download/V1.0/VoxVPN-v1.0.1.apk';
 
 const STEPS = [
   { icon: Download, label: 'Download the APK', desc: 'Tap the button above to download VoxVPN-V1.0.apk' },
@@ -58,19 +58,16 @@ export default function PublicDownload() {
           <span className="flex items-center gap-1"><Zap size={11} className="text-cyan-500" /> Android 8.0+</span>
         </div>
 
-        {/* Coming Soon Notice */}
-        <div className="w-full flex flex-col items-center gap-3 p-6 rounded-2xl mb-6" style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.25)' }}>
-          <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.3)' }}>
-            <Smartphone size={28} style={{ color: '#f59e0b' }} />
-          </div>
-          <p className="text-amber-300 font-black text-lg text-center">New Release Coming Soon</p>
-          <p className="text-slate-400 text-sm text-center leading-relaxed max-w-sm">
-            We're preparing a brand-new signed release of VoxVPN for Android (v{APK_VERSION}). The download will be available here shortly.
-          </p>
-          <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold" style={{ background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.3)', color: '#f59e0b' }}>
-            🚀 v{APK_VERSION} · Production Release · Android 8.0+
-          </span>
-        </div>
+        {/* Download Button */}
+        <a
+          href={APK_DIRECT_URL}
+          download={APK_FILENAME}
+          className="w-full flex items-center justify-center gap-3 py-4 px-6 rounded-2xl text-black font-black text-base mb-6 transition-all hover:opacity-90 active:scale-95"
+          style={{ background: 'linear-gradient(135deg, #34A853, #2d8f47)', boxShadow: '0 0 30px rgba(52,168,83,0.3)' }}
+        >
+          <Download size={20} />
+          Download VoxVPN {APK_VERSION} · APK
+        </a>
 
         {/* Unknown Sources Warning */}
         <div className="w-full rounded-xl p-4 flex items-start gap-3 mb-8" style={{ background: 'rgba(251,191,36,0.05)', border: '1px solid rgba(251,191,36,0.2)' }}>

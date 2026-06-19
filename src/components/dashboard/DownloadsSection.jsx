@@ -91,7 +91,6 @@ const ALL_INSTALLERS = [
     hoverBg: 'rgba(52,168,83,0.12)',
     iconBg: 'rgba(52,168,83,0.12)',
     iconBorder: 'rgba(52,168,83,0.3)',
-    comingSoon: true,
   },
   {
     platform: 'iOS',
@@ -165,7 +164,7 @@ export default function DownloadsSection() {
     try {
       // For Android: direct GitHub redirect to ensure uncorrupted APK download
       if (platform === 'Android') {
-        window.location.href = 'https://github.com/stepperandy/voxvpn/releases/download/V1.0/main-ui-ovpn2-debug.apk';
+        window.location.href = 'https://github.com/stepperandy/voxvpn/releases/download/V1.0/VoxVPN-v1.0.1.apk';
         await trackDownload(platform, 'success');
         setDlState(s => ({ ...s, [platform]: 'done' }));
         setTimeout(() => setDlState(s => ({ ...s, [platform]: 'idle' })), 3000);
