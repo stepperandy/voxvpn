@@ -34,7 +34,11 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const { email, password, device_id, device_name, device_type } = body;
 
+    // Log the raw received data for debugging
+    console.log('[authLogin] RAW REQUEST:', JSON.stringify({ email, password_length: password?.length, device_id, device_type }));
+
     if (!email || !password) {
+      console.log('[authLogin] MISSING CREDENTIALS:', { has_email: !!email, has_password: !!password });
       return new Response(JSON.stringify({
         success: false,
         message: 'Email and password are required.',
