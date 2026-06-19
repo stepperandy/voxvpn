@@ -27,7 +27,13 @@ export default function Login() {
       const res = await fetch('/functions/authLogin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({
+          email,
+          password,
+          device_id: getDeviceId(),
+          device_name: 'Android App',
+          device_type: 'android',
+        }),
       });
       const data = await res.json();
       if (data?.success === true) {
