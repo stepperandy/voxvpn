@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Download, Monitor, Smartphone, Loader2, Key, Copy, CheckCircle2, Shield, RefreshCw, Tag, XCircle, Zap, LogIn } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -24,7 +24,12 @@ const DOWNLOAD_FILENAMES = {
   'Android': 'VoxVPNGIT.apk',
   'Android-Mirror': 'VoxVPNFIRE.apk',
 };
-const VERSION = '1.0.1';
+// Platform keys to match Download entity platform field
+const PLATFORM_ENTITY_KEY = {
+  'Windows': 'Windows',
+  'Android': 'Android',
+  'Android-Mirror': 'Android',
+};
 
 const ALL_INSTALLERS = [
   {
@@ -126,6 +131,15 @@ export default function DownloadsSection({ isAdmin = false }) {
   const [tokenLoading, setTokenLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [expiredError, setExpiredError] = useState(null);
+  const [versions, setVersions] = useState({});
+
+  useEffect(() => {
+    base44.entities.Download.filter({ is_active: true }).then(records => {
+      const map = {};
+      records.forEach(r => { if (r.platform && r.version) map[r.platform] = r.version; });
+      setVersions(map);
+    }).catch(() => {});
+  }, []);
 
   const handleDownload = async (platform) => {
     setDlState(s => ({ ...s, [platform]: 'loading' }));
@@ -265,12 +279,14 @@ export default function DownloadsSection({ isAdmin = false }) {
                   {filename && <p className="text-[10px] font-mono font-semibold mt-0.5" style={{ color }}>{filename}</p>}
                   <p className="text-slate-500 text-xs mt-0.5">{subtitle}</p>
 
-                  {/* Version badge */}
-                  <div className="flex items-center gap-2 mt-1.5">
-                    <span className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)' }}>
-                      <Tag size={8} /> v{VERSION}
-                    </span>
-                  </div>
+                  {/* Version badge — pulled from admin Download entity */}
+                  {(versions[PLATFORM_ENTITY_KEY[platform]] || versions[platform]) && (
+                    <div className="flex items-center gap-2 mt-1.5">
+                      <span className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)' }}>
+                        <Tag size={8} /> v{versions[PLATFORM_ENTITY_KEY[platform]] || versions[platform]}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {/* State icon */}
