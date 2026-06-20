@@ -13,9 +13,9 @@ async function trackDownload(platform, status, errorMessage = null) {
   } catch {}
 }
 
-// Direct download URLs — no auth required, no backend proxy
-const DIRECT_URLS = {
-  'Windows': 'https://github.com/stepperandy/voxvpn/releases/download/V1.0/VoxVPN-Setup.exe',
+// Fallback direct download URLs — overridden dynamically from the Download entity
+const FALLBACK_URLS = {
+  'Windows': 'https://github.com/stepperandy/voxvpn/releases/download/v2.0.0/VoxVPN-Setup-v2.0.exe',
   'Android': 'https://github.com/stepperandy/voxvpn/releases/download/V1.0/VoxVPN-v1.0.1.apk',
   'Android-Mirror': 'https://firebasestorage.googleapis.com/v0/b/voxvpn-1-apk.firebasestorage.app/o/VoxVPN-v1.0.1.apk?alt=media&token=58a0f442-d7e1-4c5c-a0ee-42360097e516',
 };
@@ -132,12 +132,18 @@ export default function DownloadsSection({ isAdmin = false }) {
   const [copied, setCopied] = useState(false);
   const [expiredError, setExpiredError] = useState(null);
   const [versions, setVersions] = useState({});
+  const [entityUrls, setEntityUrls] = useState({});
 
   useEffect(() => {
     base44.entities.Download.filter({ is_active: true }).then(records => {
-      const map = {};
-      records.forEach(r => { if (r.platform && r.version) map[r.platform] = r.version; });
-      setVersions(map);
+      const vMap = {};
+      const uMap = {};
+      records.forEach(r => {
+        if (r.platform && r.version) vMap[r.platform] = r.version;
+        if (r.platform && r.file_url) uMap[r.platform] = r.file_url;
+      });
+      setVersions(vMap);
+      setEntityUrls(uMap);
     }).catch(() => {});
   }, []);
 
@@ -146,7 +152,9 @@ export default function DownloadsSection({ isAdmin = false }) {
     setExpiredError(null);
     trackDownload(platform, 'attempted');
     try {
-      const url = DIRECT_URLS[platform];
+      // Prefer URL from admin-configured Download entity, fall back to hardcoded
+      const entityKey = PLATFORM_ENTITY_KEY[platform];
+      const url = entityUrls[entityKey] || FALLBACK_URLS[platform];
       if (!url) throw new Error('No download URL for ' + platform);
       // Use window.open to let the browser handle the redirect chain natively
       window.open(url, '_blank', 'noopener,noreferrer');
