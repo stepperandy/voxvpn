@@ -41,13 +41,21 @@ export default function DownloadsSection({ isAdmin = false }) {
 
   useEffect(() => {
     setLoading(true);
-    base44.entities.Download.list()
+    base44.entities.Download.filter({ is_active: true })
       .then(records => {
-        const active = records.filter(d => d.is_active !== false);
-        const filtered = isAdmin ? active : active.filter(d => d.platform === detectedPlatform);
+        const filtered = isAdmin ? (records || []) : (records || []).filter(d => d.platform === detectedPlatform);
         setDownloads(filtered);
       })
-      .catch(() => setDownloads([]))
+      .catch(() => {
+        // fallback: try list()
+        base44.entities.Download.list()
+          .then(records => {
+            const active = (records || []).filter(d => d.is_active !== false);
+            const filtered = isAdmin ? active : active.filter(d => d.platform === detectedPlatform);
+            setDownloads(filtered);
+          })
+          .catch(() => setDownloads([]));
+      })
       .finally(() => setLoading(false));
   }, [isAdmin, detectedPlatform]);
 
