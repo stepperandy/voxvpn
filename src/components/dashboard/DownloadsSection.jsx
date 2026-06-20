@@ -121,10 +121,10 @@ function detectPlatform() {
 
 export default function DownloadsSection({ isAdmin = false }) {
   const detectedPlatform = detectPlatform();
-  // Admins see all; users see only the single installer matching their OS (exact platform match)
+  // Admins see all active installers; users see ONLY their platform's installer(s)
   const INSTALLERS = isAdmin
     ? ALL_INSTALLERS.filter(i => !i.comingSoon)
-    : ALL_INSTALLERS.filter(i => !i.comingSoon && i.osKeys.includes(detectedPlatform.toLowerCase()));
+    : ALL_INSTALLERS.filter(i => !i.comingSoon && i.osKeys[0] === detectedPlatform.toLowerCase());
 
   const [dlState, setDlState] = useState({});
   const [tokenData, setTokenData] = useState(null);
