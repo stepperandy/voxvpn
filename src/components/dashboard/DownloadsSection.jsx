@@ -1,29 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { appParams } from '@/lib/app-params';
-import { Download, Monitor, Smartphone, Loader2, Key, Copy, CheckCircle2, Shield, RefreshCw, Tag, HardDrive, XCircle, Zap, LogIn } from 'lucide-react';
+import { Download, Monitor, Smartphone, Loader2, Key, Copy, CheckCircle2, Shield, RefreshCw, Tag, XCircle, Zap, LogIn } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-
-async function fetchInstallerMeta(platform) {
-  // Use direct fetch since secureDownload returns binary, not JSON
-  const token = localStorage.getItem('base44_access_token');
-  const appUrl = window.location.origin;
-  const res = await fetch(`${appUrl}/functions/secureDownload`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-    },
-    body: JSON.stringify({ platform }),
-  });
-  if (!res.ok) {
-    const errData = await res.json().catch(() => ({}));
-    throw new Error(errData.error || 'Failed to fetch metadata');
-  }
-  // Just return metadata - the actual download happens separately
-  return { filename: platform === 'Android' ? 'VoxVPN.apk' : 'VoxVPN-Setup.exe', version: '2.0.0' };
-}
 
 async function trackDownload(platform, status, errorMessage = null) {
   try {
@@ -34,34 +13,18 @@ async function trackDownload(platform, status, errorMessage = null) {
   } catch {}
 }
 
-async function triggerDownload(platform) {
-  // Use window.open for direct backend streaming (avoids blob issues on mobile)
-  const token = localStorage.getItem('base44_access_token');
-  const appUrl = window.location.origin;
-  
-  // Create a temporary form to POST with auth header
-  const form = document.createElement('form');
-  form.method = 'POST';
-  form.action = `${appUrl}/functions/secureDownload`;
-  form.style.display = 'none';
-  
-  const tokenInput = document.createElement('input');
-  tokenInput.type = 'hidden';
-  tokenInput.name = 'platform';
-  tokenInput.value = platform;
-  form.appendChild(tokenInput);
-  
-  document.body.appendChild(form);
-  
-  // Open in new tab/window to trigger download
-  const newWindow = window.open(`${appUrl}/functions/secureDownload`, '_blank');
-  
-  // Clean up
-  document.body.removeChild(form);
-  
-  // Track success
-  return { success: true };
-}
+// Direct download URLs — no auth required, no backend proxy
+const DIRECT_URLS = {
+  'Windows': 'https://github.com/stepperandy/voxvpn/releases/download/V1.0/VoxVPN-Setup.exe',
+  'Android': 'https://github.com/stepperandy/voxvpn/releases/download/V1.0/VoxVPN-v1.0.1.apk',
+  'Android-Mirror': 'https://firebasestorage.googleapis.com/v0/b/voxvpn-1-apk.firebasestorage.app/o/VoxVPN-v1.0.1.apk?alt=media&token=58a0f442-d7e1-4c5c-a0ee-42360097e516',
+};
+const DOWNLOAD_FILENAMES = {
+  'Windows': 'VoxVPN-Setup.exe',
+  'Android': 'VoxVPNGIT.apk',
+  'Android-Mirror': 'VoxVPNFIRE.apk',
+};
+const VERSION = '1.0.1';
 
 const ALL_INSTALLERS = [
   {
@@ -159,60 +122,33 @@ export default function DownloadsSection({ isAdmin = false }) {
     : ALL_INSTALLERS.filter(i => !i.comingSoon && i.osKeys.includes(detectedPlatform.toLowerCase()));
 
   const [dlState, setDlState] = useState({});
-  const [meta, setMeta] = useState({});
   const [tokenData, setTokenData] = useState(null);
   const [tokenLoading, setTokenLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [expiredError, setExpiredError] = useState(null);
 
-  // Pre-fetch metadata (version + size) — skip coming-soon installers
-  useEffect(() => {
-    INSTALLERS.forEach(({ platform, comingSoon }) => {
-      if (comingSoon) return;
-      fetchInstallerMeta(platform)
-        .then(m => setMeta(prev => ({ ...prev, [platform]: m })))
-        .catch(() => {});
-    });
-  }, []);
-
   const handleDownload = async (platform) => {
     setDlState(s => ({ ...s, [platform]: 'loading' }));
     setExpiredError(null);
-    await trackDownload(platform, 'attempted');
+    trackDownload(platform, 'attempted');
     try {
-      // Direct URLs for all platforms — same approach that works for Android
-      const DIRECT_URLS = {
-        'Android': 'https://github.com/stepperandy/voxvpn/releases/download/V1.0/VoxVPN-v1.0.1.apk',
-        'Android-Mirror': 'https://firebasestorage.googleapis.com/v0/b/voxvpn-1-apk.firebasestorage.app/o/VoxVPN-v1.0.1.apk?alt=media&token=58a0f442-d7e1-4c5c-a0ee-42360097e516',
-        'Windows': 'https://github.com/stepperandy/voxvpn/releases/download/V1.0/VoxVPN-Setup.exe',
-      };
-      const downloadFilenames = {
-        'Android': 'VoxVPNGIT.apk',
-        'Android-Mirror': 'VoxVPNFIRE.apk',
-        'Windows': 'VoxVPN-Setup.exe',
-      };
-      if (DIRECT_URLS[platform]) {
-        const a = document.createElement('a');
-        a.href = DIRECT_URLS[platform];
-        a.download = downloadFilenames[platform] || platform;
-        a.click();
-        await trackDownload(platform, 'success');
-        setDlState(s => ({ ...s, [platform]: 'done' }));
-        setTimeout(() => setDlState(s => ({ ...s, [platform]: 'idle' })), 3000);
-        return;
-      }
-      
-      await trackDownload(platform, 'success');
+      const url = DIRECT_URLS[platform];
+      if (!url) throw new Error('No download URL for ' + platform);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = DOWNLOAD_FILENAMES[platform] || platform;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      trackDownload(platform, 'success');
       setDlState(s => ({ ...s, [platform]: 'done' }));
       setTimeout(() => setDlState(s => ({ ...s, [platform]: 'idle' })), 3000);
     } catch (err) {
-      await trackDownload(platform, 'failed', err.message);
+      trackDownload(platform, 'failed', err.message);
       setDlState(s => ({ ...s, [platform]: 'idle' }));
-      if (err.expired) {
-        setExpiredError(err.message);
-      } else {
-        alert('Download failed: ' + (err.message || 'Please try again.'));
-      }
+      alert('Download failed: ' + (err.message || 'Please try again.'));
     }
   };
 
@@ -288,8 +224,7 @@ export default function DownloadsSection({ isAdmin = false }) {
 
         {/* Installer buttons */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {INSTALLERS.map(({ platform, label, filename, subtitle, ext, icon: Icon, color, borderColor, bgColor, hoverBg, iconBg, iconBorder, directVersion, comingSoon }) => {
-            const m = meta[platform];
+          {INSTALLERS.map(({ platform, label, filename, subtitle, ext, icon: Icon, color, borderColor, bgColor, hoverBg, iconBg, iconBorder, comingSoon }) => {
             const state = dlState[platform] || 'idle';
 
             if (comingSoon) {
@@ -330,16 +265,11 @@ export default function DownloadsSection({ isAdmin = false }) {
                   {filename && <p className="text-[10px] font-mono font-semibold mt-0.5" style={{ color }}>{filename}</p>}
                   <p className="text-slate-500 text-xs mt-0.5">{subtitle}</p>
 
-                  {/* Version + size badges */}
-                  <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                  {/* Version badge */}
+                  <div className="flex items-center gap-2 mt-1.5">
                     <span className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)' }}>
-                      <Tag size={8} /> v{m?.version || '2.0.0'}
+                      <Tag size={8} /> v{VERSION}
                     </span>
-                    {m?.fileSize && (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)' }}>
-                        <HardDrive size={8} /> {m.fileSize}
-                      </span>
-                    )}
                   </div>
                 </div>
 
