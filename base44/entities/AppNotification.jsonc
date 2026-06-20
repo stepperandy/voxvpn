@@ -1,0 +1,74 @@
+{
+  "name": "AppNotification",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Notification title"
+    },
+    "message": {
+      "type": "string",
+      "description": "Notification body"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "update",
+        "announcement",
+        "promo"
+      ],
+      "default": "update",
+      "description": "Notification type"
+    },
+    "platform": {
+      "type": "string",
+      "description": "Platform this notification relates to (e.g. Android, Windows)"
+    },
+    "version": {
+      "type": "string",
+      "description": "App version this notification relates to"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether notification is visible to users"
+    },
+    "download_id": {
+      "type": "string",
+      "description": "Reference to the Download entity record"
+    }
+  },
+  "required": [
+    "title",
+    "message"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "data.is_active": true
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

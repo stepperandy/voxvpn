@@ -11,6 +11,7 @@ import {
   Zap
 } from 'lucide-react';
 import DownloadsSection from '@/components/dashboard/DownloadsSection';
+import UpdateNotifications from '@/components/dashboard/UpdateNotifications';
 
 const STATUS_CONFIG = {
   active:    { label: 'Active',    color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/30', dot: 'bg-emerald-400' },
@@ -288,6 +289,9 @@ export default function UserDashboard() {
             </Link>
           </div>
         </motion.div>
+
+        {/* Update Notifications */}
+        <UpdateNotifications />
 
         {/* Installer Downloads — active subscribers only */}
         {hasAccess ? (
