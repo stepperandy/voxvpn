@@ -5,7 +5,7 @@ const PLAN_PRICES = {
   'Standard':   { monthly: 6.99,  sixmonths: 13.99, yearly: 53.88 },
   'Premium':    { monthly: 9.99,  sixmonths: 13.99, yearly: 77.88 },
   'Advanced':   { monthly: 14.99, sixmonths: 13.99, yearly: 24.99 },
-  'Enterprise': { monthly: 29.99, sixmonths: 13.99, yearly: 239.88 },
+  'Enterprise': { monthly: 29.99, sixmonths: 13.99, yearly: 45.99 },
 };
 
 // GHS conversion rate (approximate)
