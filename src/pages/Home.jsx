@@ -6,6 +6,7 @@ import Servers from '@/components/landing/Servers';
 import Pricing from '@/components/landing/Pricing.jsx';
 import Footer from '@/components/landing/Footer';
 import TrustBadges from '@/components/landing/TrustBadges';
+import Testimonials from '@/components/landing/Testimonials';
 
 export default function Home() {
   return (
@@ -16,6 +17,7 @@ export default function Home() {
       <Features />
       <Servers />
       <Pricing />
+      <Testimonials />
       <TrustBadges />
       <Footer />
     </div>
