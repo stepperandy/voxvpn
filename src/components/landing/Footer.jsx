@@ -175,36 +175,52 @@ export default function Footer() {
           {/* Payment method icons */}
           <div className="flex items-center gap-3 flex-wrap justify-center">
             {/* Visa */}
-            <div className="h-12 w-[72px] bg-[#1434CB] rounded-2xl flex items-center justify-center shadow-lg">
-              <span className="text-white font-black text-xl italic tracking-tight" style={{fontFamily:'sans-serif'}}>VISA</span>
+            <div className="h-14 w-20 rounded-2xl flex items-center justify-center shadow-xl" style={{background:'linear-gradient(145deg,#1a4fd6,#1434CB)'}}>
+              <span className="text-white font-black text-2xl italic" style={{fontFamily:'serif',letterSpacing:'-0.5px',textShadow:'0 1px 2px rgba(0,0,0,0.3)'}}>VISA</span>
             </div>
             {/* Mastercard */}
-            <div className="h-12 w-[72px] bg-[#1a1a1a] rounded-2xl flex items-center justify-center shadow-lg">
+            <div className="h-14 w-20 rounded-2xl flex items-center justify-center shadow-xl" style={{background:'linear-gradient(145deg,#222,#111)'}}>
               <div className="relative flex items-center">
-                <div className="w-7 h-7 rounded-full bg-[#EB001B]" />
-                <div className="w-7 h-7 rounded-full bg-[#F79E1B] -ml-3.5" style={{opacity:0.95}} />
+                <div className="w-8 h-8 rounded-full" style={{background:'#EB001B'}} />
+                <div className="w-8 h-8 rounded-full -ml-4" style={{background:'#F79E1B',opacity:0.95}} />
               </div>
             </div>
             {/* Amex */}
-            <div className="h-12 w-[72px] bg-[#2E77BC] rounded-2xl flex items-center justify-center shadow-lg">
+            <div className="h-14 w-20 rounded-2xl flex items-center justify-center shadow-xl" style={{background:'linear-gradient(145deg,#3a8fd4,#2E77BC)'}}>
               <span className="text-white font-black text-sm tracking-widest">AMEX</span>
             </div>
             {/* Discover */}
-            <div className="h-12 w-[72px] bg-[#231F20] rounded-2xl flex items-center justify-center overflow-hidden shadow-lg">
-              <div className="flex flex-col items-center">
-                <span className="text-white font-black text-[9px] tracking-widest leading-none">DISCOVER</span>
-                <div className="w-8 h-1.5 rounded-full mt-0.5" style={{background:'linear-gradient(90deg,#F76F20,#FFB347)'}} />
+            <div className="h-14 w-20 rounded-2xl flex items-center justify-center shadow-xl overflow-hidden" style={{background:'linear-gradient(145deg,#1a1a1a,#111)'}}>
+              <div className="flex flex-col items-center gap-0.5">
+                <span className="text-white font-black text-[10px] tracking-wider leading-none">DISCOVER</span>
+                <div className="w-10 h-2 rounded-full" style={{background:'linear-gradient(90deg,#F76F20,#FFB347)'}} />
               </div>
             </div>
             {/* Apple Pay */}
-            <div className="h-12 w-[72px] bg-[#1a1a1a] rounded-2xl flex items-center justify-center gap-1 shadow-lg">
+            <div className="h-14 w-20 rounded-2xl flex items-center justify-center gap-1 shadow-xl" style={{background:'linear-gradient(145deg,#222,#111)'}}>
               <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white flex-shrink-0"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
               <span className="text-white text-xs font-semibold">Pay</span>
             </div>
             {/* Google Pay */}
-            <div className="h-12 w-[72px] bg-white rounded-2xl flex items-center justify-center shadow-lg px-2">
-              <span className="font-bold text-lg leading-none"><span className="text-[#4285F4]">G</span></span>
-              <span className="text-[#5F6368] font-semibold text-xs ml-0.5">Pay</span>
+            <div className="h-14 w-20 rounded-2xl flex items-center justify-center shadow-xl px-2" style={{background:'linear-gradient(145deg,#f0f0f0,#e0e0e0)'}}>
+              <span className="font-bold text-xl leading-none"><span style={{color:'#4285F4'}}>G</span></span>
+              <span className="font-semibold text-xs ml-0.5" style={{color:'#5F6368'}}>Pay</span>
+            </div>
+            {/* Hubtel */}
+            <div className="h-14 w-20 rounded-2xl flex items-center justify-center shadow-xl px-2" style={{background:'linear-gradient(145deg,#f5f5f5,#e8e8e8)'}}>
+              <span className="font-black text-sm" style={{color:'#FF6B00'}}>Hub</span><span className="font-black text-sm" style={{color:'#333'}}>tel</span>
+            </div>
+            {/* Alipay */}
+            <div className="h-14 w-20 rounded-2xl flex items-center justify-center shadow-xl" style={{background:'linear-gradient(145deg,#1a9ce8,#0E8CD1)'}}>
+              <div className="flex flex-col items-center">
+                <span className="text-white font-black text-lg leading-none" style={{fontFamily:'serif'}}>支</span>
+                <span className="text-white font-bold text-[9px] tracking-widest leading-none mt-0.5">Alipay</span>
+              </div>
+            </div>
+            {/* WeChat Pay */}
+            <div className="h-14 w-20 rounded-2xl flex items-center justify-center gap-1 shadow-xl" style={{background:'linear-gradient(145deg,#2dc84d,#1aab38)'}}>
+              <svg viewBox="0 0 24 24" className="w-4 h-4 fill-white flex-shrink-0"><path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 0 1 .213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.295.295a.326.326 0 0 0 .167-.054l1.903-1.114a.864.864 0 0 1 .717-.098 10.16 10.16 0 0 0 2.837.403c-.276-.94-.42-1.92-.42-2.934 0-3.842 3.498-6.963 7.814-6.963.218 0 .433.012.648.03C15.887 4.43 12.548 2.188 8.69 2.188zm-1.927 3.95a.97.97 0 0 1 .968.968.97.97 0 0 1-.968.967.97.97 0 0 1-.967-.967.97.97 0 0 1 .967-.968zm4.844 0a.97.97 0 0 1 .968.968.97.97 0 0 1-.968.967.97.97 0 0 1-.967-.967.97.97 0 0 1 .967-.968zm3.497 3.497c-3.606 0-6.53 2.67-6.53 5.963 0 3.292 2.924 5.963 6.53 5.963.724 0 1.42-.114 2.07-.315a.69.69 0 0 1 .58.08l1.49.87a.264.264 0 0 0 .135.044.24.24 0 0 0 .239-.239c0-.058-.024-.113-.038-.17l-.316-1.196a.48.48 0 0 1 .172-.538c1.478-1.1 2.43-2.76 2.43-4.499 0-3.293-2.924-5.963-6.53-5.963zm-2.09 2.99a.79.79 0 0 1 .784.784.79.79 0 0 1-.784.784.79.79 0 0 1-.783-.784.79.79 0 0 1 .783-.784zm4.18 0a.79.79 0 0 1 .784.784.79.79 0 0 1-.784.784.79.79 0 0 1-.784-.784.79.79 0 0 1 .784-.784z"/></svg>
+              <span className="text-white text-[9px] font-bold leading-tight">WeChat<br/>Pay</span>
             </div>
           </div>
 
