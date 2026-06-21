@@ -265,7 +265,7 @@ export default function Navbar() {
 
       {/* Announcement bar */}
       {announcementVisible && (
-        <div className="bg-[#0a1a1f] border-b border-cyan-500/20 py-2 px-4 flex items-center justify-center gap-1.5 text-[10px] sm:text-xs text-slate-300 relative text-center">
+        <div className="bg-[#0a1a1f] border-b border-cyan-500/20 py-1.5 px-3 sm:px-4 flex items-center justify-center gap-1.5 text-[9px] sm:text-xs text-slate-300 relative text-center">
           <span className="leading-tight">🌐 📱 <span className="text-white font-semibold">Global Communication, Simplified</span>{' '}·{' '}
             <a href="https://www.voxdigits.net" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline font-medium">Get eSIM</a>{' '}and{' '}
             <a href="https://www.voxdigits.net" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline font-medium">Virtual Numbers</a>
