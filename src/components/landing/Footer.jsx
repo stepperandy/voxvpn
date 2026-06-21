@@ -175,9 +175,9 @@ export default function Footer() {
           {/* Payment method icons */}
           <div className="flex items-center justify-center">
             <img
-              src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/7ae0ebc8c_generated_image.png"
+              src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/8bfc6ccfc_image.png"
               alt="Payment Methods: Visa, Mastercard, Amex, Discover, Apple Pay, Google Pay, Hubtel, Alipay, WeChat Pay, MTN MoMo"
-              className="h-48 w-auto object-contain"
+              className="h-48 w-auto object-contain mix-blend-screen"
             />
           </div>
 
