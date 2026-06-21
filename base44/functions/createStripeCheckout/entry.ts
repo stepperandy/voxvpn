@@ -1,7 +1,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 const PLAN_PRICES = {
-  'Basic': { monthly: 3.99, yearly: 29.88 },
+  'Basic': { monthly: 2.59, yearly: 29.88 },
   'Standard': { monthly: 6.99, yearly: 53.88 },
   'Premium': { monthly: 9.99, yearly: 77.88 },
   'Advanced': { monthly: 14.99, yearly: 119.88 },
