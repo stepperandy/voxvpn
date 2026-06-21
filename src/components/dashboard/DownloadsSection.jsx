@@ -135,7 +135,15 @@ export default function DownloadsSection({ isAdmin = false }) {
           </p>
         )}
 
-        {loading ? (
+        {detectedPlatform === 'iOS' && !isAdmin ? (
+          <div className="rounded-2xl border border-violet-500/20 bg-violet-500/5 py-12 text-center">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(167,139,250,0.12)', border: '1px solid rgba(167,139,250,0.25)' }}>
+              <Smartphone size={28} style={{ color: '#a78bfa' }} />
+            </div>
+            <p className="text-violet-300 font-black text-lg mb-1">iOS — Coming Soon</p>
+            <p className="text-slate-500 text-sm">VoxVPN for iPhone & iPad is currently in development.<br />Check back soon!</p>
+          </div>
+        ) : loading ? (
           <div className="flex items-center justify-center py-12 gap-2 text-slate-400">
             <Loader2 size={18} className="animate-spin text-cyan-400" />
             <span className="text-sm">Loading downloads...</span>
