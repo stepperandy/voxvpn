@@ -23,6 +23,10 @@
       "type": "boolean",
       "default": false,
       "description": "Whether the token has been consumed"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional notes or description for this token (up to 1000 characters)"
     }
   },
   "required": [

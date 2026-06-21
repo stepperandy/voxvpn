@@ -36,6 +36,10 @@
     "download_id": {
       "type": "string",
       "description": "Reference to the Download entity record"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional notes or description for this notification (up to 1000 characters)"
     }
   },
   "required": [
