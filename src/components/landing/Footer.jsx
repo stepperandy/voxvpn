@@ -172,18 +172,19 @@ export default function Footer() {
         </div>
 
         {/* Trust & Distribution — payment, app stores, social */}
-        <div className="border-t border-white/5 pt-10 pb-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-6 items-center">
-            {/* Payment methods */}
-            <div className="flex flex-col items-center lg:items-start gap-2">
-              <span className="text-slate-600 text-[10px] font-bold uppercase tracking-widest">We Accept</span>
-              <img
-                src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/ec6333756_image.png"
-                alt="Payment Methods: Visa, Mastercard, Amex, Discover, Apple Pay, Google Pay, Hubtel, Alipay, WeChat Pay, MTN MoMo"
-                className="h-[68px] w-auto object-contain mix-blend-screen"
-              />
-            </div>
+        <div className="border-t border-white/5 pt-10 pb-8 space-y-8">
+          {/* Payment methods — full width row */}
+          <div className="flex flex-col items-center gap-3">
+            <span className="text-slate-600 text-[10px] font-bold uppercase tracking-widest">We Accept</span>
+            <img
+              src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/d9f1ec5eb_image.png"
+              alt="Payment Methods: Visa, Mastercard, Amex, Discover, Apple Pay, Google Pay, Hubtel, Alipay, WeChat Pay, MTN MoMo"
+              className="h-[54px] w-auto object-contain mix-blend-screen"
+            />
+          </div>
 
+          {/* App stores + Social — two columns */}
+          <div className="flex flex-col sm:flex-row gap-6 items-center justify-between">
             {/* App store badges */}
             <div className="flex items-center gap-3 flex-wrap justify-center">
               <a href="https://play.google.com/store/apps/details?id=net.openvpn.openvpn" target="_blank" rel="noopener noreferrer"
@@ -210,7 +211,7 @@ export default function Footer() {
             </div>
 
             {/* Social media */}
-            <div className="flex flex-col items-center lg:items-end gap-2">
+            <div className="flex flex-col items-center sm:items-end gap-2">
               <span className="text-slate-600 text-[10px] font-bold uppercase tracking-widest">Follow Us</span>
               <SocialIcons />
             </div>
