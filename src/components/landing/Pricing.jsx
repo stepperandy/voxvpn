@@ -266,6 +266,8 @@ export default function Pricing() {
           plan={selectedPlan}
           isAdmin={isAdmin}
           onProceed={handlePaymentProceed}
+          currency={{ code: 'USD' }}
+          countryCode="US"
         />
 
         {/* Trust bar */}

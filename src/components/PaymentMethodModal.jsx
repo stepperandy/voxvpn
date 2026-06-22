@@ -7,6 +7,16 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
   const [selectedMethod, setSelectedMethod] = useState('stripe');
   const [loading, setLoading] = useState(false);
 
+  // Detect if the buyer is in China via timezone or locale
+  const isChinaBuyer = (() => {
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+      const locale = navigator.language || navigator.languages?.[0] || '';
+      return tz === 'Asia/Shanghai' || tz === 'Asia/Urumqi' ||
+             locale.toLowerCase().startsWith('zh') || locale.toLowerCase().includes('cn');
+    } catch { return false; }
+  })();
+
   const handleProceed = async () => {
     setLoading(true);
     try {
@@ -28,14 +38,17 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
         }
         return;
       }
-      // Stripe with card, Alipay, or WeChat Pay
+      // WeChat Pay and Alipay are Chinese payment methods — always use CNY.
+      // Also auto-convert to CNY for China-based buyers using any Stripe method.
+      const isChineseMethod = selectedMethod === 'wechat_pay' || selectedMethod === 'alipay';
+      const useCNY = isChineseMethod || isChinaBuyer;
       const res = await base44.functions.invoke('createStripeCheckout', {
         plan: plan?.name,
         isBilledYearly: !!isBilledYearly,
         isSixMonths: !!isSixMonths,
         paymentMethod: selectedMethod,
-        currencyCode: currency?.code || 'USD',
-        countryCode: countryCode || 'US',
+        currencyCode: useCNY ? 'CNY' : (currency?.code || 'USD'),
+        countryCode: useCNY ? 'CN' : (countryCode || 'US'),
       });
       const url = res?.data?.url;
       if (url) {
