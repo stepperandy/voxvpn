@@ -1,8 +1,27 @@
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import { lazy, Suspense, useEffect, useState } from 'react';
+
+// Detects if the app is running inside the native Capacitor shell (Android APK)
+function isNativeCapacitor() {
+  return typeof window !== 'undefined' &&
+    window.Capacitor &&
+    (window.Capacitor.isNative === true || window.Capacitor.platform !== 'web');
+}
+
+// Inside the Capacitor native shell, force all traffic to the /app mobile routes
+function NativeAppRedirect() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  useEffect(() => {
+    if (isNativeCapacitor() && !location.pathname.startsWith('/app')) {
+      navigate('/app', { replace: true });
+    }
+  }, [location.pathname, navigate]);
+  return null;
+}
 import { motion, AnimatePresence } from 'framer-motion';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
@@ -233,6 +252,7 @@ function App() {
           <AuthProvider>
             <QueryClientProvider client={queryClientInstance}>
               <Router>
+                <NativeAppRedirect />
                 <AuthenticatedAppWrapper isMobileDevice={isMobileDevice} />
                 <FloatingAssistant />
               </Router>
