@@ -42,19 +42,20 @@ export default function AuthLogin() {
     setLoading(true);
     setError('');
     try {
-      // Step 1: Verify credentials and registration via backend function
-      // This enforces the database pre-check — only registered users get through
-      const res = await fetch('/functions/authLogin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+      // Route through the authLogin backend function — it enforces the database
+      // pre-check (only registered users with active subscriptions get through).
+      // This replaces the old direct SDK call that auto-created accounts.
+      const response = await base44.functions.invoke('authLogin', {
+        email,
+        password,
       });
-      const data = await res.json();
+      const data = response?.data || response;
       if (!data?.success) {
         setError(data?.message || 'Invalid email or password.');
         return;
       }
-      // Step 2: SDK login to establish the web session token
+      // The backend function already authenticated via SDK and returned a token.
+      // Establish the web session by logging in with the same verified credentials.
       await base44.auth.loginViaEmailPassword(email, password);
       const params = new URLSearchParams(window.location.search);
       window.location.href = params.get('next') || '/dashboard';
