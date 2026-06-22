@@ -48,6 +48,18 @@ Deno.serve(async (req) => {
 
     const base44 = createClientFromRequest(req);
 
+    // ── Step 0: PRE-CHECK — verify user is registered before attempting login ─
+    // This is a security gate: only users who exist in the User database may log in.
+    const registeredUsers = await base44.asServiceRole.entities.User.filter({ email });
+    if (!registeredUsers || registeredUsers.length === 0) {
+      console.log('[authLogin] REJECTED — user not registered:', email);
+      return new Response(JSON.stringify({
+        success: false,
+        message: 'No account found with this email. Please sign up first.',
+        subscriptionActive: false,
+      }), { status: 401, headers: CORS });
+    }
+
     // ── Step 1: Authenticate via Base44 SDK ──────────────────────────────
     console.log('[authLogin] authenticating:', email);
 
@@ -61,21 +73,11 @@ Deno.serve(async (req) => {
       console.log('[authLogin] SDK login OK, token:', !!token);
     } catch (authErr) {
       console.log('[authLogin] SDK login failed:', authErr.message || '');
-      // SECURITY: Do NOT auto-create auth accounts on failed login.
-      // Only registered users who authenticate with correct credentials may log in.
-      const userExists = await base44.asServiceRole.entities.User.filter({ email });
-      if (userExists && userExists.length > 0) {
-        return new Response(JSON.stringify({
-          success: false,
-          message: 'Invalid password. If you forgot your password, tap "Forgot password" to reset it.',
-          subscriptionActive: false,
-          userExists: true,
-        }), { status: 401, headers: CORS });
-      }
       return new Response(JSON.stringify({
         success: false,
-        message: 'Invalid email or password. Please sign up first.',
+        message: 'Invalid password. If you forgot your password, tap "Forgot password" to reset it.',
         subscriptionActive: false,
+        userExists: true,
       }), { status: 401, headers: CORS });
     }
 
@@ -122,20 +124,14 @@ Deno.serve(async (req) => {
         }), { status: 403, headers: CORS });
       }
 
-      // Auto-create trial if no subscription exists - grant immediate access
+      // Block login if no active/trial subscription exists — no auto-creation on login
       if (!activeSub) {
-        activeSub = await base44.asServiceRole.entities.VPNSubscription.create({
-          user_email: userEmail,
-          plan: 'Free Trial',
-          status: 'trial',
-          billing_cycle: 'trial',
-          start_date: new Date().toISOString(),
-          renewal_date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-          max_devices: 1,
-          price: 0,
-          notes: 'Auto-trial: 5 days free access from login.',
-        });
-        console.log('[authLogin] Created trial subscription for:', userEmail);
+        console.log('[authLogin] no active subscription for:', userEmail);
+        return new Response(JSON.stringify({
+          success: false,
+          message: 'Your subscription has expired. Please renew to access the dashboard.',
+          subscriptionActive: false,
+        }), { status: 403, headers: CORS });
       }
     }
 
