@@ -50,26 +50,18 @@ Deno.serve(async (req) => {
     const userEmail = authUser?.email || email;
     console.log(`[vpnLogin] Auth success for ${userEmail}, token obtained`);
 
-    // Step 2: Check subscription
+    // Step 2: Check subscription — only registered users with an existing
+    // active/trial subscription may log in. No auto-creation on login.
     const subs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: userEmail });
-    let activeSub = subs?.find(s => ['active', 'trial'].includes(s.status)) || subs?.[0] || null;
+    const activeSub = subs?.find(s => ['active', 'trial'].includes(s.status)) || null;
 
     console.log(`[vpnLogin] Found ${subs?.length || 0} subscriptions for ${userEmail}`);
 
-    // Auto-create trial subscription if none exists - grant immediate access
     if (!activeSub) {
-      activeSub = await base44.asServiceRole.entities.VPNSubscription.create({
-        user_email: userEmail,
-        plan: 'Free Trial',
-        status: 'trial',
-        billing_cycle: 'trial',
-        start_date: new Date().toISOString(),
-        renewal_date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-        max_devices: 1,
-        price: 0,
-        notes: 'Auto-trial: 5 days free access from first login.',
-      });
-      console.log(`[vpnLogin] Created new trial subscription for ${userEmail}`);
+      return new Response(JSON.stringify({
+        success: false,
+        message: 'No active subscription found. Please choose a plan to access VoxVPN.',
+      }), { status: 403, headers: CORS });
     }
 
     console.log(`[vpnLogin] Subscription status: ${activeSub.status}, plan: ${activeSub.plan}`);

@@ -60,46 +60,23 @@ Deno.serve(async (req) => {
       authUser = authResult.user || null;
       console.log('[authLogin] SDK login OK, token:', !!token);
     } catch (authErr) {
-      // Check if user has a subscription but no auth account - auto-create it
       console.log('[authLogin] SDK login failed:', authErr.message || '');
-      const existingSubs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: email });
-      
-      if (existingSubs && existingSubs.length > 0 && authErr.message?.includes('Invalid email or password')) {
-        // User has subscription but no auth account - create one
-        console.log('[authLogin] User has subscription but no auth account - creating...');
-        try {
-          await base44.auth.register({ email, password });
-          const newAuthResult = await base44.auth.loginViaEmailPassword(email, password);
-          token = newAuthResult.access_token || null;
-          authUser = newAuthResult.user || null;
-          console.log('[authLogin] Auto-created auth account, token:', !!token);
-        } catch (createErr) {
-          console.log('[authLogin] Failed to auto-create account:', createErr.message);
-          // User already exists - just tell them to use correct password
-          return new Response(JSON.stringify({
-            success: false,
-            message: 'Wrong password. Use the same password as your web dashboard, or tap "Forgot password" to reset.',
-            subscriptionActive: false,
-            userExists: true,
-          }), { status: 401, headers: CORS });
-        }
-      } else {
-        // Check if user exists with subscription to give helpful error
-        const userExists = await base44.asServiceRole.entities.User.filter({ email });
-        if (userExists && userExists.length > 0) {
-          return new Response(JSON.stringify({
-            success: false,
-            message: 'Invalid password. If you forgot your password, use "Forgot password" to reset it.',
-            subscriptionActive: false,
-            userExists: true,
-          }), { status: 401, headers: CORS });
-        }
+      // SECURITY: Do NOT auto-create auth accounts on failed login.
+      // Only registered users who authenticate with correct credentials may log in.
+      const userExists = await base44.asServiceRole.entities.User.filter({ email });
+      if (userExists && userExists.length > 0) {
         return new Response(JSON.stringify({
           success: false,
-          message: 'Invalid email or password.',
+          message: 'Invalid password. If you forgot your password, tap "Forgot password" to reset it.',
           subscriptionActive: false,
+          userExists: true,
         }), { status: 401, headers: CORS });
       }
+      return new Response(JSON.stringify({
+        success: false,
+        message: 'Invalid email or password. Please sign up first.',
+        subscriptionActive: false,
+      }), { status: 401, headers: CORS });
     }
 
     if (!token) {
