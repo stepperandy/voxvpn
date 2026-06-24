@@ -47,8 +47,9 @@ export default function AuthSignup() {
       });
 
       if (res.data?.success) {
-        // Account created successfully - redirect to login
-        navigate('/auth-login');
+        // Account created — redirect to pricing so they can choose a plan and pay.
+        // They can't log in yet (authLogin requires an active subscription).
+        navigate('/pricing?new=1');
       } else {
         setError(res.data?.error || 'Signup failed');
       }

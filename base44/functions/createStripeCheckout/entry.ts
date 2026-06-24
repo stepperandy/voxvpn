@@ -32,19 +32,23 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const body = await req.json().catch(() => ({}));
-    const { plan: rawPlan, isBilledYearly, isSixMonths, paymentMethod, currencyCode, countryCode } = body;
+    const { plan: rawPlan, isBilledYearly, isSixMonths, paymentMethod, currencyCode, countryCode, email: bodyEmail } = body;
     const plan = PLAN_ALIASES[rawPlan] || (PLAN_PRICES[rawPlan] ? rawPlan : null);
 
     if (!plan) {
       return Response.json({ error: `Invalid plan: ${rawPlan || 'none provided'}` }, { status: 400 });
     }
 
-    // Get the authenticated user's email so the webhook can provision the subscription
+    // Get the authenticated user's email so the webhook can provision the subscription.
+    // Fall back to the email passed from the frontend (for new users who haven't logged in yet).
     let userEmail = null;
     try {
       const user = await base44.auth.me();
       userEmail = user?.email || null;
     } catch (_) {}
+    if (!userEmail && bodyEmail) {
+      userEmail = bodyEmail;
+    }
 
     const stripe = await import('npm:stripe@14.0.0');
     const client = new stripe.default(Deno.env.get('STRIPE_SECRET_KEY'));
@@ -85,13 +89,16 @@ Deno.serve(async (req) => {
         billing: isBilledYearly ? 'yearly' : isSixMonths ? 'sixmonths' : 'monthly',
         email: userEmail || '',
       },
-      // WeChat Pay requires client='web' for browser checkout. This option is only
-      // applied if WeChat Pay is enabled in the Stripe Dashboard — safe to include
-      // even if it isn't, Stripe ignores options for unavailable methods.
-      ...(currency === 'cny' && {
-        payment_method_options: {
-          wechat_pay: { client: 'web' },
-        },
+      // When a specific Chinese payment method is selected, explicitly request it.
+      // This ensures WeChat Pay / Alipay show up on the checkout page for that method.
+      // If the method isn't enabled in the Stripe Dashboard, Stripe will reject the
+      // session — the error is surfaced to the user so they know to try another method.
+      ...(paymentMethod === 'wechat_pay' && {
+        payment_method_types: ['wechat_pay'],
+        payment_method_options: { wechat_pay: { client: 'web' } },
+      }),
+      ...(paymentMethod === 'alipay' && {
+        payment_method_types: ['alipay'],
       }),
       success_url: `${origin}/dashboard?payment=success&plan=${encodeURIComponent(plan)}`,
       cancel_url: `${origin}/payment-failed`,

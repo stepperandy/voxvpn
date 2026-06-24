@@ -99,6 +99,7 @@ export default function RenewSubscription() {
         isBilledYearly: !!plan.yearly,
         currencyCode: currency.code,
         countryCode,
+        email: user?.email,
       });
       if (res.data?.url) window.location.href = res.data.url;
       else alert('Error: ' + (res.data?.error || 'Unknown error'));

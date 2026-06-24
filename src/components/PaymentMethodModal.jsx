@@ -3,9 +3,14 @@ import { CreditCard, X, Smartphone } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 // v2
 
-export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, isAdmin, isBilledYearly, isSixMonths, currency, countryCode }) {
+export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, isAdmin, isBilledYearly, isSixMonths, currency, countryCode, userEmail }) {
   const [selectedMethod, setSelectedMethod] = useState('stripe');
   const [loading, setLoading] = useState(false);
+  const [guestEmail, setGuestEmail] = useState('');
+
+  // The email to attach to the checkout — uses logged-in user's email, or the guest email input
+  const checkoutEmail = userEmail || guestEmail || null;
+  const needsEmailInput = !userEmail;
 
   // Detect if the buyer is in China via timezone or locale
   const isChinaBuyer = (() => {
@@ -26,10 +31,16 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
         return;
       }
       if (selectedMethod === 'hubtel') {
+        if (!checkoutEmail) {
+          alert('Please enter your email address so we can link your subscription to your account.');
+          setLoading(false);
+          return;
+        }
         const res = await base44.functions.invoke('createHubtelCheckout', {
           plan: plan?.name,
           isBilledYearly: !!isBilledYearly,
           isSixMonths: !!isSixMonths,
+          email: checkoutEmail,
         });
         if (res.data?.url) {
           window.location.href = res.data.url;
@@ -42,6 +53,11 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
       // Also auto-convert to CNY for China-based buyers using any Stripe method.
       const isChineseMethod = selectedMethod === 'wechat_pay' || selectedMethod === 'alipay';
       const useCNY = isChineseMethod || isChinaBuyer;
+      if (!checkoutEmail) {
+        alert('Please enter your email address so we can link your subscription to your account.');
+        setLoading(false);
+        return;
+      }
       const res = await base44.functions.invoke('createStripeCheckout', {
         plan: plan?.name,
         isBilledYearly: !!isBilledYearly,
@@ -49,6 +65,7 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
         paymentMethod: selectedMethod,
         currencyCode: useCNY ? 'CNY' : (currency?.code || 'USD'),
         countryCode: useCNY ? 'CN' : (countryCode || 'US'),
+        email: checkoutEmail,
       });
       const url = res?.data?.url;
       if (url) {
@@ -76,6 +93,20 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
           <h2 className="text-white font-bold text-lg">Choose Payment Method</h2>
           <button onClick={onClose} className="text-slate-500 hover:text-white transition-colors"><X size={18} /></button>
         </div>
+
+        {needsEmailInput && (
+          <div className="mb-5">
+            <label className="block text-slate-400 text-xs font-semibold mb-2">Your Email Address</label>
+            <input
+              type="email"
+              placeholder="you@example.com"
+              value={guestEmail}
+              onChange={e => setGuestEmail(e.target.value)}
+              className="w-full px-4 py-3 rounded-lg bg-[#0a1020] border border-white/10 text-white placeholder-slate-600 text-sm focus:outline-none focus:border-cyan-500 transition-all"
+            />
+            <p className="text-slate-500 text-xs mt-1.5">Required to link your subscription to your account after payment.</p>
+          </div>
+        )}
 
         <div className="space-y-3 mb-6">
           {isAdmin && (

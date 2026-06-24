@@ -258,6 +258,11 @@ export default function Pricing() {
 
       <div className="pt-28 pb-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
+          {new URLSearchParams(window.location.search).get('new') === '1' && (
+            <div className="mb-6 p-4 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-center">
+              <p className="text-cyan-300 text-sm font-semibold">🎉 Your account is ready! Choose a plan below to activate your VPN access.</p>
+            </div>
+          )}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
             <p className="text-cyan-400 text-xs font-semibold tracking-widest uppercase mb-3">Pricing</p>
             <h1 className="text-4xl sm:text-5xl font-black text-white mb-4">Simple, Transparent Pricing</h1>
@@ -309,6 +314,7 @@ export default function Pricing() {
             isBilledYearly={selectedPlan?.stripePlanName === 'Advanced' || selectedPlan?.stripePlanName === 'Enterprise'}
             isSixMonths={selectedPlan?.stripePlanName === 'Premium'}
             isAdmin={user?.role === 'admin'}
+            userEmail={user?.email}
             onProceed={async (method) => {
               if (method === 'admin-bypass') {
                 const plan = selectedPlan;

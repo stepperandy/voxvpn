@@ -91,7 +91,7 @@ Deno.serve(async (req) => {
       success: true,
       message: 'Account created successfully',
       user: { email, full_name },
-      redirect: '/auth-login',
+      redirect: '/pricing?new=1',
     });
 
   } catch (error) {

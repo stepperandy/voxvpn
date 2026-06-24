@@ -18,6 +18,8 @@ async function syncSubscription(base44, customerEmail, plan, stripeSubscriptionI
   const renewalDate = new Date(startDate);
   if (billingCycle === 'yearly') {
     renewalDate.setFullYear(renewalDate.getFullYear() + 1);
+  } else if (billingCycle === 'sixmonths') {
+    renewalDate.setMonth(renewalDate.getMonth() + 6);
   } else {
     renewalDate.setMonth(renewalDate.getMonth() + 1);
   }

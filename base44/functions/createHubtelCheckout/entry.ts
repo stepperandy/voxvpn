@@ -24,7 +24,7 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const body = await req.json().catch(() => ({}));
-    const { plan: rawPlan, isBilledYearly, isSixMonths } = body;
+    const { plan: rawPlan, isBilledYearly, isSixMonths, email: bodyEmail } = body;
     const plan = PLAN_ALIASES[rawPlan] || (PLAN_PRICES[rawPlan] ? rawPlan : null);
 
     if (!plan) {
@@ -36,6 +36,7 @@ Deno.serve(async (req) => {
     if (authHeader) {
       try { user = await base44.auth.me(); } catch (_) {}
     }
+    const checkoutEmail = user?.email || bodyEmail || null;
 
     const planPrice = PLAN_PRICES[plan];
     const amountUSD = isBilledYearly ? planPrice.yearly : isSixMonths ? planPrice.sixmonths : planPrice.monthly;
@@ -59,7 +60,7 @@ Deno.serve(async (req) => {
       cancellationUrl: `${origin}/payment-failed`,
       merchantAccountNumber: merchantAccount,
       clientReference: clientRef,
-      ...(user?.email ? { customerEmail: user.email } : {}),
+      ...(checkoutEmail ? { customerEmail: checkoutEmail } : {}),
     };
 
     const response = await fetch('https://payproxyapi.hubtel.com/items/initiate', {

@@ -183,6 +183,7 @@ export default function PricingMobile() {
         isBilledYearly: yearly,
         currencyCode: currency.code,
         countryCode,
+        email: user?.email,
       });
       setModalOpen(false);
       setLoadingPlan(null);
@@ -250,6 +251,7 @@ export default function PricingMobile() {
             onProceed={handlePaymentProceed}
             currency={currency}
             countryCode={countryCode}
+            userEmail={user?.email}
           />
         </div>
       </PullToRefresh>
