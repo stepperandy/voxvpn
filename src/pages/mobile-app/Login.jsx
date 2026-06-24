@@ -41,18 +41,28 @@ export default function Login() {
         device_type: 'android',
       });
       const data = response?.data || response;
-      if (data?.success === true) {
-        // Set up the SDK auth state so verifySession (base44.auth.me()) works on next launch
+
+      // Strict client-side verification: backend must return success AND an active subscription.
+      // This is a second layer of defense on top of the backend's database checks.
+      if (data?.success === true && data?.subscription) {
+        const subStatus = data.subscription.status;
+        if (subStatus !== 'active' && subStatus !== 'trial') {
+          setError('Your subscription is not active. Please choose a plan at voxvpn.net to access VoxVPN.');
+          return;
+        }
+        // Subscription verified — set up SDK auth state and grant access
         await base44.auth.loginViaEmailPassword(email, password);
         if (data.token) localStorage.setItem('vpn_token', data.token);
-        if (data.subscription) localStorage.setItem('subscription', JSON.stringify(data.subscription));
+        localStorage.setItem('subscription', JSON.stringify(data.subscription));
         localStorage.setItem('vpn_email', email);
         navigate('/app/servers');
       } else {
-        setError(data?.message || 'Login failed');
+        setError(data?.message || 'Access denied. No active subscription found.');
       }
     } catch (err) {
-      setError(err.message || 'Login failed. Please try again.');
+      // Extract the actual backend error message (e.g. "No active subscription found")
+      const backendMsg = err?.response?.data?.message || err?.message || 'Login failed.';
+      setError(backendMsg);
     } finally {
       setLoading(false);
     }
