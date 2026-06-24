@@ -50,17 +50,26 @@ export default function AuthLogin() {
         password,
       });
       const data = response?.data || response;
-      if (!data?.success) {
-        setError(data?.message || 'Invalid email or password.');
+
+      // Strict client-side verification: backend must return success AND an active subscription.
+      // This is a second layer of defense on top of the backend's database checks.
+      if (!data?.success || !data?.subscription) {
+        setError(data?.message || 'Access denied. No active subscription found.');
         return;
       }
-      // The backend function already authenticated via SDK and returned a token.
-      // Establish the web session by logging in with the same verified credentials.
+      const subStatus = data.subscription.status;
+      if (subStatus !== 'active' && subStatus !== 'trial') {
+        setError('Your subscription is not active. Please choose a plan to access VoxVPN.');
+        return;
+      }
+      // Subscription verified — establish the web session
       await base44.auth.loginViaEmailPassword(email, password);
       const params = new URLSearchParams(window.location.search);
       window.location.href = params.get('next') || '/dashboard';
     } catch (err) {
-      setError(err.message || 'Invalid email or password.');
+      // Extract the actual backend error message (e.g. "No active subscription found")
+      const backendMsg = err?.response?.data?.message || err?.message || 'Invalid email or password.';
+      setError(backendMsg);
     } finally {
       setLoading(false);
     }
