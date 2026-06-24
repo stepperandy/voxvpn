@@ -8,6 +8,15 @@ const PLAN_PRICES = {
   'Enterprise': { monthly: 29.99, sixmonths: 13.99, yearly: 45.99 },
 };
 
+// Maps user-facing plan names (durations) to internal plan keys
+const PLAN_ALIASES = {
+  '1 Month': 'Basic', '1 month': 'Basic', 'monthly': 'Basic',
+  '3 Months': 'Standard', '3 months': 'Standard',
+  '6 Months': 'Premium', '6 months': 'Premium',
+  '1 Year': 'Advanced', '1 year': 'Advanced', '12 Months': 'Advanced',
+  '2 Years': 'Enterprise', '2 years': 'Enterprise', '24 Months': 'Enterprise',
+};
+
 // GHS conversion rate (approximate)
 const USD_TO_GHS = 15.5;
 
@@ -15,10 +24,11 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const body = await req.json().catch(() => ({}));
-    const { plan, isBilledYearly, isSixMonths } = body;
+    const { plan: rawPlan, isBilledYearly, isSixMonths } = body;
+    const plan = PLAN_ALIASES[rawPlan] || (PLAN_PRICES[rawPlan] ? rawPlan : null);
 
-    if (!plan || !PLAN_PRICES[plan]) {
-      return Response.json({ error: 'Invalid plan name' }, { status: 400 });
+    if (!plan) {
+      return Response.json({ error: `Invalid plan name: ${rawPlan || 'none provided'}` }, { status: 400 });
     }
 
     let user = null;
