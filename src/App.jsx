@@ -197,6 +197,7 @@ const AuthenticatedApp = ({ isMobileDevice }) => {
           <Route path="/vpn-login" element={<PageTransition><VpnLogin /></PageTransition>} />
           <Route path="/vpn-signup" element={<PageTransition><VpnSignup /></PageTransition>} />
           <Route path="/auth-login" element={<PageTransition><AuthLogin /></PageTransition>} />
+          <Route path="/login" element={<PageTransition><AuthLogin /></PageTransition>} />
           <Route path="/auth-signup" element={<PageTransition><AuthSignup /></PageTransition>} />
           <Route path="/signup" element={<PageTransition><AuthSignup /></PageTransition>} />
           <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
