@@ -293,7 +293,7 @@ export default function AuthLogin() {
             <div className="text-gray-500">
               Need an account?{' '}
               <Link
-                to="/auth-signup"
+                to="/signup"
                 className="text-cyan-600 hover:text-cyan-700 font-semibold transition-colors"
               >
                 Sign up
