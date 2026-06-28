@@ -17,6 +17,7 @@ export default function AuthSignup() {
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [alreadyRegistered, setAlreadyRegistered] = useState(false);
 
   const passwordStrength = {
     length: password.length >= 8,
@@ -47,14 +48,22 @@ export default function AuthSignup() {
       });
 
       if (res.data?.success) {
-        // Account created — redirect to pricing so they can choose a plan and pay.
-        // They can't log in yet (authLogin requires an active subscription).
+        setAlreadyRegistered(false);
         navigate('/pricing?new=1');
       } else {
         setError(res.data?.error || 'Signup failed');
       }
     } catch (err) {
-      setError(err.response?.data?.error || err.message || 'Signup failed');
+      const errMsg = err.response?.data?.error || '';
+      const status = err.response?.status;
+
+      // Email already exists in auth — offer login or reset instead
+      if (status === 409 || errMsg.toLowerCase().includes('already registered') || errMsg.toLowerCase().includes('already exists')) {
+        setAlreadyRegistered(true);
+        setError('This email is already registered');
+      } else {
+        setError(errMsg || err.message || 'Signup failed');
+      }
     } finally {
       setLoading(false);
     }
@@ -84,7 +93,37 @@ export default function AuthSignup() {
           </div>
         </div>
 
+        {/* Already Registered Banner */}
+        {alreadyRegistered && (
+          <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl mb-6 text-center">
+            <div className="text-amber-400 font-semibold text-sm mb-1">You already have an account</div>
+            <p className="text-slate-400 text-xs mb-3">This email is already registered with VoxVPN.</p>
+            <div className="flex flex-col sm:flex-row gap-2 justify-center">
+              <Link
+                to="/auth-login"
+                className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-black rounded-lg text-sm font-bold transition-colors"
+              >
+                Sign In
+              </Link>
+              <Link
+                to="/reset-password"
+                className="inline-flex items-center justify-center gap-1.5 px-4 py-2 border border-slate-600 hover:border-amber-400 text-slate-300 hover:text-white rounded-lg text-sm font-medium transition-colors"
+              >
+                Reset Password
+              </Link>
+            </div>
+            <button
+              onClick={() => { setAlreadyRegistered(false); setError(''); }}
+              className="text-slate-500 hover:text-slate-300 text-xs mt-2 underline"
+            >
+              Try a different email
+            </button>
+          </div>
+        )}
+
         {/* Email Signup Form */}
+        {!alreadyRegistered && (
+        <div>  
         <form onSubmit={handleSignup} className="space-y-4 mb-6">
           {error && (
             <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
@@ -207,6 +246,8 @@ export default function AuthSignup() {
             {loading ? 'Creating account...' : 'Create Account'}
           </Button>
         </form>
+          </div>
+        )}
 
         {/* Footer */}
         <div className="text-center text-sm text-slate-400">

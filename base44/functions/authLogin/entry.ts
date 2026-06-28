@@ -84,9 +84,14 @@ Deno.serve(async (req) => {
       : null;
 
     if (!activeSub) {
+      const hasSubRecords = subs && subs.length > 0;
+      const subMsg = hasSubRecords
+        ? 'Your subscription has expired or is not active. Please renew or choose a new plan.'
+        : 'No active subscription found. Please choose a plan to activate your VPN access.';
       return new Response(JSON.stringify({
         success: false,
-        message: 'No active subscription found',
+        message: subMsg,
+        redirectToPricing: true,
       }), { status: 403, headers: CORS });
     }
 
