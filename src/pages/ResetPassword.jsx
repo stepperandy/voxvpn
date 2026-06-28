@@ -1,13 +1,25 @@
 import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Mail, ArrowLeft, CheckCircle2, Shield } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Mail, ArrowLeft, CheckCircle2, Shield, Lock, Eye, EyeOff } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function ResetPassword() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
+
+  // Token-based reset (user clicked the link in the email)
+  const params = new URLSearchParams(window.location.search);
+  const resetToken = params.get('token') || params.get('resetToken') || params.get('t');
+  const isTokenMode = !!resetToken;
+
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [done, setDone] = useState(false);
 
   const handleReset = async (e) => {
     e.preventDefault();
@@ -24,9 +36,39 @@ export default function ResetPassword() {
       await base44.functions.invoke('forgotPassword', { email });
       setSent(true);
     } catch (err) {
-      // forgotPassword always returns success to avoid email enumeration,
-      // but handle network errors gracefully.
       setSent(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSetPassword = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    if (newPassword.length < 8) {
+      setError('Password must be at least 8 characters.');
+      setLoading(false);
+      return;
+    }
+    if (!/[A-Z]/.test(newPassword) || !/[a-z]/.test(newPassword) || !/[0-9]/.test(newPassword)) {
+      setError('Password must contain uppercase, lowercase, and numbers.');
+      setLoading(false);
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setError('Passwords do not match.');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      await base44.auth.resetPassword({ resetToken, newPassword });
+      setDone(true);
+      setTimeout(() => navigate('/auth-login'), 2500);
+    } catch (err) {
+      setError(err?.message || 'Failed to reset password. The link may have expired.');
     } finally {
       setLoading(false);
     }
@@ -51,16 +93,103 @@ export default function ResetPassword() {
               alt="VoxVPN"
               className="w-16 h-16 mx-auto mb-3"
             />
-            <h1 className="text-2xl font-bold text-gray-900 mb-1">Reset Your Password</h1>
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">
+              {isTokenMode ? 'Set New Password' : 'Reset Your Password'}
+            </h1>
             <p className="text-gray-500 text-sm">
-              {sent
-                ? 'Check your inbox for the reset link'
-                : 'Enter your email and we\'ll send you a reset link'}
+              {isTokenMode
+                ? 'Enter your new password below'
+                : sent
+                  ? 'Check your inbox for the reset link'
+                  : 'Enter your email and we\'ll send you a reset link'}
             </p>
           </div>
 
-          {sent ? (
-            /* Success state */
+          {/* TOKEN MODE — set new password */}
+          {isTokenMode && !done && (
+            <form onSubmit={handleSetPassword} className="space-y-4">
+              {error && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+                  {error}
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">New Password</label>
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    <Lock size={18} />
+                  </div>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="••••••••"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Confirm Password</label>
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    <Lock size={18} />
+                  </div>
+                  <input
+                    type={showConfirm ? 'text' : 'password'}
+                    placeholder="••••••••"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirm(!showConfirm)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+              </div>
+
+              <p className="text-gray-400 text-xs">
+                Must be at least 8 characters with uppercase, lowercase, and a number.
+              </p>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3 rounded-lg font-semibold text-white text-sm transition-all disabled:opacity-50"
+                style={{ background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)', boxShadow: '0 4px 20px rgba(0,212,255,0.3)' }}
+              >
+                {loading ? 'Updating...' : 'Set New Password'}
+              </button>
+            </form>
+          )}
+
+          {/* TOKEN MODE — success */}
+          {isTokenMode && done && (
+            <div className="text-center py-6">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
+                <CheckCircle2 size={36} className="text-green-600" />
+              </div>
+              <p className="text-gray-700 text-sm mb-2 font-medium">Password updated!</p>
+              <p className="text-gray-500 text-sm mb-6">Redirecting you to sign in...</p>
+            </div>
+          )}
+
+          {/* REQUEST MODE — success state */}
+          {!isTokenMode && sent && (
             <div className="text-center py-6">
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
                 <CheckCircle2 size={36} className="text-green-600" />
@@ -86,8 +215,10 @@ export default function ResetPassword() {
                 <ArrowLeft size={16} /> Back to sign in
               </Link>
             </div>
-          ) : (
-            /* Form state */
+          )}
+
+          {/* REQUEST MODE — form state */}
+          {!isTokenMode && !sent && (
             <form onSubmit={handleReset} className="space-y-4">
               {error && (
                 <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
@@ -123,7 +254,7 @@ export default function ResetPassword() {
             </form>
           )}
 
-          {!sent && (
+          {(!isTokenMode && !sent) && (
             <div className="mt-6 text-center">
               <Link
                 to="/auth-login"

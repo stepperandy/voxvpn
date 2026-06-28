@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
 
     // Trigger Base44 platform password reset
-    await base44.auth.sendPasswordResetEmail(email);
+    await base44.auth.resetPasswordRequest(email);
 
     // Always return success to avoid email enumeration
     return new Response(JSON.stringify({
@@ -37,6 +37,7 @@ Deno.serve(async (req) => {
     }), { status: 200, headers: CORS });
 
   } catch (error) {
+    console.error('forgotPassword error:', error.message);
     // Still return a generic success to avoid email enumeration
     return new Response(JSON.stringify({
       success: true,
