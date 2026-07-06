@@ -8,64 +8,60 @@ import {
   ArrowLeft, Smartphone, Download, Shield, Lock, UserCheck,
   Settings, Wifi, CheckCircle2, Loader2, ExternalLink, Apple,
   ChevronRight, KeyRound, Fingerprint, AppWindow, Bell, Clock,
-  PackageCheck, FileCheck2, Rocket
+  FileText, FolderOpen, RefreshCw, FileCheck2, Rocket, AlertCircle,
+  Cpu, Network
 } from 'lucide-react';
-
-const RELEASE_STAGES = [
-  { icon: PackageCheck, label: 'Development', status: 'active', date: 'In Progress' },
-  { icon: FileCheck2, label: 'App Store Submission', status: 'pending', date: 'Pending' },
-  { icon: Clock, label: 'Apple Review', status: 'pending', date: 'Pending' },
-  { icon: Rocket, label: 'Public Release', status: 'pending', date: 'Coming Soon' },
-];
 
 const STEPS = [
   {
-    icon: Download,
-    title: 'Download VoxVPN',
-    subtitle: 'From the App Store',
-    description: 'Once the app is approved, open the App Store on your iPhone or iPad and search for "VoxVPN", or use the download button that will appear on this page.',
-    accent: '#a78bfa',
-  },
-  {
     icon: AppWindow,
-    title: 'Install & Open',
-    subtitle: 'Launch the app',
-    description: 'Tap Get in the App Store to install, then open VoxVPN from your home screen. The app icon features the VoxVPN shield logo.',
-    accent: '#8b5cf6',
+    title: 'Install OpenVPN Connect',
+    subtitle: 'From the App Store',
+    description: 'Open the App Store on your iPhone or iPad, search for "OpenVPN Connect", and install it. This is the official, free OpenVPN client that will run your VoxVPN profile.',
+    accent: '#a78bfa',
+    action: { label: 'Open in App Store', href: 'https://apps.apple.com/app/openvpn-connect/id590379981' },
   },
   {
     icon: UserCheck,
-    title: 'Sign In',
-    subtitle: 'Use your VoxVPN credentials',
-    description: 'Enter the email and password you used to subscribe. Your same account works across all platforms — Windows, Android, and iOS.',
+    title: 'Sign In to VoxVPN',
+    subtitle: 'Get your credentials',
+    description: 'Sign in to your VoxVPN dashboard using the button below. Your subscription must be active to generate a VPN configuration file for your device.',
+    accent: '#8b5cf6',
+    action: { label: 'Go to Dashboard', to: '/dashboard' },
+  },
+  {
+    icon: Download,
+    title: 'Download Your VPN Profile',
+    subtitle: '.ovpn config file',
+    description: 'From your dashboard, use the server selector to pick a location, then tap "Download Config" to get your personal .ovpn profile. This file contains your encrypted connection credentials and server details.',
     accent: '#7c3aed',
   },
   {
-    icon: Shield,
-    title: 'Allow VPN Configuration',
-    subtitle: 'iOS permission prompt',
-    description: 'When you connect for the first time, iOS will show "VoxVPN Would Like to Add VPN Configurations". Tap Allow to let VoxVPN create the secure VPN profile.',
+    icon: FolderOpen,
+    title: 'Import the Profile',
+    subtitle: 'Open in OpenVPN Connect',
+    description: 'After the download completes, tap the downloaded .ovpn file in Safari, then tap "Open in OpenVPN" from the share sheet. OpenVPN Connect will launch and show "New profile available — Import". Tap the green + button to import.',
     accent: '#6d28d9',
   },
   {
-    icon: Fingerprint,
-    title: 'Authenticate',
-    subtitle: 'Face ID, Touch ID, or Passcode',
-    description: 'Confirm with Face ID, Touch ID, or your device passcode. This authorizes the VPN profile to be added to your device securely.',
+    icon: KeyRound,
+    title: 'Enter Your Credentials',
+    subtitle: 'VoxVPN username & password',
+    description: 'OpenVPN Connect will ask for a username and password. Use the email address you subscribed with as the username, and your VoxVPN account password. Toggle "Save" so you don\'t have to re-enter them each time.',
     accent: '#5b21b6',
   },
   {
-    icon: Settings,
-    title: 'Trust the Profile',
-    subtitle: 'Settings → General → VPN & Device Management',
-    description: 'If iOS blocks the connection, go to Settings → General → VPN & Device Management, tap the VoxVPN profile, and select Trust. This is standard for all VPN apps on iOS.',
+    icon: Fingerprint,
+    title: 'Allow VPN Configuration',
+    subtitle: 'iOS permission prompt',
+    description: 'iOS will show "OpenVPN Connect Would Like to Add VPN Configurations". Tap Allow. Confirm with Face ID, Touch ID, or your device passcode to authorize the VPN profile.',
     accent: '#4c1d95',
   },
   {
     icon: Wifi,
     title: 'Connect & Browse Securely',
     subtitle: 'You\'re protected!',
-    description: 'Open VoxVPN, select a server location, and tap Connect. Your connection is now encrypted with AES-256 — browse, stream, and work privately.',
+    description: 'Toggle the connection switch in OpenVPN Connect to the ON position. You\'ll see a "VPN" icon in your status bar — your traffic is now encrypted with AES-256. Browse, stream, and work privately.',
     accent: '#00d4ff',
   },
 ];
@@ -73,13 +69,48 @@ const STEPS = [
 export default function IOSSetup() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [servers, setServers] = useState([]);
+  const [generating, setGenerating] = useState(null);
 
   useEffect(() => {
     base44.auth.me()
       .then(me => { if (me) setUser(me); })
       .catch(() => {})
       .finally(() => setLoading(false));
+
+    base44.functions.invoke('getServers', {})
+      .then(res => {
+        const list = res?.data?.servers || res?.data || [];
+        setServers(Array.isArray(list) ? list.slice(0, 6) : []);
+      })
+      .catch(() => setServers([]));
   }, []);
+
+  const handleDownloadConfig = async (server) => {
+    setGenerating(server.id || server.region);
+    try {
+      const res = await base44.functions.invoke('downloadVpnConfigForServer', {
+        server_id: server.id,
+        server_region: server.region,
+        server_country: server.country,
+      });
+      const config = res?.data?.config || res?.config;
+      if (!config) throw new Error('No config returned');
+      const blob = new Blob([config], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `voxvpn-${server.country || server.region}.ovpn`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      alert('Could not download config: ' + (err.message || 'Please try again.'));
+    } finally {
+      setGenerating(null);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#060c1a]">
@@ -102,16 +133,15 @@ export default function IOSSetup() {
             </div>
             <div>
               <h1 className="text-3xl font-black text-white">VoxVPN for iOS</h1>
-              <p className="text-slate-400 text-sm mt-0.5">Install & configure the VPN profile on your iPhone or iPad</p>
+              <p className="text-slate-400 text-sm mt-0.5">Manual VPN profile setup — no installer app needed</p>
             </div>
           </div>
         </motion.div>
 
-        {/* Installer release status */}
+        {/* Why manual? */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.03 }}
           className="rounded-2xl border border-violet-500/25 p-6 mb-8 relative overflow-hidden"
           style={{ background: 'linear-gradient(135deg, rgba(167,139,250,0.08), rgba(124,58,237,0.04))' }}>
-          {/* Glow */}
           <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full pointer-events-none"
             style={{ background: 'radial-gradient(circle, rgba(167,139,250,0.15), transparent 70%)' }} />
 
@@ -119,80 +149,29 @@ export default function IOSSetup() {
             <div className="flex items-center gap-2 mb-1">
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider"
                 style={{ background: 'rgba(167,139,250,0.2)', border: '1px solid rgba(167,139,250,0.35)', color: '#c4b5fd' }}>
-                <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" /> Coming Soon
+                <Cpu size={10} /> Manual Setup
               </span>
             </div>
-            <h2 className="text-white font-black text-xl mb-1">iOS Installer — Coming Soon</h2>
-            <p className="text-slate-400 text-xs leading-relaxed mb-5">
-              The VoxVPN iOS app is currently in development. Once it's built, submitted, and approved by Apple,
-              you'll be able to download it directly from the App Store and follow the setup guide below to get connected.
+            <h2 className="text-white font-black text-xl mb-1">No Installer? No Problem.</h2>
+            <p className="text-slate-400 text-xs leading-relaxed">
+              The dedicated VoxVPN iOS app is still in development. In the meantime, you can connect securely
+              right now using the official OpenVPN Connect app and your personal VoxVPN profile. It takes about
+              5 minutes — follow the 7 steps below.
             </p>
 
-            {/* Release progress tracker */}
-            <div className="grid grid-cols-4 gap-2 mb-5">
-              {RELEASE_STAGES.map((stage, idx) => {
-                const StageIcon = stage.icon;
-                const statusConfig = {
-                  done: { color: '#34d399', bg: 'rgba(52,211,153,0.1)', border: 'rgba(52,211,153,0.3)', label: 'Done' },
-                  active: { color: '#a78bfa', bg: 'rgba(167,139,250,0.12)', border: 'rgba(167,139,250,0.35)', label: stage.date },
-                  pending: { color: '#64748b', bg: 'rgba(100,116,139,0.08)', border: 'rgba(100,116,139,0.2)', label: 'Pending' },
-                };
-                const cfg = statusConfig[stage.status];
-                return (
-                  <div key={idx} className="relative">
-                    <div className="flex flex-col items-center text-center">
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-2 relative"
-                        style={{ background: cfg.bg, border: `1px solid ${cfg.border}` }}>
-                        <StageIcon size={16} style={{ color: cfg.color }} />
-                        {stage.status === 'active' && (
-                          <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-violet-400 animate-pulse" style={{ boxShadow: '0 0 8px rgba(167,139,250,0.6)' }} />
-                        )}
-                        {stage.status === 'done' && (
-                          <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 flex items-center justify-center">
-                            <CheckCircle2 size={8} className="text-emerald-950" />
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-white font-bold text-[11px] leading-tight">{stage.label}</p>
-                      <p className="text-[9px] mt-0.5 font-semibold uppercase tracking-wider" style={{ color: cfg.color }}>{cfg.label}</p>
-                    </div>
-                    {/* Connector line */}
-                    {idx < RELEASE_STAGES.length - 1 && (
-                      <div className="absolute top-5 left-[60%] w-[80%] h-px"
-                        style={{ background: stage.status === 'done' ? 'rgba(52,211,153,0.3)' : 'rgba(255,255,255,0.05)' }} />
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-white/5">
+            <div className="flex flex-wrap items-center gap-3 pt-4 mt-4 border-t border-white/5">
               <div className="flex items-center gap-2 text-xs">
                 <Clock size={12} className="text-violet-400" />
-                <span className="text-slate-400">Estimated release:</span>
-                <span className="text-white font-semibold">Q3 2026</span>
+                <span className="text-slate-400">Setup time:</span>
+                <span className="text-white font-semibold">~5 minutes</span>
               </div>
               <span className="text-slate-700">·</span>
               <div className="flex items-center gap-2 text-xs">
                 <Smartphone size={12} className="text-violet-400" />
-                <span className="text-slate-400">Requires iOS 14.0+ · iPhone, iPad & iPod touch</span>
+                <span className="text-slate-400">iOS 14.0+ · iPhone, iPad & iPod touch</span>
               </div>
             </div>
           </div>
-        </motion.div>
-
-        {/* What to expect — setup preview */}
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06 }}
-          className="rounded-2xl border border-cyan-500/15 bg-[#0d1420] p-5 mb-8">
-          <div className="flex items-center gap-2 mb-2">
-            <Bell size={14} className="text-cyan-400" />
-            <h3 className="text-white font-bold text-sm">What happens when it's released?</h3>
-          </div>
-          <p className="text-slate-400 text-xs leading-relaxed">
-            Once Apple approves the app, this page will update with a direct App Store download button. You'll install VoxVPN,
-            sign in with your existing account, and follow the 7-step guide below to configure the VPN profile on your device.
-            Your subscription already includes iOS access — no extra purchase needed.
-          </p>
         </motion.div>
 
         {/* Credentials reminder */}
@@ -205,7 +184,7 @@ export default function IOSSetup() {
               </div>
               <h3 className="text-white font-bold text-sm">Your Sign-In Credentials</h3>
             </div>
-            <p className="text-slate-400 text-xs mb-3">Use this email to sign in to the VoxVPN iOS app:</p>
+            <p className="text-slate-400 text-xs mb-3">Use this email when OpenVPN Connect asks for your username:</p>
             <div className="flex items-center gap-3 px-3 py-2 rounded-lg" style={{ background: '#060c1a', border: '1px solid rgba(255,255,255,0.05)' }}>
               <span className="text-slate-500 text-xs w-12 flex-shrink-0">Email</span>
               <span className="text-white text-xs font-mono font-semibold">{user.email}</span>
@@ -213,6 +192,69 @@ export default function IOSSetup() {
             <p className="text-slate-600 text-[10px] mt-2">Use the same password you set when you signed up. <Link to="/reset-password" className="text-violet-400 hover:text-violet-300">Forgot password?</Link></p>
           </motion.div>
         )}
+
+        {/* Quick config download */}
+        {!loading && user && servers.length > 0 && (
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.07 }}
+            className="rounded-2xl border border-cyan-500/20 p-5 mb-8"
+            style={{ background: 'linear-gradient(135deg, rgba(0,212,255,0.06), rgba(0,80,160,0.04))' }}>
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'rgba(0,212,255,0.12)', border: '1px solid rgba(0,212,255,0.25)' }}>
+                <Network size={14} style={{ color: '#00d4ff' }} />
+              </div>
+              <h3 className="text-white font-bold text-sm">Quick: Download Your Profile</h3>
+            </div>
+            <p className="text-slate-400 text-xs mb-3">Skip step 3 — grab your .ovpn config right here and AirDrop or save it to Files for import.</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {servers.map((s) => {
+                const isGenerating = generating === (s.id || s.region);
+                return (
+                  <button key={s.id || s.region}
+                    onClick={() => handleDownloadConfig(s)}
+                    disabled={!!generating}
+                    className="flex items-center gap-2 p-2.5 rounded-lg text-left transition-all disabled:opacity-50 group"
+                    style={{ background: 'rgba(0,212,255,0.05)', border: '1px solid rgba(0,212,255,0.15)' }}>
+                    {isGenerating
+                      ? <Loader2 size={14} className="text-cyan-400 animate-spin flex-shrink-0" />
+                      : <Download size={14} style={{ color: '#00d4ff' }} className="flex-shrink-0" />}
+                    <span className="text-slate-300 text-xs font-semibold truncate">{s.region}</span>
+                    <span className="text-slate-600 text-[10px] ml-auto">{s.country}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+
+        {/* What you'll need */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06 }}
+          className="rounded-2xl border border-cyan-500/15 bg-[#0d1420] p-5 mb-8">
+          <div className="flex items-center gap-2 mb-3">
+            <FileText size={14} className="text-cyan-400" />
+            <h3 className="text-white font-bold text-sm">What You'll Need</h3>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {[
+              { icon: Apple, label: 'iPhone or iPad', note: 'iOS 14.0 or later' },
+              { icon: AppWindow, label: 'OpenVPN Connect', note: 'Free from App Store' },
+              { icon: KeyRound, label: 'VoxVPN account', note: 'Active subscription' },
+              { icon: FileText, label: '.ovpn profile', note: 'Downloaded from dashboard' },
+            ].map((item, idx) => {
+              const Icon = item.icon;
+              return (
+                <div key={idx} className="flex items-center gap-3 p-2.5 rounded-lg" style={{ background: '#060c1a', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(0,212,255,0.08)', border: '1px solid rgba(0,212,255,0.15)' }}>
+                    <Icon size={13} style={{ color: '#00d4ff' }} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-white text-xs font-semibold">{item.label}</p>
+                    <p className="text-slate-500 text-[10px]">{item.note}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </motion.div>
 
         {/* Steps */}
         <div className="space-y-3">
@@ -249,6 +291,23 @@ export default function IOSSetup() {
                     </span>
                   </div>
                   <p className="text-slate-400 text-xs leading-relaxed">{step.description}</p>
+
+                  {/* Action button */}
+                  {step.action && (
+                    step.action.href ? (
+                      <a href={step.action.href} target="_blank" rel="noopener noreferrer"
+                        className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+                        style={{ background: `${step.accent}15`, border: `1px solid ${step.accent}35`, color: step.accent }}>
+                        <ExternalLink size={12} /> {step.action.label}
+                      </a>
+                    ) : (
+                      <Link to={step.action.to}
+                        className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+                        style={{ background: `${step.accent}15`, border: `1px solid ${step.accent}35`, color: step.accent }}>
+                        <ChevronRight size={12} /> {step.action.label}
+                      </Link>
+                    )
+                  )}
                 </div>
 
                 {/* Connecting line */}
@@ -280,14 +339,16 @@ export default function IOSSetup() {
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}
           className="mt-4 rounded-2xl border border-white/5 bg-[#0d1420] p-5">
           <h3 className="text-white font-bold text-sm mb-3 flex items-center gap-2">
-            <ChevronRight size={14} className="text-violet-400" /> Troubleshooting
+            <AlertCircle size={14} className="text-violet-400" /> Troubleshooting
           </h3>
           <div className="space-y-2.5">
             {[
-              { q: '"Untrusted Enterprise Developer" error', a: 'Go to Settings → General → VPN & Device Management → tap VoxVPN → Trust.' },
-              { q: 'VPN won\'t connect after allowing', a: 'Toggle the VPN off and on in Settings, or restart your iPhone, then reconnect from the app.' },
-              { q: 'App says "subscription required"', a: 'Make sure you signed in with the same email you used to subscribe. Check your dashboard for your active plan.' },
-              { q: 'Profile disappeared after iOS update', a: 'iOS updates can reset VPN profiles. Open VoxVPN and tap Connect again — you may need to re-allow the configuration.' },
+              { q: 'Can\'t find the .ovpn file after download', a: 'Open the Files app → Downloads folder. Or in Safari, tap the downloads arrow in the address bar to find the file.' },
+              { q: '"Open in OpenVPN" option doesn\'t appear', a: 'Tap and hold the downloaded file in Files, then tap Share → "Open in OpenVPN" from the share sheet.' },
+              { q: 'VPN won\'t connect after importing', a: 'Make sure you entered your VoxVPN email (not a separate username) and correct password. Toggle "Save" on. Then slide the connection switch to ON.' },
+              { q: 'Profile says "authentication failed"', a: 'Double-check your VoxVPN password. Go to reset it at the "Forgot password?" link above if needed. Ensure your subscription is still active.' },
+              { q: 'VPN disconnects when app is closed', a: 'OpenVPN Connect must stay running in the background for the VPN to persist. iOS may kill background apps under memory pressure — just reopen and reconnect.' },
+              { q: 'Profile disappeared after iOS update', a: 'iOS updates can reset VPN profiles. Re-import the .ovpn file from Files into OpenVPN Connect and re-authorize with Face ID / passcode.' },
             ].map((item, idx) => (
               <details key={idx} className="group rounded-lg" style={{ background: '#060c1a', border: '1px solid rgba(255,255,255,0.05)' }}>
                 <summary className="flex items-center justify-between gap-2 px-3 py-2.5 cursor-pointer list-none">
@@ -300,9 +361,27 @@ export default function IOSSetup() {
           </div>
         </motion.div>
 
+        {/* iOS app preview */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
+          className="mt-6 rounded-2xl border border-violet-500/15 p-5"
+          style={{ background: 'linear-gradient(135deg, rgba(167,139,250,0.04), rgba(124,58,237,0.02))' }}>
+          <div className="flex items-start gap-3">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(167,139,250,0.12)', border: '1px solid rgba(167,139,250,0.25)' }}>
+              <Rocket size={16} style={{ color: '#a78bfa' }} />
+            </div>
+            <div>
+              <h3 className="text-white font-bold text-sm mb-1">Prefer a dedicated app?</h3>
+              <p className="text-slate-400 text-xs leading-relaxed">
+                The native VoxVPN iOS app is in development — it will replace this manual setup with a one-tap connect
+                experience. Until then, the OpenVPN Connect method above gives you the same AES-256 encrypted protection.
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
         {/* Help link */}
         <div className="mt-8 text-center">
-          <p className="text-slate-500 text-xs mb-2">Still need help installing VoxVPN on iOS?</p>
+          <p className="text-slate-500 text-xs mb-2">Still need help setting up VoxVPN on iOS?</p>
           <Link to="/contact"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border text-sm font-semibold transition-all"
             style={{ borderColor: 'rgba(0,212,255,0.3)', color: '#00d4ff', background: 'rgba(0,212,255,0.05)' }}>
