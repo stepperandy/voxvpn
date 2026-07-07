@@ -299,6 +299,39 @@ export default function Pricing() {
           </div>
         </div>
 
+        {/* Payment trust section */}
+        <div className="mt-12 rounded-2xl border border-white/5 bg-[#0d1120] p-8 max-w-3xl mx-auto">
+          <div className="flex items-center gap-2 mb-6">
+            <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
+              <path d="M13.5 6H5.5C4.4 6 3.5 6.9 3.5 8v8c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2v-2h2v2c0 1.1.9 2 2 2s2-.9 2-2v-3c0-.55-.22-1.05-.59-1.41L18.5 10h-3c-1.1 0-2-.9-2-2V6z" fill="#635BFF"/>
+            </svg>
+            <h3 className="text-white font-bold text-sm">Secure Payment by Stripe</h3>
+            <span className="ml-auto px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider" style={{ background: 'rgba(99,91,255,0.15)', color: '#8b80ff', border: '1px solid rgba(99,91,255,0.3)' }}>
+              PCI-DSS Compliant
+            </span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
+            {[
+              { label: 'Payment Processor', value: 'Stripe (PCI-DSS Level 1)' },
+              { label: 'Accepted Cards', value: 'Visa, Mastercard, Amex, Discover' },
+              { label: 'Alternative Methods', value: 'Apple Pay, Google Pay, Hubtel, Alipay' },
+              { label: 'Billing Cycle', value: 'One-time per period (1mo–2yr)' },
+              { label: 'Auto-Renewal', value: 'Optional — cancel anytime' },
+              { label: 'Cancellation Policy', value: 'Cancel anytime, no fees' },
+              { label: 'Money-Back Guarantee', value: '30-day full refund' },
+              { label: 'Currency', value: 'USD' },
+            ].map(item => (
+              <div key={item.label} className="flex justify-between items-center py-1.5 border-b border-white/5 last:border-0">
+                <span className="text-slate-500 text-xs">{item.label}</span>
+                <span className="text-white font-semibold text-xs text-right">{item.value}</span>
+              </div>
+            ))}
+          </div>
+          <p className="text-slate-600 text-[10px] mt-4 leading-relaxed">
+            Payments are processed securely by Stripe. VoxVPN never stores your full card details. Subscriptions can be cancelled at any time from your account dashboard. See our <a href="/refund-policy" className="text-cyan-400 hover:underline">Refund Policy</a> for full details.
+          </p>
+        </div>
+
         <p className="text-center text-slate-600 text-xs mt-8">
           All prices in USD. 30-day money-back guarantee. Secure payment via Stripe · Hubtel · Alipay · WeChat Pay.
         </p>

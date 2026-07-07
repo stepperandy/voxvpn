@@ -1,11 +1,13 @@
-import { ShieldCheck, Lock, Globe, Eye, Award, Server } from 'lucide-react';
+import { ShieldCheck, Lock, Globe, Eye, Award, Server, CreditCard, Headphones } from 'lucide-react';
 
 const badges = [
   { icon: ShieldCheck, label: 'AES-256 Encryption', sub: 'Military-grade security' },
   { icon: Lock, label: 'No-Logs Policy', sub: 'We never track you' },
-  { icon: Globe, label: '90+ Countries', sub: 'Global server network' },
   { icon: Eye, label: 'DNS Leak Protection', sub: 'Your identity stays hidden' },
   { icon: Server, label: 'Kill Switch', sub: 'Auto-disconnect on drop' },
+  { icon: CreditCard, label: 'Secure Payments', sub: 'Stripe-protected checkout' },
+  { icon: Headphones, label: '24/7 Support', sub: 'Always here to help' },
+  { icon: Globe, label: '60+ Countries', sub: 'Global server network' },
   { icon: Award, label: 'Independently Audited', sub: 'Verified & certified' },
 ];
 
@@ -17,7 +19,7 @@ export default function TrustBadges() {
           <h2 className="text-white text-lg font-bold tracking-tight">Trusted &amp; Secure</h2>
           <p className="text-slate-500 text-sm mt-1">Privacy-first infrastructure, built to keep you protected</p>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
           {badges.map(({ icon: Icon, label, sub }) => (
             <div key={label} className="flex flex-col items-center text-center gap-2 p-4 rounded-2xl border border-white/5 bg-[#0d1120] hover:border-cyan-500/20 transition-colors">
               <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(0,212,255,0.08)', border: '1px solid rgba(0,212,255,0.15)' }}>

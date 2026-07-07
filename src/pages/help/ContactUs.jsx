@@ -81,6 +81,25 @@ export default function ContactUs() {
             </div>
           ))}
         </div>
+        {/* Support channels */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          <a href="/help-center" className="p-4 rounded-xl border border-white/5 bg-[#0d1120] hover:border-cyan-500/20 transition-all text-center">
+            <MessageSquare size={20} className="text-cyan-400 mx-auto mb-2" />
+            <h3 className="text-white font-semibold text-sm mb-1">Knowledge Base</h3>
+            <p className="text-slate-500 text-xs">Browse guides & FAQs</p>
+          </a>
+          <a href="mailto:support@voxvpn.net" className="p-4 rounded-xl border border-white/5 bg-[#0d1120] hover:border-cyan-500/20 transition-all text-center">
+            <Mail size={20} className="text-cyan-400 mx-auto mb-2" />
+            <h3 className="text-white font-semibold text-sm mb-1">Ticket System</h3>
+            <p className="text-slate-500 text-xs">Email support@voxvpn.net</p>
+          </a>
+          <div className="p-4 rounded-xl border border-white/5 bg-[#0d1120] text-center">
+            <MessageSquare size={20} className="text-cyan-400 mx-auto mb-2" />
+            <h3 className="text-white font-semibold text-sm mb-1">Live Chat</h3>
+            <p className="text-slate-500 text-xs">Mon–Fri, 9am–6pm UTC</p>
+          </div>
+        </div>
+
         <div className="rounded-2xl border border-white/5 bg-[#0d1120] p-8">
           <h2 className="text-white font-bold text-lg mb-6">Send Us a Message</h2>
           <form onSubmit={handleSubmit} className="space-y-4">

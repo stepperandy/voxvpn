@@ -54,21 +54,21 @@ const partnershipTypes = [
     title: 'Guest Posts & Content',
     description: 'We accept high-quality guest posts about VPN technology, online privacy, cybersecurity, and digital freedom on our blog.',
     cta: 'Submit a Guest Post',
-    mailto: 'mailto:press@voxdigits.com?subject=Guest Post Inquiry',
+    mailto: 'mailto:press@voxvpn.net?subject=Guest Post Inquiry',
   },
   {
     icon: <Star size={22} />,
     title: 'Product Reviews',
     description: 'Tech journalists and bloggers — get a free VoxVPN account to write an honest, in-depth review for your audience.',
     cta: 'Request a Review Account',
-    mailto: 'mailto:press@voxdigits.com?subject=Review Account Request',
+    mailto: 'mailto:press@voxvpn.net?subject=Review Account Request',
   },
   {
     icon: <Link2 size={22} />,
     title: 'Backlink Exchange',
     description: 'We partner with reputable cybersecurity, tech, and privacy-focused websites for quality backlink exchanges.',
     cta: 'Propose a Backlink',
-    mailto: 'mailto:press@voxdigits.com?subject=Backlink Partnership',
+    mailto: 'mailto:press@voxvpn.net?subject=Backlink Partnership',
   },
   {
     icon: <Users size={22} />,
@@ -109,7 +109,7 @@ export default function Press() {
             We actively build relationships with quality privacy & tech publishers.
           </p>
           <a
-            href="mailto:press@voxdigits.com"
+            href="mailto:press@voxvpn.net"
             className="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-full text-sm transition-all"
           >
             <Mail size={15} /> Contact Our Press Team
@@ -190,10 +190,10 @@ export default function Press() {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a
-              href="mailto:press@voxdigits.com?subject=Partnership Inquiry"
+              href="mailto:press@voxvpn.net?subject=Partnership Inquiry"
               className="inline-flex items-center justify-center gap-2 px-7 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-full text-sm transition-all"
             >
-              <Mail size={15} /> press@voxdigits.com
+              <Mail size={15} /> press@voxvpn.net
             </a>
             <Link
               to="/affiliate-register"

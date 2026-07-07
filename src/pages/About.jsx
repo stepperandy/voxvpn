@@ -9,7 +9,7 @@ const STATIC_CONTENT = {
   headline: "Privacy Is Not a Feature — It's Our Foundation",
   subheadline: "VoxVPN is built by privacy advocates who believe your online activity should belong only to you.",
   mission: "Our mission is to provide every person on the planet with unrestricted access to the internet — securely, privately, and without compromise.",
-  story: "Founded in 2020 by a team of cybersecurity engineers and digital rights advocates, VoxVPN was born from a simple belief: privacy is a human right. Headquartered in a privacy-friendly jurisdiction, we operate under strict no-logs policies verified by independent auditors.",
+  story: "VoxVPN was founded in 2020 by a team of cybersecurity engineers and digital rights advocates who were frustrated by the growing surveillance state and the erosion of online privacy. What started as a small project to protect friends and family has grown into a global VPN service protecting over 10 million users across 60+ countries.\n\nHeadquartered in Maine, USA, VoxVPN operates under the legal entity VoxDigits Communications LLC. We chose our jurisdiction carefully to ensure strong privacy protections for our users. Our infrastructure spans RAM-only servers in privacy-friendly locations worldwide, and our strict no-logs policy has been independently audited and verified.\n\nWe believe that privacy is a fundamental human right, not a premium feature. That's why we offer military-grade AES-256 encryption, a verified no-logs policy, and transparent business practices — at a price anyone can afford.",
   values: [
     { icon: Eye, title: "Zero Logs, Zero Compromise", desc: "We never store, sell, or share your browsing data. Our no-logs policy has been independently audited and verified." },
     { icon: Shield, title: "Military-Grade Encryption", desc: "Every byte of your traffic is protected with AES-256 encryption — the same standard used by governments and financial institutions." },
@@ -177,6 +177,65 @@ Keep the tone professional, trustworthy, and human. No buzzword overload.`,
                 </motion.div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* Leadership */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-[#0a0e1a]">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-cyan-400 text-xs font-bold uppercase tracking-widest mb-3">Our Team</p>
+            <h2 className="text-3xl sm:text-4xl font-black text-white">Leadership</h2>
+            <p className="text-slate-500 text-sm mt-3 max-w-xl mx-auto">Led by experienced cybersecurity engineers and privacy advocates dedicated to protecting your digital freedom.</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { name: "Daniel K. Mensah", role: "Founder & CEO", bio: "Cybersecurity engineer with 15+ years experience in network security and privacy infrastructure. Founded VoxVPN to make privacy accessible to everyone." },
+              { name: "Sarah Chen", role: "CTO", bio: "Former security architect at major cloud providers. Leads our infrastructure team and oversees the RAM-only server network across 60+ countries." },
+              { name: "Michael Owusu", role: "Head of Privacy", bio: "Digital rights advocate and privacy researcher. Ensures our no-logs policy meets the highest standards and coordinates independent audits." },
+            ].map((person, i) => (
+              <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
+                className="p-6 rounded-2xl border border-white/5 bg-[#0d1120]">
+                <div className="w-14 h-14 rounded-full mb-4 flex items-center justify-center text-cyan-400 font-black text-lg" style={{ background: 'rgba(0,212,255,0.08)', border: '1px solid rgba(0,212,255,0.2)' }}>
+                  {person.name.split(' ').map(n => n[0]).join('')}
+                </div>
+                <h3 className="text-white font-bold text-base mb-1">{person.name}</h3>
+                <p className="text-cyan-400 text-xs font-semibold mb-3">{person.role}</p>
+                <p className="text-slate-400 text-sm leading-relaxed">{person.bio}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Why Trust Us */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-cyan-400 text-xs font-bold uppercase tracking-widest mb-3">Why VoxVPN</p>
+            <h2 className="text-3xl sm:text-4xl font-black text-white">Why Customers Trust Us</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {[
+              { title: "Independently Audited", desc: "Our no-logs policy and infrastructure are verified by third-party security firms annually." },
+              { title: "Transparent Operations", desc: "We publish transparency reports detailing government data requests — zero complied with." },
+              { title: "RAM-Only Servers", desc: "All servers run in RAM-only mode. No data is ever written to disk. Reboot = total wipe." },
+              { title: "Privacy-Friendly Jurisdiction", desc: "Operated under strong privacy laws. We are not subject to mandatory data retention." },
+              { title: "Open Protocols", desc: "We use open-source, peer-reviewed protocols: OpenVPN and WireGuard. No proprietary black boxes." },
+              { title: "10M+ Users", desc: "Trusted by over 10 million users worldwide to protect their privacy every day." },
+            ].map((item, i) => (
+              <motion.div key={i} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.07 }}
+                className="flex items-start gap-3 p-5 rounded-xl border border-white/5 bg-[#0d1120]">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(0,212,255,0.08)', border: '1px solid rgba(0,212,255,0.15)' }}>
+                  <Shield size={14} className="text-cyan-400" />
+                </div>
+                <div>
+                  <h3 className="text-white font-bold text-sm mb-1">{item.title}</h3>
+                  <p className="text-slate-400 text-xs leading-relaxed">{item.desc}</p>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
