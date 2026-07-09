@@ -1,10 +1,11 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Shield, Building2, Users, Globe, FileText, BarChart3, Settings, LogOut, Home } from 'lucide-react';
+import { Shield, Building2, Users, Globe, FileText, BarChart3, Settings, LogOut, Home, LayoutDashboard } from 'lucide-react';
 
 const navItems = [
   { label: 'Dashboard', path: '/shield', icon: BarChart3, roles: ['super_admin', 'agency_admin', 'client_admin'] },
+  { label: 'Agency', path: '/shield/agency', icon: LayoutDashboard, roles: ['super_admin', 'agency_admin'] },
   { label: 'Agencies', path: '/shield/agencies', icon: Building2, roles: ['super_admin'] },
   { label: 'Clients', path: '/shield/clients', icon: Users, roles: ['super_admin', 'agency_admin'] },
   { label: 'DNS Filtering', path: '/shield/dns-filtering', icon: Globe, roles: ['super_admin', 'agency_admin', 'client_admin'] },

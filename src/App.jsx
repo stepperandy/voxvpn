@@ -128,6 +128,7 @@ const VoxShieldLayout = lazy(() => import('./components/voxshield/VoxShieldLayou
 const ShieldDashboard = lazy(() => import('./pages/voxshield/Dashboard.jsx'));
 const ShieldAgencies = lazy(() => import('./pages/voxshield/Agencies.jsx'));
 const ShieldClients = lazy(() => import('./pages/voxshield/Clients.jsx'));
+const ShieldAgencyDashboard = lazy(() => import('./pages/voxshield/AgencyDashboard.jsx'));
 
 const PageTransition = ({ children }) => (
   <motion.div
@@ -256,6 +257,7 @@ const AuthenticatedApp = ({ isMobileDevice }) => {
             <Route index element={<ShieldDashboard />} />
             <Route path="agencies" element={<ShieldAgencies />} />
             <Route path="clients" element={<ShieldClients />} />
+            <Route path="agency" element={<ShieldAgencyDashboard />} />
           </Route>
           <Route path="*" element={<PageNotFound />} />
         </Routes>
