@@ -1,0 +1,105 @@
+{
+  "name": "SecurityLog",
+  "type": "object",
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "description": "Reference to the Client (if applicable)"
+    },
+    "agency_id": {
+      "type": "string",
+      "description": "Reference to the Agency (if applicable)"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Email of the user who triggered the event"
+    },
+    "device_name": {
+      "type": "string",
+      "description": "Name of the device involved"
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "vpn_connect",
+        "vpn_disconnect",
+        "dns_block",
+        "device_register",
+        "device_remove",
+        "login",
+        "login_failed",
+        "threat_detected",
+        "policy_change",
+        "subscription_change"
+      ],
+      "default": "login",
+      "description": "Type of security event"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "info",
+        "warning",
+        "critical"
+      ],
+      "default": "info",
+      "description": "Event severity level"
+    },
+    "message": {
+      "type": "string",
+      "description": "Human-readable event description"
+    },
+    "ip_address": {
+      "type": "string",
+      "description": "Source IP address"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the event occurred"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional notes (up to 1000 characters)"
+    }
+  },
+  "required": [
+    "event_type",
+    "message"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "agency_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "client_admin"
+          }
+        },
+        {
+          "data.user_email": "{{user.email}}"
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "super_admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "super_admin"
+      }
+    }
+  }
+}

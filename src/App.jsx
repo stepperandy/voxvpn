@@ -124,6 +124,10 @@ const MediaKit = lazy(() => import('./pages/MediaKit.jsx'));
 const HelpCenter = lazy(() => import('./pages/HelpCenter.jsx'));
 const AcceptableUsePolicy = lazy(() => import('./pages/legal/AcceptableUsePolicy.jsx'));
 const SecurityPage = lazy(() => import('./pages/SecurityPage.jsx'));
+const VoxShieldLayout = lazy(() => import('./components/voxshield/VoxShieldLayout.jsx'));
+const ShieldDashboard = lazy(() => import('./pages/voxshield/Dashboard.jsx'));
+const ShieldAgencies = lazy(() => import('./pages/voxshield/Agencies.jsx'));
+const ShieldClients = lazy(() => import('./pages/voxshield/Clients.jsx'));
 
 const PageTransition = ({ children }) => (
   <motion.div
@@ -248,6 +252,11 @@ const AuthenticatedApp = ({ isMobileDevice }) => {
           <Route path="/help-center" element={<PageTransition><HelpCenter /></PageTransition>} />
           <Route path="/acceptable-use-policy" element={<PageTransition><AcceptableUsePolicy /></PageTransition>} />
           <Route path="/security" element={<PageTransition><SecurityPage /></PageTransition>} />
+          <Route path="/shield" element={<VoxShieldLayout />}>
+            <Route index element={<ShieldDashboard />} />
+            <Route path="agencies" element={<ShieldAgencies />} />
+            <Route path="clients" element={<ShieldClients />} />
+          </Route>
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </Suspense>

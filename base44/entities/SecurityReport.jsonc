@@ -1,0 +1,123 @@
+{
+  "name": "SecurityReport",
+  "type": "object",
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "description": "Reference to the Client"
+    },
+    "agency_id": {
+      "type": "string",
+      "description": "Reference to the Agency"
+    },
+    "period": {
+      "type": "string",
+      "description": "Report period (e.g. '2026-07' for July 2026)"
+    },
+    "report_type": {
+      "type": "string",
+      "enum": [
+        "client_monthly",
+        "agency_monthly"
+      ],
+      "default": "client_monthly",
+      "description": "Report scope"
+    },
+    "users_protected": {
+      "type": "integer",
+      "default": 0,
+      "description": "Number of users protected in this period"
+    },
+    "devices_protected": {
+      "type": "integer",
+      "default": 0,
+      "description": "Number of devices protected in this period"
+    },
+    "threats_blocked": {
+      "type": "integer",
+      "default": 0,
+      "description": "Total threats blocked (DNS + VPN)"
+    },
+    "vpn_usage_hours": {
+      "type": "number",
+      "default": 0,
+      "description": "Total VPN usage in hours"
+    },
+    "risk_score": {
+      "type": "number",
+      "default": 0,
+      "description": "Risk score for this period (0-100, lower is better)"
+    },
+    "recommendations": {
+      "type": "string",
+      "description": "AI-generated security recommendations"
+    },
+    "pdf_url": {
+      "type": "string",
+      "description": "URL to the generated PDF report"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "generating",
+        "ready",
+        "failed"
+      ],
+      "default": "generating",
+      "description": "Report generation status"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional notes (up to 1000 characters)"
+    }
+  },
+  "required": [
+    "client_id",
+    "period"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "agency_admin"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "agency_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "client_admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "super_admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "super_admin"
+      }
+    }
+  }
+}

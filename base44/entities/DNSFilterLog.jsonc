@@ -1,0 +1,99 @@
+{
+  "name": "DNSFilterLog",
+  "type": "object",
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "description": "Reference to the Client"
+    },
+    "agency_id": {
+      "type": "string",
+      "description": "Reference to the Agency"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Email of the user whose device triggered the filter"
+    },
+    "device_name": {
+      "type": "string",
+      "description": "Name of the device that triggered the filter"
+    },
+    "domain": {
+      "type": "string",
+      "description": "Domain that was queried / blocked"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "malware",
+        "phishing",
+        "adult",
+        "gambling",
+        "social_media",
+        "streaming",
+        "custom",
+        "allowed"
+      ],
+      "default": "malware",
+      "description": "Filter category that matched"
+    },
+    "blocked": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether the domain was blocked"
+    },
+    "ip_address": {
+      "type": "string",
+      "description": "Source IP address of the DNS query"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the DNS query occurred"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional notes (up to 1000 characters)"
+    }
+  },
+  "required": [
+    "client_id",
+    "domain",
+    "category"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "agency_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "client_admin"
+          }
+        },
+        {
+          "data.user_email": "{{user.email}}"
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "super_admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "super_admin"
+      }
+    }
+  }
+}

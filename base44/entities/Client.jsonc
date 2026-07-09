@@ -1,0 +1,170 @@
+{
+  "name": "Client",
+  "type": "object",
+  "properties": {
+    "agency_id": {
+      "type": "string",
+      "description": "Reference to the Agency this client belongs to"
+    },
+    "name": {
+      "type": "string",
+      "description": "Client company name"
+    },
+    "logo_url": {
+      "type": "string",
+      "description": "Client logo URL"
+    },
+    "vpn_plan": {
+      "type": "string",
+      "enum": [
+        "basic",
+        "standard",
+        "premium",
+        "enterprise"
+      ],
+      "default": "standard",
+      "description": "VPN plan assigned to this client"
+    },
+    "max_users": {
+      "type": "integer",
+      "default": 10,
+      "description": "Maximum users for this client"
+    },
+    "max_devices": {
+      "type": "integer",
+      "default": 20,
+      "description": "Maximum devices for this client"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "suspended",
+        "trial"
+      ],
+      "default": "trial",
+      "description": "Client account status"
+    },
+    "dns_filter_config": {
+      "type": "object",
+      "description": "DNS filtering configuration (categories, custom blocklists)",
+      "properties": {
+        "block_malware": {
+          "type": "boolean",
+          "default": true
+        },
+        "block_phishing": {
+          "type": "boolean",
+          "default": true
+        },
+        "block_adult": {
+          "type": "boolean",
+          "default": false
+        },
+        "block_gambling": {
+          "type": "boolean",
+          "default": false
+        },
+        "block_social_media": {
+          "type": "boolean",
+          "default": false
+        },
+        "block_streaming": {
+          "type": "boolean",
+          "default": false
+        },
+        "custom_blocklist": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Custom domains to block"
+        },
+        "custom_allowlist": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Custom domains to always allow"
+        }
+      }
+    },
+    "stripe_subscription_id": {
+      "type": "string",
+      "description": "Stripe subscription ID"
+    },
+    "contact_email": {
+      "type": "string",
+      "description": "Primary contact email"
+    },
+    "contact_phone": {
+      "type": "string",
+      "description": "Primary contact phone"
+    },
+    "risk_score": {
+      "type": "number",
+      "default": 0,
+      "description": "Current risk score (0-100, lower is better)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional notes or description (up to 1000 characters)"
+    }
+  },
+  "required": [
+    "agency_id",
+    "name"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "agency_admin"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "agency_admin"
+          }
+        },
+        {
+          "data.created_by_id": "{{user.id}}"
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "agency_admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "super_admin"
+      }
+    }
+  }
+}

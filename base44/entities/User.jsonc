@@ -6,9 +6,40 @@
       "type": "string",
       "description": "The role of the user in the app",
       "enum": [
+        "super_admin",
+        "agency_admin",
+        "client_admin",
+        "team_member",
         "admin",
         "user"
-      ]
+      ],
+      "default": "user"
+    },
+    "agency_id": {
+      "type": "string",
+      "description": "Reference to the Agency this user belongs to (agency_admin, client_admin, team_member)"
+    },
+    "client_id": {
+      "type": "string",
+      "description": "Reference to the Client this user belongs to (client_admin, team_member)"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Phone number"
+    },
+    "job_title": {
+      "type": "string",
+      "description": "Job title or role description"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether this user account is active"
+    },
+    "last_login": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last login timestamp"
     }
   },
   "required": [
