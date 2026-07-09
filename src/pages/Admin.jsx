@@ -19,6 +19,7 @@ import DownloadLinkManager from '@/components/admin/DownloadLinkManager';
 import SubscriberStats from '@/components/admin/SubscriberStats';
 import GrantSubscriptionView from '@/components/admin/GrantSubscriptionView';
 import SecureFilesView from '@/components/admin/SecureFilesView';
+import AgencyDashboard from '@/pages/voxshield/AgencyDashboard';
 
 export default function Admin() {
   const [activePage, setActivePage] = useState('dashboard');
@@ -52,6 +53,7 @@ export default function Admin() {
       );
       case 'grant-subscription': return <GrantSubscriptionView />;
       case 'secure-files': return <SecureFilesView />;
+      case 'agency-dashboard': return <AgencyDashboard />;
       default: return <DashboardView />;
     }
   };

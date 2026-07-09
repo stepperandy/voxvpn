@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Server, LogOut, Menu, X, ChevronRight, Home, Download, Link, Radio, TrendingUp, Megaphone, Activity, BarChart2, Handshake, Globe, Gift, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, Users, Server, LogOut, Menu, X, ChevronRight, Home, Download, Link, Radio, TrendingUp, Megaphone, Activity, BarChart2, Handshake, Globe, Gift, ShieldCheck, Building2 } from 'lucide-react';
 import { useState } from 'react';
 
 const navItems = [
@@ -17,6 +17,7 @@ const navItems = [
   { icon: Users, label: 'Subscribers', id: 'subscribers', desc: 'Stats & download link' },
   { icon: Gift, label: 'Grant Subscription', id: 'grant-subscription', desc: 'Manually activate plans' },
   { icon: ShieldCheck, label: 'Secure Files', id: 'secure-files', desc: 'Host installer files privately' },
+  { icon: Building2, label: 'Agency Dashboard', id: 'agency-dashboard', desc: 'Clients, VPN access & devices' },
 ];
 
 export default function AdminSidebar({ activePage, onNavigate, onLogout }) {
