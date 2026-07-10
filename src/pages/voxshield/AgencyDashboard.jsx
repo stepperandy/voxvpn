@@ -4,6 +4,7 @@ import { Building2, Users, Smartphone, Activity, Plus, UserPlus, Loader2, Refres
 import AddClientModal from '@/components/voxshield/AddClientModal';
 import AssignVpnModal from '@/components/voxshield/AssignVpnModal';
 import DevicesTable from '@/components/voxshield/DevicesTable';
+import SecurityLogsSection from '@/components/voxshield/SecurityLogsSection';
 
 const planColor = {
   basic: 'text-slate-400 bg-slate-500/10 border-slate-500/20',
@@ -156,6 +157,9 @@ export default function AgencyDashboard() {
               </div>
             )}
           </div>
+
+          {/* Security logs & threat reports */}
+          <SecurityLogsSection clients={clients} />
 
           {/* Devices table */}
           <DevicesTable devices={devices} clients={clients} onRefresh={load} />
