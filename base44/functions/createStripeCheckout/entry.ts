@@ -17,36 +17,16 @@ const PLAN_ALIASES = {
   '2 Years': 'Enterprise', '2 years': 'Enterprise', '24 Months': 'Enterprise',
 };
 
+// Static fallback rates — kept in sync with src/hooks/useCurrencyDetection.js FALLBACK_RATES.
+// Used only when the frontend cannot supply a live rate (e.g. China buyers where
+// the rate is explicitly passed as null to force CNY conversion).
 const CURRENCY_RATES = {
-  'CNY': 7.3,
-  'GBP': 0.79,
-  'EUR': 0.92,
-  'JPY': 155,
-  'INR': 83,
-  'BRL': 4.97,
-  'AUD': 1.50,
-  'GHS': 12.5,
-  'CAD': 1.36,
-  'ZAR': 18.5,
-  'NGN': 1500,
-  'KES': 129,
-  'SGD': 1.35,
-  'HKD': 7.8,
-  'MXN': 18.5,
-  'AED': 3.67,
-  'RUB': 90,
-  'KRW': 1380,
-  'THB': 36,
-  'IDR': 16300,
-  'MYR': 4.7,
-  'PHP': 58,
-  'PKR': 278,
-  'EGP': 48,
-  'TRY': 32,
-  'SAR': 3.75,
-  'QAR': 3.64,
-  'NZD': 1.65,
-  'USD': 1,
+  'CNY': 7.3, 'USD': 1, 'GBP': 0.79, 'JPY': 155, 'INR': 83,
+  'BRL': 4.97, 'AUD': 1.50, 'EUR': 0.92, 'GHS': 12.5, 'CAD': 1.36,
+  'ZAR': 18.5, 'NGN': 1500, 'KES': 129, 'SGD': 1.35, 'HKD': 7.8,
+  'MXN': 18.5, 'AED': 3.67, 'RUB': 90, 'KRW': 1380, 'THB': 36,
+  'IDR': 16300, 'MYR': 4.7, 'PHP': 58, 'PKR': 278, 'EGP': 48,
+  'TRY': 32, 'SAR': 3.75, 'QAR': 3.64, 'NZD': 1.65,
 };
 
 Deno.serve(async (req) => {

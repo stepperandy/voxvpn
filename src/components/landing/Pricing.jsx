@@ -194,35 +194,22 @@ export default function Pricing() {
     setModalOpen(true);
   };
 
+  // Only admin-bypass is handled here — all Stripe/Hubtel/Alipay/WeChat checkout
+  // is handled inside PaymentMethodModal, which passes the detected currency,
+  // country, live exchange rate, and billing cycle to createStripeCheckout.
   const handlePaymentProceed = async (method) => {
-    try {
-      if (isAdmin && method === 'admin-bypass') {
+    if (isAdmin && method === 'admin-bypass') {
+      try {
         await base44.functions.invoke('grantSubscription', {
           plan: selectedPlan.name,
           target_email: user.email,
         });
         alert(`${selectedPlan.name} plan granted to ${user.email}`);
-        setModalOpen(false);
-        return;
-      }
-
-      // Regular Stripe checkout
-      const res = await base44.functions.invoke('createStripeCheckout', {
-        plan: selectedPlan.name,
-        price: selectedPlan.price,
-        period: selectedPlan.period,
-      });
-      if (res.data?.url) {
-        setModalOpen(false);
-        window.location.href = res.data.url;
-      } else {
-        alert('Failed to create checkout session: ' + (res.data?.error || 'Unknown error'));
+      } catch (error) {
+        alert('Error: ' + error.message);
+      } finally {
         setModalOpen(false);
       }
-    } catch (error) {
-      console.error('Checkout error:', error);
-      alert('Error: ' + error.message);
-      setModalOpen(false);
     }
   };
 
@@ -273,6 +260,9 @@ export default function Pricing() {
           onProceed={handlePaymentProceed}
           currency={currency}
           countryCode={countryCode}
+          isBilledYearly={selectedPlan?.name === '1 Year' || selectedPlan?.name === '2 Years'}
+          isSixMonths={selectedPlan?.name === '6 Months'}
+          userEmail={user?.email}
         />
 
         {/* Trust bar */}

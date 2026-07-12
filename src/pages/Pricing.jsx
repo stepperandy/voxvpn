@@ -5,6 +5,7 @@ import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
 import { motion } from 'framer-motion';
 import PaymentMethodModal from '@/components/PaymentMethodModal';
+import { useCurrencyDetection } from '@/hooks/useCurrencyDetection';
 
 const PLANS = [
   {
@@ -159,82 +160,11 @@ function PlanCard({ plan, onSelectPlan, currency, convertPrice }) {
   );
 }
 
-const CURRENCY_SYMBOLS = {
-  'CNY': '¥', 'USD': '$', 'GBP': '£', 'JPY': '¥', 'INR': '₹',
-  'BRL': 'R$', 'AUD': 'A$', 'EUR': '€',
-};
-
-const COUNTRY_CURRENCY = {
-  'CN': 'CNY', 'US': 'USD', 'GB': 'GBP', 'JP': 'JPY', 'IN': 'INR',
-  'BR': 'BRL', 'AU': 'AUD',
-  'FR': 'EUR', 'DE': 'EUR', 'IT': 'EUR', 'ES': 'EUR', 'NL': 'EUR',
-  'BE': 'EUR', 'AT': 'EUR', 'IE': 'EUR', 'PT': 'EUR', 'GR': 'EUR',
-  'PL': 'EUR', 'SE': 'EUR', 'NO': 'EUR', 'CH': 'EUR',
-};
-
-// Fallback static rates (used if the live API is unreachable)
-const FALLBACK_RATES = {
-  'CNY': 7.3, 'USD': 1, 'GBP': 0.79, 'JPY': 155, 'INR': 83,
-  'BRL': 4.97, 'AUD': 1.50, 'EUR': 0.92,
-};
-
-// Detect China via timezone/locale — fallback when geo APIs are blocked in China
-function detectChinaFallback() {
-  try {
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
-    const locale = navigator.language || navigator.languages?.[0] || '';
-    return tz === 'Asia/Shanghai' || tz === 'Asia/Urumqi' ||
-           locale.toLowerCase().startsWith('zh') || locale.toLowerCase().includes('cn');
-  } catch { return false; }
-}
-
-function makeCurrency(currencyCode, rate) {
-  return {
-    code: currencyCode,
-    rate: rate || FALLBACK_RATES[currencyCode] || 1,
-    symbol: CURRENCY_SYMBOLS[currencyCode] || '$',
-  };
-}
-
 export default function Pricing() {
   const [user, setUser] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
-  const [currency, setCurrency] = useState({ code: 'USD', rate: 1, symbol: '$' });
-  const [countryCode, setCountryCode] = useState('US');
-
-  // Fetch live exchange rates (cached per browser session in localStorage)
-  const fetchLiveRates = async () => {
-    try {
-      const cached = JSON.parse(localStorage.getItem('voxvpn_live_rates') || 'null');
-      if (cached && Date.now() - cached.fetchedAt < 3600000) {
-        return cached.rates;
-      }
-      const res = await fetch('https://open.er-api.com/v6/latest/USD');
-      const data = await res.json();
-      if (data?.rates) {
-        localStorage.setItem('voxvpn_live_rates', JSON.stringify({ rates: data.rates, fetchedAt: Date.now() }));
-        return data.rates;
-      }
-    } catch { /* fall through to fallback rates */ }
-    return null;
-  };
-
-  useEffect(() => {
-    // Detect user location + fetch live exchange rates in parallel
-    Promise.all([
-      fetch('https://ipapi.co/json/').then(r => r.json()).catch(() => ({})),
-      fetchLiveRates(),
-    ]).then(([geoData, liveRates]) => {
-      const code = geoData.country_code || (detectChinaFallback() ? 'CN' : 'US');
-      setCountryCode(code);
-      const currencyCode = COUNTRY_CURRENCY[code] || 'USD';
-      const rate = liveRates
-        ? liveRates[currencyCode] || FALLBACK_RATES[currencyCode] || 1
-        : FALLBACK_RATES[currencyCode] || 1;
-      setCurrency(makeCurrency(currencyCode, rate));
-    });
-  }, []);
+  const { currency, countryCode, refresh } = useCurrencyDetection();
 
   useEffect(() => {
     base44.auth.me()
@@ -274,23 +204,7 @@ export default function Pricing() {
             className="text-center mb-10 flex items-center justify-center gap-2">
             <p className="text-slate-500 text-xs">Prices shown in <span className="text-cyan-400 font-semibold">{currency.code}</span></p>
             <button
-              onClick={async () => {
-                try {
-                  const [geoRes, liveRates] = await Promise.all([
-                    fetch('https://ipapi.co/json/').then(r => r.json()),
-                    fetchLiveRates(),
-                  ]);
-                  const code = geoRes.country_code || (detectChinaFallback() ? 'CN' : 'US');
-                  setCountryCode(code);
-                  const currencyCode = COUNTRY_CURRENCY[code] || 'USD';
-                  const rate = liveRates
-                    ? liveRates[currencyCode] || FALLBACK_RATES[currencyCode] || 1
-                    : FALLBACK_RATES[currencyCode] || 1;
-                  setCurrency(makeCurrency(currencyCode, rate));
-                } catch {
-                  setCurrency(makeCurrency('USD', 1));
-                }
-              }}
+              onClick={refresh}
               className="text-cyan-400 hover:text-cyan-300 text-xs font-semibold ml-1"
             >
               (refresh)

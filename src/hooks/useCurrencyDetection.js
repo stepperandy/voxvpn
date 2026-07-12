@@ -60,7 +60,7 @@ export function useCurrencyDetection() {
   const [countryCode, setCountryCode] = useState('US');
   const [paymentMethods, setPaymentMethods] = useState(['stripe']);
 
-  useEffect(() => {
+  const detect = async () => {
     const fetchLiveRates = async () => {
       try {
         const cached = JSON.parse(localStorage.getItem('voxvpn_live_rates') || 'null');
@@ -83,27 +83,29 @@ export function useCurrencyDetection() {
       symbol: CURRENCY_SYMBOLS[currencyCode] || '$',
     });
 
-    Promise.all([
+    const [geoData, liveRates] = await Promise.all([
       fetch('https://ipapi.co/json/').then(r => r.json()).catch(() => ({})),
       fetchLiveRates(),
-    ]).then(([geoData, liveRates]) => {
-      let code = geoData.country_code;
-      // Fallback: if geo API failed (common in China), detect via timezone/locale
-      if (!code && detectChinaFromLocale()) {
-        code = 'CN';
-      }
-      code = code || 'US';
-      setCountryCode(code);
-      const currencyCode = COUNTRY_CURRENCY[code] || 'USD';
-      const rate = liveRates
-        ? liveRates[currencyCode] || FALLBACK_RATES[currencyCode] || 1
-        : FALLBACK_RATES[currencyCode] || 1;
-      setCurrency(makeCurrency(currencyCode, rate));
-      setPaymentMethods(getPaymentMethods(code));
-    });
-  }, []);
+    ]);
 
-  return { currency, countryCode, paymentMethods };
+    let code = geoData.country_code;
+    // Fallback: if geo API failed (common in China), detect via timezone/locale
+    if (!code && detectChinaFromLocale()) {
+      code = 'CN';
+    }
+    code = code || 'US';
+    setCountryCode(code);
+    const currencyCode = COUNTRY_CURRENCY[code] || 'USD';
+    const rate = liveRates
+      ? liveRates[currencyCode] || FALLBACK_RATES[currencyCode] || 1
+      : FALLBACK_RATES[currencyCode] || 1;
+    setCurrency(makeCurrency(currencyCode, rate));
+    setPaymentMethods(getPaymentMethods(code));
+  };
+
+  useEffect(() => { detect(); }, []);
+
+  return { currency, countryCode, paymentMethods, refresh: detect };
 }
 
 export { CURRENCY_SYMBOLS, FALLBACK_RATES, COUNTRY_CURRENCY };
