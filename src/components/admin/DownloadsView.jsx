@@ -312,17 +312,17 @@ export default function DownloadsView() {
                 </div>
 
                 {/* Actions */}
-                <div className="space-y-2">
+                <div className="flex gap-2">
                   {d.payment_link && !d.is_free && (
                     <a href={d.payment_link} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-1.5 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold hover:bg-amber-500/20 transition-all">
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold hover:bg-amber-500/20 transition-all">
                       <ExternalLink size={12} /> Payment Link
                     </a>
                   )}
                   {d.file_url && (
                     <a href={d.file_url} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-cyan-500/30 text-cyan-400 text-xs font-bold hover:bg-cyan-500/10 transition-all w-full">
-                      <Download size={13} /> DOWNLOAD
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold hover:bg-cyan-500/20 transition-all">
+                      <Download size={12} /> DOWNLOAD
                     </a>
                   )}
                 </div>
