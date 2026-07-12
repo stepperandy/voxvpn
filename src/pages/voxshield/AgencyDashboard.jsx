@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Building2, Users, Smartphone, Activity, Plus, UserPlus, Loader2, RefreshCw } from 'lucide-react';
+import { Building2, Users, Smartphone, Activity, Plus, UserPlus, Loader2, RefreshCw, Rocket } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import AddClientModal from '@/components/voxshield/AddClientModal';
 import AssignVpnModal from '@/components/voxshield/AssignVpnModal';
 import DevicesTable from '@/components/voxshield/DevicesTable';
@@ -93,6 +94,9 @@ export default function AgencyDashboard() {
           <button onClick={() => setShowAssignVpn(true)} className="flex items-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/15 text-white font-semibold rounded-lg text-sm transition-all border border-white/10">
             <UserPlus size={14} /> Assign VPN
           </button>
+          <Link to="/shield/onboarding" className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-500 to-violet-500 hover:from-cyan-400 hover:to-violet-400 text-white font-bold rounded-lg text-sm transition-all shadow-lg shadow-cyan-500/10">
+            <Rocket size={14} /> Guided Setup
+          </Link>
           <button onClick={() => setShowAddClient(true)} className="flex items-center gap-2 px-4 py-2 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-lg text-sm transition-all">
             <Plus size={14} /> Add Client
           </button>
