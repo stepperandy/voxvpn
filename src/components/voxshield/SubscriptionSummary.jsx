@@ -135,6 +135,86 @@ export default function SubscriptionSummary({ subscriptions, clients }) {
           </div>
         )}
       </div>
+
+      {/* Full subscriptions table */}
+      <div className="lg:col-span-3 rounded-2xl bg-[#0d1120] border border-white/5 p-5">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Calendar size={15} className="text-cyan-400" />
+            <h3 className="text-white font-bold text-sm">All Client Subscriptions</h3>
+          </div>
+          <span className="text-slate-600 text-xs">{subscriptions.length} total</span>
+        </div>
+        {subscriptions.length === 0 ? (
+          <p className="text-slate-600 text-xs py-6 text-center">No subscriptions found</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="text-slate-500 border-b border-white/5">
+                  <th className="text-left font-medium py-2 px-2">Client</th>
+                  <th className="text-left font-medium py-2 px-2">Email</th>
+                  <th className="text-left font-medium py-2 px-2">Plan</th>
+                  <th className="text-left font-medium py-2 px-2">Status</th>
+                  <th className="text-right font-medium py-2 px-2">Renewal Date</th>
+                  <th className="text-right font-medium py-2 px-2">Days Left</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[...subscriptions]
+                  .sort((a, b) => {
+                    if (!a.renewal_date) return 1;
+                    if (!b.renewal_date) return -1;
+                    return new Date(a.renewal_date) - new Date(b.renewal_date);
+                  })
+                  .map((sub) => {
+                    const days = daysUntil(sub.renewal_date);
+                    const cfg = STATUS_CONFIG[sub.status] || STATUS_CONFIG.pending_payment;
+                    const Icon = cfg.icon;
+                    const clientName = clientNameFor(sub);
+                    const isUrgent = days !== null && days >= 0 && days <= 7;
+                    const isUpcoming = days !== null && days >= 0 && days <= 30;
+                    const rowBg = isUrgent ? 'bg-red-500/5' : isUpcoming ? 'bg-amber-500/5' : '';
+                    return (
+                      <tr key={sub.id} className={`border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors ${rowBg}`}>
+                        <td className="py-2.5 px-2">
+                          <span className="text-white font-medium">{clientName || '—'}</span>
+                        </td>
+                        <td className="py-2.5 px-2">
+                          <span className="text-slate-400">{sub.user_email || '—'}</span>
+                        </td>
+                        <td className="py-2.5 px-2">
+                          <span className="text-slate-300">{sub.plan}</span>
+                        </td>
+                        <td className="py-2.5 px-2">
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border ${cfg.color}`}>
+                            <Icon size={9} /> {cfg.label}
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-2 text-right">
+                          <span className={isUrgent ? 'text-red-400 font-bold' : isUpcoming ? 'text-amber-400 font-semibold' : 'text-slate-300'}>
+                            {formatDate(sub.renewal_date)}
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-2 text-right">
+                          {days === null ? (
+                            <span className="text-slate-600">—</span>
+                          ) : days < 0 ? (
+                            <span className="text-slate-600 text-[10px]">expired</span>
+                          ) : (
+                            <span className={`font-bold ${isUrgent ? 'text-red-400' : isUpcoming ? 'text-amber-400' : 'text-slate-400'}`}>
+                              {days === 0 ? 'Today' : `${days}d`}
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
