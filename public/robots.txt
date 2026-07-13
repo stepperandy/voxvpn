@@ -1,22 +1,18 @@
-# robots.txt — VoxVPN
-# Allow all crawlers including OpenAI ad crawlers
-
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /customer-dashboard
+Disallow: /dashboard
+Disallow: /vpn-dashboard
+Disallow: /account-settings
+Disallow: /profile
+Disallow: /renew
+Disallow: /affiliate-dashboard
+Disallow: /referral-dashboard
+Disallow: /app
+Disallow: /play-review
+Disallow: /review
+Disallow: /payment-success
+Disallow: /payment-failed
 
-# Explicitly allow OpenAI crawlers (for ads and search)
-User-agent: OAI-AdsBot
-Allow: /
-
-User-agent: OAI-SearchBot
-Allow: /
-
-# Allow Google crawlers
-User-agent: Googlebot
-Allow: /
-
-User-agent: Googlebot-Image
-Allow: /
-
-# Sitemap
 Sitemap: https://voxvpn.net/sitemap.xml
