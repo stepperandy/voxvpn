@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Server, LogOut, Menu, X, ChevronRight, Home, Download, Link, Radio, TrendingUp, Megaphone, Activity, BarChart2, Handshake, Globe, Gift, ShieldCheck, Building2 } from 'lucide-react';
+import { LayoutDashboard, Users, Server, LogOut, Menu, X, ChevronRight, Home, Download, Link, Radio, TrendingUp, Megaphone, Activity, BarChart2, Handshake, Globe, Gift, ShieldCheck, Building2, Search } from 'lucide-react';
 import { useState } from 'react';
 
 const navItems = [
@@ -12,6 +12,7 @@ const navItems = [
   { icon: Activity, label: 'Server Status', id: 'server-status', desc: 'All VPN nodes & regions' },
   { icon: BarChart2, label: 'Connections', id: 'connections', desc: 'Connections, bandwidth & export' },
   { icon: Megaphone, label: 'Marketing', id: 'marketing', desc: 'SEO, PPC & AI campaigns' },
+  { icon: Search, label: 'Search Console', id: 'search-console', desc: 'Google search performance' },
   { icon: TrendingUp, label: 'Performance', id: 'marketing-performance', desc: 'SEO & PPC results by plan' },
   { icon: Handshake, label: 'Affiliates', id: 'affiliates', desc: 'Affiliates & partners' },
   { icon: Globe, label: 'Providers', id: 'providers', desc: 'Hybrid VPN provider APIs' },

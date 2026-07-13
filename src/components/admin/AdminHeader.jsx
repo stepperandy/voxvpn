@@ -9,6 +9,7 @@ const pageMeta = {
   setups: { title: 'Setup Portals', sub: 'Manage customer setup portal entries', breadcrumb: 'Home / Setups' },
   downloads: { title: 'Downloads & Payments', sub: 'Manage VPN setup files with pricing', breadcrumb: 'Home / Downloads' },
   'marketing-performance': { title: 'Marketing Performance', sub: 'Track SEO and PPC campaign results by plan', breadcrumb: 'Home / Marketing / Performance' },
+  'search-console': { title: 'Google Search Console', sub: 'Search performance, queries, and indexing status', breadcrumb: 'Home / Search Console' },
 };
 
 export default function AdminHeader({ activePage }) {
