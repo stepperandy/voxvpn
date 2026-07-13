@@ -7,7 +7,7 @@ const INDEXNOW_HOST = 'voxvpn.net';
 const ENTITY_URL_MAP = {
   Download: ['https://voxvpn.net/download', 'https://voxvpn.net/get', 'https://voxvpn.net/'],
   AppNotification: ['https://voxvpn.net/'],
-  BlogPost: ['https://voxvpn.net/blog'],
+  BlogPost: ['https://voxvpn.net/blog'], // for future BlogPost entity
 };
 
 Deno.serve(async (req) => {
