@@ -1,0 +1,138 @@
+{
+  "name": "BusinessAlert",
+  "type": "object",
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "description": "Reference to the Client (business team)"
+    },
+    "agency_id": {
+      "type": "string",
+      "description": "Reference to the Agency (if applicable)"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Email of the user associated with this alert"
+    },
+    "device_name": {
+      "type": "string",
+      "description": "Name of the device that triggered the alert"
+    },
+    "alert_type": {
+      "type": "string",
+      "enum": [
+        "device_disconnect",
+        "device_offline",
+        "antivirus_update",
+        "threat_detected",
+        "policy_violation"
+      ],
+      "default": "device_disconnect",
+      "description": "Type of security alert"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "info",
+        "warning",
+        "critical"
+      ],
+      "default": "warning",
+      "description": "Alert severity level"
+    },
+    "title": {
+      "type": "string",
+      "description": "Short alert title"
+    },
+    "message": {
+      "type": "string",
+      "description": "Detailed alert message"
+    },
+    "is_resolved": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether an admin has resolved this alert"
+    },
+    "resolved_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the alert was resolved"
+    },
+    "resolved_by": {
+      "type": "string",
+      "description": "User ID of the admin who resolved the alert"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the alert was triggered"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional notes (up to 1000 characters)"
+    }
+  },
+  "required": [
+    "alert_type",
+    "message"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "agency_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "client_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.user_email": "{{user.email}}"
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "agency_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "client_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "super_admin"
+      }
+    }
+  }
+}

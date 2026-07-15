@@ -1,6 +1,7 @@
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
+import BusinessAlerts from '@/components/business/BusinessAlerts';
 import { Shield, LayoutDashboard, Users, Monitor, Lock, Download, CreditCard, LogOut, Home, Building2, Menu, X } from 'lucide-react';
 
 const navItems = [
@@ -107,6 +108,7 @@ export default function BusinessLayout({ activeTab, onTabChange, children }) {
           </div>
           {user && (
             <div className="flex items-center gap-3">
+              <BusinessAlerts />
               <span className="text-slate-400 text-xs hidden sm:block">{user.full_name || user.email}</span>
               <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
                 {user.role.replace('_', ' ')}

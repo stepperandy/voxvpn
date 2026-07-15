@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Users, Monitor, Shield, Bug, ArrowRight, Clock, Activity, TrendingUp } from 'lucide-react';
+import AlertsBanner from '@/components/business/AlertsBanner';
 
 const STAT_CARDS = [
   { key: 'totalMembers', label: 'Team Members', icon: Users, color: '#00d4ff', bg: 'rgba(0,212,255,0.08)', border: 'rgba(0,212,255,0.2)' },
@@ -28,6 +29,9 @@ export default function OverviewTab({ data, onNavigate }) {
           </div>
         </div>
       </div>
+
+      {/* Security alerts banner */}
+      <AlertsBanner onNavigate={onNavigate} />
 
       {/* Stats grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
