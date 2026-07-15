@@ -46,7 +46,7 @@ export default function InstallerTab({ client }) {
         const records = await base44.entities.Download.list();
         const active = (records || []).filter(d => d.is_active !== false);
         setAllInstallers(active);
-        const business = active.filter(d => /voxshield/i.test(d.name));
+        const business = active.filter(d => /voxshield|voxhub/i.test(d.name));
         setInstallers(business);
       } catch {
         setInstallers([]);
