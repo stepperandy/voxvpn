@@ -4,7 +4,7 @@
   "properties": {
     "agency_id": {
       "type": "string",
-      "description": "Reference to the Agency this client belongs to"
+      "description": "Reference to the Agency this client belongs to (null for direct business signups)"
     },
     "name": {
       "type": "string",
@@ -119,7 +119,6 @@
     }
   },
   "required": [
-    "agency_id",
     "name"
   ],
   "rls": {
@@ -133,6 +132,11 @@
         {
           "user_condition": {
             "role": "agency_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "client_admin"
           }
         }
       ]
@@ -150,6 +154,11 @@
           }
         },
         {
+          "user_condition": {
+            "role": "client_admin"
+          }
+        },
+        {
           "data.created_by_id": "{{user.id}}"
         }
       ]
@@ -164,6 +173,11 @@
         {
           "user_condition": {
             "role": "agency_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "client_admin"
           }
         }
       ]
