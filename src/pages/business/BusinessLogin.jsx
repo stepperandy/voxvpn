@@ -6,7 +6,7 @@ import { Shield, Mail, Lock, Eye, EyeOff, Loader2, AlertCircle, ArrowRight, Buil
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
 
-const LOGO_URL = 'https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/4b7aaa837_image.png';
+const LOGO_URL = 'https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/9d3567c74_image.png';
 
 export default function BusinessLogin() {
   const navigate = useNavigate();

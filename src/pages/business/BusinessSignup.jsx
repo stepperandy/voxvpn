@@ -61,7 +61,7 @@ export default function BusinessSignup() {
           {/* Hero */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
             <img
-              src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/4b7aaa837_image.png"
+              src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/9d3567c74_image.png"
               alt="VoxVPN Business Shield"
               className="w-40 h-auto mx-auto mb-4"
             />

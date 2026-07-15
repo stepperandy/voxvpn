@@ -56,7 +56,7 @@ export default function BusinessLayout({ activeTab, onTabChange, children }) {
         <div className="p-5 border-b border-white/5">
           <Link to="/business/dashboard" className="flex flex-col gap-1" onClick={() => setSidebarOpen(false)}>
             <img
-              src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/4b7aaa837_image.png"
+              src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/9d3567c74_image.png"
               alt="VoxVPN Business Shield"
               className="w-full max-w-[160px] h-auto"
             />
