@@ -102,16 +102,26 @@ chmod +x src/installer/voxshield/build-linux.sh
 
 **Output**: `src/installer/windows/output/VoxShield-*.AppImage`
 
-### All Platforms (GitHub Actions)
+### macOS & Linux (GitHub Actions)
 
-Push a tag `shield-v*` to trigger the CI/CD pipeline:
+The workflow builds **macOS (.dmg)** and **Linux (.AppImage)** installers.
 
+**Setup (one-time):**
+1. Copy `src/installer/voxshield/voxshield-build.yml` to `.github/workflows/voxshield-build.yml`
+2. (Optional) Add `SLACK_WEBHOOK_URL` secret for failure notifications
+3. (Optional) Add `APPLE_ID`, `APPLE_PASSWORD`, `APPLE_TEAM_ID` secrets for macOS code signing
+
+**Trigger a release:**
 ```bash
-git tag shield-v1.0.0
-git push origin shield-v1.0.0
+git tag shield-v3.0.1
+git push origin shield-v3.0.1
 ```
 
-This builds all 3 platforms and creates a GitHub Release with download links.
+This builds both platforms in parallel and creates a GitHub Release with:
+- `VoxShield-*.dmg` (macOS, x64 + arm64)
+- `VoxShield-*.AppImage` (Linux, x64)
+
+You can also run manually from the Actions tab → "Run workflow".
 
 ---
 

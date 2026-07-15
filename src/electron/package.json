@@ -1,60 +1,66 @@
 {
   "name": "voxvpn-shield-agent",
   "version": "3.0.0",
-  "description": "VoxVPN Shield Agent — VPN + DNS Protection for Windows",
-  "main": "electron/main.js",
+  "description": "VoxVPN Shield Agent — VPN + DNS Protection",
+  "main": "main.js",
   "private": true,
   "scripts": {
     "dev":        "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
     "build":      "vite build",
-    "build:win":  "vite build && electron-builder --win",
-    "build:mac":  "vite build && electron-builder --mac",
-    "build:linux":"vite build && electron-builder --linux"
+    "build:win":  "electron-builder --win",
+    "build:mac":  "electron-builder --mac",
+    "build:linux":"electron-builder --linux"
   },
   "build": {
     "appId": "net.voxvpn.shield",
-    "productName": "VoxVPN Shield Agent",
+    "productName": "VoxShield",
     "copyright": "Copyright © 2026 VoxDigits Communications LLC",
     "directories": {
-      "output": "installer/windows/output"
+      "output": "../installer/voxshield/output"
     },
     "files": [
-      "dist/**/*",
-      "electron/**/*",
-      "!electron/backend/**"
+      "../dist/**/*",
+      "main.js",
+      "preload.js",
+      "api.js",
+      "*.jsx"
     ],
     "extraResources": [
       {
-        "from": "installer/assets/configs",
+        "from": "../assets/configs",
         "to":   "configs",
         "filter": ["**/*.ovpn"]
       }
     ],
     "win": {
       "target": [
-        { "target": "dir", "arch": ["x64"] }
+        { "target": "nsis", "arch": ["x64"] }
       ],
-      "icon": "installer/windows/assets/icon.ico",
+      "icon": "../installer/windows/assets/icon.ico",
       "requestedExecutionLevel": "requireAdministrator"
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "installerIcon": "installer/windows/assets/icon.ico",
-      "uninstallerIcon": "installer/windows/assets/icon.ico",
-      "installerHeaderIcon": "installer/windows/assets/icon.ico",
+      "installerIcon": "../installer/windows/assets/icon.ico",
+      "uninstallerIcon": "../installer/windows/assets/icon.ico",
+      "installerHeaderIcon": "../installer/windows/assets/icon.ico",
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "runAfterFinish": true
     },
     "mac": {
-      "target": "dmg",
-      "icon": "installer/windows/assets/icon.icns",
-      "category": "public.app-category.utilities"
+      "target": [{ "target": "dmg", "arch": ["x64", "arm64"] }],
+      "icon": "../installer/voxshield/assets/icon.icns",
+      "category": "public.app-category.utilities",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "../installer/voxshield/assets/entitlements.mac.plist",
+      "entitlementsInherit": "../installer/voxshield/assets/entitlements.mac.plist"
     },
     "linux": {
-      "target": "AppImage",
-      "icon": "installer/windows/assets/icon.png",
+      "target": [{ "target": "AppImage", "arch": ["x64"] }],
+      "icon": "../installer/voxshield/assets/icon.png",
       "category": "Network"
     }
   },

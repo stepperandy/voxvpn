@@ -2,50 +2,47 @@
 set -e
 
 # ============================================================
-#  VoxShield Business Security — macOS Build Script
-#  Builds the Electron app and creates a .dmg installer
+#  VoxShield — macOS Build Script
+#  Builds the Vite frontend + Electron app and creates a .dmg
 # ============================================================
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+ELECTRON_DIR="$ROOT_DIR/src/electron"
+OUTPUT_DIR="$SCRIPT_DIR/output"
+
+echo ""
+echo "================================================"
+echo "  VoxShield — macOS Build"
+echo "================================================"
+echo ""
+
+# Step 1: Install root dependencies & build Vite frontend
+echo "[1/4] Installing root dependencies..."
 cd "$ROOT_DIR"
-
-echo ""
-echo "================================================"
-echo "  VoxShield Business Security v1.0.0 — macOS"
-echo "================================================"
-echo ""
-
-# Step 1: Install dependencies
-echo "[1/3] Installing dependencies..."
 npm install
 
-# Step 2: Build Electron app (.dmg)
 echo ""
-echo "[2/3] Building Electron app..."
-npm run build:mac
+echo "[2/4] Building Vite frontend..."
+npm run build
 
-# Step 3: Locate output
-OUTPUT_DIR="installer/windows/output"
+# Step 3: Prepare electron directory
+echo ""
+echo "[3/4] Preparing Electron build..."
+cd "$ELECTRON_DIR"
+npm install
+rm -rf dist
+cp -r "$ROOT_DIR/dist" ./dist
+
+# Step 4: Build with electron-builder
+echo ""
+echo "[4/4] Building macOS .dmg..."
 mkdir -p "$OUTPUT_DIR"
+CSC_IDENTITY_AUTO_DISCOVERY=false npx electron-builder --mac
 
-# electron-builder outputs to the directory configured in package.json
-# Copy the .dmg to our output folder for consistency
-DMG_FILE=$(find . -name "*.dmg" -path "*/output/*" 2>/dev/null | head -1)
-if [ -z "$DMG_FILE" ]; then
-  DMG_FILE=$(find . -name "VoxShield*.dmg" 2>/dev/null | head -1)
-fi
-
-if [ -n "$DMG_FILE" ]; then
-  cp "$DMG_FILE" "$OUTPUT_DIR/"
-  echo ""
-  echo "================================================"
-  echo "  Build complete!"
-  echo "  Output: $OUTPUT_DIR/$(basename "$DMG_FILE")"
-  echo "================================================"
-else
-  echo ""
-  echo "================================================"
-  echo "  Build complete! Check installer/windows/output/"
-  echo "================================================"
-fi
+echo ""
+echo "================================================"
+echo "  Build complete!"
+echo "  Output: $OUTPUT_DIR"
+ls -lh "$OUTPUT_DIR"/*.dmg 2>/dev/null || echo "  (check $ELECTRON_DIR for output)"
+echo "================================================"

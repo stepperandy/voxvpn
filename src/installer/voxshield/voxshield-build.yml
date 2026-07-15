@@ -1,12 +1,15 @@
-# VoxShield Desktop — Build & Release
+# VoxShield Desktop — macOS & Linux Build & Release
 # Copy this file to: .github/workflows/voxshield-build.yml
 # (GitHub Actions workflows cannot be edited from the app builder)
+#
+# Triggers:
+#   - Push a tag matching shield-v* (e.g. shield-v3.0.1) → builds + creates GitHub Release
+#   - Manual dispatch from the Actions tab
 
 name: VoxShield Desktop — Build & Release
 
 on:
   push:
-    branches: [main]
     tags: ['shield-v*']
   workflow_dispatch:
 
@@ -16,18 +19,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: windows-latest
-            build_cmd: npm run build:win
-            artifact_name: VoxShield-Windows
-            artifact_path: installer/voxshield/output
           - os: macos-latest
-            build_cmd: npm run build:mac
+            build_target: mac
             artifact_name: VoxShield-macOS
-            artifact_path: installer/windows/output
           - os: ubuntu-latest
-            build_cmd: npm run build:linux
+            build_target: linux
             artifact_name: VoxShield-Linux
-            artifact_path: installer/windows/output
 
     runs-on: ${{ matrix.os }}
 
@@ -38,27 +35,42 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install root dependencies
+        run: npm install
 
-      - name: Build Vite + Electron
-        run: ${{ matrix.build_cmd }}
-        env:
-          BASE44_APP_ID: 69c84f61d5543b54fe26e1e5
+      - name: Build Vite frontend
+        run: npm run build
 
-      - name: Compile Inno Setup (Windows only)
-        if: matrix.os == 'windows-latest'
+      - name: Install electron dependencies
+        run: npm install
+        working-directory: src/electron
+
+      - name: Copy dist to electron directory
         run: |
-          iscc /O"installer/voxshield/output" "installer/voxshield/VoxShield.iss"
-        shell: cmd
+          rm -rf src/electron/dist
+          cp -r dist src/electron/dist
+
+      - name: Build ${{ matrix.build_target }} installer
+        run: npx electron-builder --${{ matrix.build_target }}
+        working-directory: src/electron
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+          BASE44_APP_ID: 69c84f61d5543b54fe26e1e5
+          # macOS code signing (optional — leave empty for unsigned builds)
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+
+      - name: Make AppImage executable (Linux only)
+        if: matrix.os == 'ubuntu-latest'
+        run: find src/installer/voxshield/output -name "*.AppImage" -exec chmod +x {} \;
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
-          path: ${{ matrix.artifact_path }}
+          path: src/installer/voxshield/output
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/shield-v')
@@ -70,17 +82,16 @@ jobs:
 
             ### Features
             - Unified authentication with voxvpn.net / VoxShield dashboard
-            - OS-encrypted token storage (Windows DPAPI / macOS Keychain)
+            - OS-encrypted token storage (macOS Keychain / Linux encrypted config)
             - DNS filtering with malware & phishing protection
             - Kill switch, auto-start, system tray
             - Heartbeat subscription enforcement
             - Session lifecycle (start / end / heartbeat) fully wired to live backend
 
             ### Install
-            - **Windows**: Download `VoxShield-Setup-*.exe`, run as Administrator
             - **macOS**: Download `.dmg`, drag to Applications
             - **Linux**: Download `.AppImage`, `chmod +x` and run
-          files: ${{ matrix.artifact_path }}/**/*
+          files: src/installer/voxshield/output/*
           draft: false
           prerelease: ${{ contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
         env:
