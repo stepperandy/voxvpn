@@ -160,6 +160,11 @@ export default function DownloadPage() {
 
   const isExpired = subscription && !canDownload(subscription);
 
+  // Non-admin users only see their detected OS; admins see all platforms
+  const visiblePlatforms = user?.role === 'admin'
+    ? PLATFORMS
+    : PLATFORMS.filter(p => p.id === detectedPlatform);
+
   // Not logged in
   if (!loading && !user) {
     return (
@@ -411,7 +416,7 @@ export default function DownloadPage() {
 
                 {/* Platform Tabs */}
                 <div className="flex gap-2 mb-4 bg-[#0d1420] p-1.5 rounded-2xl border border-white/5 flex-wrap">
-                  {PLATFORMS.map((p) => {
+                  {visiblePlatforms.map((p) => {
                     const Icon = p.icon;
                     const isActive = activePlatform === p.id;
                     return (
@@ -430,7 +435,7 @@ export default function DownloadPage() {
                 </div>
 
                 {/* Platform Card */}
-                {PLATFORMS.filter(p => p.id === activePlatform).map((p) => {
+                {visiblePlatforms.filter(p => p.id === activePlatform).map((p) => {
                   const Icon = p.icon;
                   const url = p.url;
                   return (
