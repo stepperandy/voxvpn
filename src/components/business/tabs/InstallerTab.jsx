@@ -14,7 +14,12 @@ export default function InstallerTab({ client }) {
       const res = await base44.functions.invoke('secureDownload', { platform });
       const url = res.data?.url;
       if (!url) throw new Error(res.data?.error || 'No download URL available');
-      window.open(url, '_blank', 'noopener,noreferrer');
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = res.data?.filename || `VoxShield-${platform}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     } catch (err) {
       alert('Download failed: ' + err.message);
     } finally {

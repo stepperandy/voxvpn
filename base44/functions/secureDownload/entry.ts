@@ -20,8 +20,10 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const platform = body.platform || 'Windows';
 
-    // For non-admins, verify active subscription with expiry check
-    if (user.role !== 'admin') {
+    // Business roles bypass the personal subscription check — their access
+    // is governed by their Client/Agency membership, not an individual plan.
+    const businessRoles = ['admin', 'client_admin', 'agency_admin', 'super_admin'];
+    if (!businessRoles.includes(user.role)) {
       const subs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: user.email });
       const active = subs?.find(s => ['active', 'trial'].includes(s.status));
 
@@ -50,69 +52,18 @@ Deno.serve(async (req) => {
 
     const fileUri = entry.file_url;
     const filename = entry.name || (platform === 'Android' ? 'VoxVPN.apk' : 'VoxVPN-Setup.exe');
-    const version = entry.version || '2.0.0';
 
-    // Private storage URI — generate signed URL and stream
+    // Private storage URI — generate a signed URL the browser can download directly
     if (!fileUri.startsWith('http')) {
       const signed = await base44.asServiceRole.integrations.Core.CreateFileSignedUrl({
         file_uri: fileUri,
         expires_in: 300,
       });
-      const fileRes = await fetch(signed.signed_url);
-      if (!fileRes.ok) throw new Error(`Storage fetch failed: ${fileRes.status}`);
-      const ext = platform === 'Android' ? 'apk' : 'exe';
-      const dlFilename = filename.endsWith(`.${ext}`) ? filename : `${filename}.${ext}`;
-      return new Response(fileRes.body, {
-        status: 200,
-        headers: {
-          ...corsHeaders,
-          'Content-Type': 'application/octet-stream',
-          'Content-Disposition': `attachment; filename="${dlFilename}"`,
-        },
-      });
+      return Response.json({ url: signed.signed_url, filename }, { status: 200, headers: corsHeaders });
     }
 
-    // External/GitHub URL — stream the file directly so users never see GitHub
-    // GitHub releases require GET to follow the redirect chain to the CDN
-    const fileRes = await fetch(fileUri, {
-      method: 'GET',
-      headers: { 
-        'User-Agent': 'VoxVPN-Download-Proxy/1.0',
-        'Accept': 'application/octet-stream',
-      },
-      redirect: 'follow',
-    });
-    if (!fileRes.ok) throw new Error(`GitHub fetch failed: ${fileRes.status}`);
-    
-    // Verify we got binary content, not HTML
-    const contentType = fileRes.headers.get('content-type');
-    const contentLength = fileRes.headers.get('content-length');
-    console.log('[secureDownload] GitHub response:', {
-      status: fileRes.status,
-      contentType,
-      contentLength,
-      url: fileUri,
-    });
-    
-    if (contentType && contentType.includes('text/html')) {
-      throw new Error('GitHub returned HTML instead of APK file. Check the release URL.');
-    }
-
-    const ext = platform === 'Android' ? 'apk' : 'exe';
-    const dlFilename = filename.endsWith(`.${ext}`) ? filename : `${filename}.${ext}`;
-    const downloadContentType = platform === 'Android' ? 'application/vnd.android.package-archive' : 'application/octet-stream';
-
-    // Stream the binary directly with download headers
-    return new Response(fileRes.body, {
-      status: 200,
-      headers: {
-        ...corsHeaders,
-        'Content-Type': downloadContentType,
-        'Content-Disposition': `attachment; filename="${dlFilename}"`,
-        'X-Original-Content-Length': contentLength || 'unknown',
-        'X-Original-URL': fileUri,
-      },
-    });
+    // External URL (GitHub release, etc.) — return it directly for the browser to download
+    return Response.json({ url: fileUri, filename }, { status: 200, headers: corsHeaders });
 
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500, headers: corsHeaders });
