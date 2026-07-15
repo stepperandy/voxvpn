@@ -133,6 +133,7 @@ const ShieldAgencyDashboard = lazy(() => import('./pages/voxshield/AgencyDashboa
 const ShieldClientOnboarding = lazy(() => import('./pages/voxshield/ClientOnboarding.jsx'));
 const BusinessSignup = lazy(() => import('./pages/business/BusinessSignup.jsx'));
 const TeamDashboard = lazy(() => import('./pages/business/TeamDashboard.jsx'));
+const BusinessOnboarding = lazy(() => import('./pages/business/BusinessOnboarding.jsx'));
 
 const PageTransition = ({ children }) => (
   <motion.div
@@ -266,6 +267,7 @@ const AuthenticatedApp = ({ isMobileDevice }) => {
             <Route path="onboarding" element={<ShieldClientOnboarding />} />
           </Route>
           <Route path="/business" element={<PageTransition><BusinessSignup /></PageTransition>} />
+          <Route path="/business/setup" element={<BusinessOnboarding />} />
           <Route path="/business/dashboard" element={<TeamDashboard />} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>

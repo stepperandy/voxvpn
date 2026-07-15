@@ -8,7 +8,9 @@ import MembersTab from '@/components/business/tabs/MembersTab';
 import DevicesTab from '@/components/business/tabs/DevicesTab';
 import SecurityTab from '@/components/business/tabs/SecurityTab';
 import InstallerTab from '@/components/business/tabs/InstallerTab';
-import { Loader2, AlertCircle } from 'lucide-react';
+import BillingTab from '@/components/business/tabs/BillingTab';
+import { Loader2, AlertCircle, Rocket, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function TeamDashboard() {
   const navigate = useNavigate();
@@ -52,10 +54,30 @@ export default function TeamDashboard() {
         </motion.div>
       ) : (
         <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
-          {activeTab === 'overview' && <OverviewTab data={teamData} onNavigate={setActiveTab} />}
+          {activeTab === 'overview' && (
+            <>
+              {teamData?.client && (!teamData.client.domains || teamData.client.domains.length === 0) && (
+                <Link to="/business/setup" className="block mb-6">
+                  <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}
+                    className="rounded-2xl border border-cyan-500/20 bg-gradient-to-r from-cyan-500/10 to-violet-500/10 p-5 flex items-center gap-4 hover:border-cyan-500/40 transition-all group">
+                    <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center flex-shrink-0">
+                      <Rocket size={22} className="text-cyan-400" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-white font-bold text-sm">Complete your business setup</p>
+                      <p className="text-slate-400 text-xs mt-0.5">Register your domains and configure your VPN policy to activate protection.</p>
+                    </div>
+                    <ArrowRight size={18} className="text-slate-600 group-hover:text-cyan-400 transition-colors" />
+                  </motion.div>
+                </Link>
+              )}
+              <OverviewTab data={teamData} onNavigate={setActiveTab} />
+            </>
+          )}
           {activeTab === 'members' && <MembersTab data={teamData} onRefresh={loadData} />}
           {activeTab === 'devices' && <DevicesTab data={teamData} />}
           {activeTab === 'security' && <SecurityTab client={teamData?.client} onRefresh={loadData} />}
+          {activeTab === 'billing' && <BillingTab data={teamData} />}
           {activeTab === 'installer' && <InstallerTab client={teamData?.client} />}
         </motion.div>
       )}

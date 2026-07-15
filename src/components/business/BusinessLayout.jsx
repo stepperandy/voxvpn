@@ -1,13 +1,14 @@
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Shield, LayoutDashboard, Users, Monitor, Lock, Download, LogOut, Home, Building2, Menu, X } from 'lucide-react';
+import { Shield, LayoutDashboard, Users, Monitor, Lock, Download, CreditCard, LogOut, Home, Building2, Menu, X } from 'lucide-react';
 
 const navItems = [
   { label: 'Overview', icon: LayoutDashboard, tab: 'overview' },
   { label: 'Team Members', icon: Users, tab: 'members' },
   { label: 'Devices', icon: Monitor, tab: 'devices' },
   { label: 'Security', icon: Lock, tab: 'security' },
+  { label: 'Billing', icon: CreditCard, tab: 'billing' },
   { label: 'Installer', icon: Download, tab: 'installer' },
 ];
 
