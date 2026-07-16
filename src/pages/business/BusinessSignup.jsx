@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
-import { Shield, Building2, Users, Lock, Mail, User, Phone, Loader2, CheckCircle2, AlertCircle, Antenna, Bug, Eye, ArrowRight } from 'lucide-react';
+import { Shield, Building2, Users, Lock, Mail, User, Phone, Loader2, CheckCircle2, AlertCircle, Antenna, Bug, Eye, ArrowRight, KeyRound } from 'lucide-react';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
 
@@ -31,6 +31,9 @@ export default function BusinessSignup() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [step, setStep] = useState('form'); // 'form' | 'verify'
+  const [otpCode, setOtpCode] = useState('');
+  const [verifying, setVerifying] = useState(false);
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -41,13 +44,45 @@ export default function BusinessSignup() {
     try {
       const res = await base44.functions.invoke('businessSignup', form);
       if (res.data?.error) throw new Error(res.data.error);
-      // Log the user in so they can access the dashboard immediately
-      await base44.auth.loginViaEmailPassword(form.email, form.password);
-      window.location.href = res.data?.redirect || '/business/dashboard';
+      // Account created — platform sent an OTP verification code to the email
+      setStep('verify');
     } catch (err) {
-      setError(err.message || 'Signup failed. Please try again.');
+      // If the email is already registered but not yet verified, let the user
+      // verify the code they already received (or resend) instead of blocking them.
+      const msg = (err.message || '').toLowerCase();
+      if (msg.includes('already') || msg.includes('exist')) {
+        setError(null);
+        setStep('verify');
+      } else {
+        setError(err.message || 'Signup failed. Please try again.');
+      }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleVerify = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setVerifying(true);
+    try {
+      await base44.auth.verifyOtp({ email: form.email, otpCode });
+      await base44.auth.loginViaEmailPassword(form.email, form.password);
+      window.location.href = '/business/dashboard';
+    } catch (err) {
+      setError(err.message || 'Verification failed. Check your code and try again.');
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  const handleResend = async () => {
+    setError(null);
+    try {
+      await base44.auth.resendOtp(form.email);
+      setError('A new code has been sent to your email.');
+    } catch (err) {
+      setError(err.message || 'Could not resend code. Please try again.');
     }
   };
 
@@ -110,8 +145,16 @@ export default function BusinessSignup() {
               className="rounded-3xl border border-cyan-500/20 bg-gradient-to-br from-[#0d1420] to-[#060c1a] p-8"
               style={{ boxShadow: '0 0 60px rgba(0,212,255,0.06)' }}>
 
-              <h2 className="text-white font-black text-2xl mb-1">Create Business Account</h2>
-              <p className="text-slate-500 text-sm mb-6">Start your 14-day trial — no credit card required.</p>
+              {step === 'verify' ? (
+                <h2 className="text-white font-black text-2xl mb-1">Verify Your Email</h2>
+              ) : (
+                <h2 className="text-white font-black text-2xl mb-1">Create Business Account</h2>
+              )}
+              <p className="text-slate-500 text-sm mb-6">
+                {step === 'verify'
+                  ? `Enter the 6-digit code we sent to ${form.email}.`
+                  : 'Start your 14-day trial — no credit card required.'}
+              </p>
 
               {error && (
                 <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center gap-2 text-rose-400 text-sm">
@@ -119,7 +162,43 @@ export default function BusinessSignup() {
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              {step === 'verify' ? (
+                <form onSubmit={handleVerify} className="space-y-4">
+                  <div>
+                    <label className="text-slate-500 text-xs font-semibold uppercase tracking-wider mb-1.5 block">Verification Code *</label>
+                    <div className="relative">
+                      <KeyRound size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600" />
+                      <input
+                        value={otpCode}
+                        onChange={e => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                        required
+                        inputMode="numeric"
+                        maxLength={6}
+                        placeholder="123456"
+                        className="w-full pl-10 pr-3 py-3 rounded-xl bg-[#060910] border border-white/10 text-white text-center text-2xl tracking-[0.5em] font-mono focus:outline-none focus:border-cyan-500/50 transition-colors"
+                      />
+                    </div>
+                  </div>
+
+                  <button type="submit" disabled={verifying || otpCode.length < 6}
+                    className="w-full flex items-center justify-center gap-2 py-4 rounded-xl font-black text-base text-black transition-all disabled:opacity-50"
+                    style={{ background: 'linear-gradient(135deg, #00d4ff, #00b8e6)', boxShadow: '0 8px 30px rgba(0,212,255,0.3)' }}>
+                    {verifying ? <Loader2 size={20} className="animate-spin" /> : <CheckCircle2 size={20} />}
+                    {verifying ? 'Verifying...' : 'Verify & Continue'}
+                  </button>
+
+                  <div className="flex items-center justify-between text-xs">
+                    <button type="button" onClick={handleResend} className="text-cyan-400 hover:text-cyan-300 font-semibold">
+                      Resend code
+                    </button>
+                    <button type="button" onClick={() => setStep('form')} className="text-slate-500 hover:text-slate-300">
+                      Back to form
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <>
+                <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="text-slate-500 text-xs font-semibold uppercase tracking-wider mb-1.5 block">Company Name *</label>
                   <div className="relative">
@@ -196,6 +275,8 @@ export default function BusinessSignup() {
                 Already have an account?{' '}
                 <Link to="/business/login" className="text-cyan-400 hover:text-cyan-300 font-semibold">Sign in</Link>
               </p>
+                </>
+              )}
             </motion.div>
           </div>
         </div>
