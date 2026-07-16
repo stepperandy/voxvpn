@@ -16,11 +16,11 @@ export default function PaymentIcons() {
   const iconWidthPct = 100 / PAYMENT_METHODS.length;
 
   return (
-    <div className="relative w-full max-w-[640px] mx-auto">
+    <div className="relative w-full max-w-[560px] mx-auto rounded-2xl bg-white/95 p-3 shadow-lg">
       <img
         src={IMAGE_URL}
         alt="Payment Methods: Visa, Mastercard, Amex, Discover, Apple Pay, Google Pay, Hubtel, Alipay, WeChat Pay"
-        className="w-full h-auto object-contain mix-blend-screen select-none"
+        className="w-full h-auto object-contain select-none"
         draggable={false}
       />
       {PAYMENT_METHODS.map((method, i) => (
