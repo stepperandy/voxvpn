@@ -118,7 +118,7 @@ export default function InstallerTab({ client, subscriptions }) {
           <Link to="/pricing"
             className="inline-flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm text-black transition-all"
             style={{ background: 'linear-gradient(135deg, #00d4ff, #00b8e6)', boxShadow: '0 8px 30px rgba(0,212,255,0.3)' }}>
-            <Zap size={16} /> View Plans & Subscribe
+            <Zap size={16} /> Upgrade Now
           </Link>
         </div>
       ) : (
