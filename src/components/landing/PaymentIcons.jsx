@@ -16,7 +16,7 @@ const IMAGE_URL = 'https://media.base44.com/images/public/69b202c06dc5b1988efe96
 
 export default function PaymentIcons() {
   return (
-    <div className="relative w-full max-w-[640px] mx-auto" style={{ isolation: 'isolate' }}>
+    <div className="relative w-full max-w-[320px] mx-auto" style={{ isolation: 'isolate' }}>
       <img
         src={IMAGE_URL}
         alt="Payment Methods: Visa, Mastercard, Amex, Apple Pay, Discover, Google Pay, Alipay, WeChat Pay"
