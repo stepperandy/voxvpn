@@ -25,7 +25,7 @@ const FEATURES = [
 export default function BusinessSignup() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
-    company_name: '', full_name: '', email: 'info@sunrisewellness.ca', password: '',
+    company_name: '', full_name: '', email: '', password: '',
     team_size: '10', contact_phone: '', plan: 'standard',
   });
   const [loading, setLoading] = useState(false);
