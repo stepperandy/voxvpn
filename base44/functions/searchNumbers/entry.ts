@@ -1,101 +1,81 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.38';
+// Search available phone numbers via Twilio
+// Body: { country_code, area_code, features, limit }
+
+const COUNTRY_MONTHLY_FEES = {
+  US: 6.99,
+  CA: 7.99,
+  GB: 8.99,
+  AU: 9.99,
+};
+
+async function searchTwilio(country_code, area_code, limit, number_type) {
+  const accountSid = Deno.env.get('TWILIO_ACCOUNT_SID');
+  const authToken = Deno.env.get('TWILIO_AUTH_TOKEN');
+  if (!accountSid || !authToken) return null;
+
+  const auth = btoa(`${accountSid}:${authToken}`);
+  const country = country_code.toUpperCase();
+
+  // Twilio number types: Local, TollFree, Mobile, National
+  const typeMap = { local: 'Local', toll_free: 'TollFree', mobile: 'Mobile', national: 'National' };
+  const numberType = typeMap[number_type] || 'Local';
+  const params = new URLSearchParams();
+  params.set('PageSize', String(limit));
+  params.set('VoiceEnabled', 'true');
+  params.set('SmsEnabled', 'true');
+  if (area_code?.trim()) params.set('AreaCode', area_code.trim());
+
+  const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/AvailablePhoneNumbers/${country}/${numberType}.json?${params}`;
+
+  const res = await fetch(url, {
+    headers: { 'Authorization': `Basic ${auth}` },
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    console.warn('[searchNumbers] Twilio error:', JSON.stringify(err));
+    return null;
+  }
+
+  const data = await res.json();
+  const monthly_fee = COUNTRY_MONTHLY_FEES[country] ?? 6.99;
+
+  return (data.available_phone_numbers || []).map(item => ({
+    id: item.phone_number,
+    phone_number: item.phone_number,
+    country_iso: country,
+    city: item.locality || item.region || '',
+    type: 'local',
+    prefix: item.phone_number?.slice(-10, -7) || '',
+    monthly_fee,
+    setup_fee: 0,
+    voice_enabled: item.capabilities?.voice || false,
+    sms_enabled: item.capabilities?.sms || false,
+    mms_enabled: item.capabilities?.mms || false,
+    provider: 'twilio',
+  }));
+}
 
 Deno.serve(async (req) => {
   try {
-    const base44 = createClientFromRequest(req);
+    const { country_code = 'US', area_code, limit = 12, number_type } = await req.json();
 
-    const body = await req.json().catch(() => ({}));
-    const {
-      country_code = 'US',
-      area_code = '',
-      contains = '',
-      number_type = 'local',
-      page_size = 30,
-      in_region = '',
-      in_postal_code = '',
-    } = body;
-
-    // Vanity phrase -> Twilio Contains pattern
-    // Twilio accepts letters, digits, and wildcards (* or .)
-    // Letters are auto-mapped to keypad digits by Twilio
-    let containsPattern = (contains || '').trim();
-    if (containsPattern) {
-      // Remove spaces but keep letters, digits, and wildcards
-      containsPattern = containsPattern.replace(/\s+/g, '').toUpperCase();
-    }
-
-    const accountSid = Deno.env.get('TWILIO_ACCOUNT_SID');
-    const authToken = Deno.env.get('TWILIO_AUTH_TOKEN');
-
-    if (!accountSid || !authToken) {
-      return Response.json({ error: 'Phone number search is not configured. Missing Twilio credentials.' }, { status: 503 });
-    }
-
-    // Map number_type to Twilio endpoint segment
-    const typeMap = {
-      local: 'Local',
-      toll_free: 'TollFree',
-      tollfree: 'TollFree',
-      mobile: 'Mobile',
-      national: 'Local',
-    };
-    const twilioType = typeMap[number_type?.toLowerCase()] || 'Local';
-
-    // Build query params
-    const params = new URLSearchParams();
-    params.set('PageSize', String(Math.min(page_size, 100)));
-    if (area_code && twilioType === 'Local') params.set('AreaCode', area_code);
-    if (containsPattern) params.set('Contains', containsPattern);
-    if (in_region) params.set('InRegion', in_region);
-    if (in_postal_code) params.set('InPostalCode', in_postal_code);
-
-    const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/AvailablePhoneNumbers/${country_code.toUpperCase()}/${twilioType}.json?${params.toString()}`;
-
-    console.log('[searchNumbers] Calling Twilio:', url);
-
-    const authHeader = 'Basic ' + btoa(`${accountSid}:${authToken}`);
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Authorization': authHeader,
-        'Accept': 'application/json',
-      },
+    console.log(`[searchNumbers] Searching Twilio for ${country_code} (${number_type || 'local'})...`);
+    const results = await searchTwilio(country_code, area_code, limit, number_type).catch(e => {
+      console.warn('[searchNumbers] Twilio threw:', e.message);
+      return null;
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      console.error('[searchNumbers] Twilio error:', data);
-      return Response.json({
-        error: data?.message || 'Failed to search phone numbers',
-        code: data?.code,
-      }, { status: response.status });
+    if (results && results.length > 0) {
+      console.log(`[searchNumbers] Twilio returned ${results.length} numbers`);
+      return Response.json({ success: true, data: results, provider: 'twilio' });
     }
 
-    const numbers = (data.available_phone_numbers || []).map((n) => ({
-      phone_number: n.phone_number,
-      friendly_name: n.friendly_name,
-      locality: n.locality || n.rate_center || '',
-      region: n.region || '',
-      postal_code: n.postal_code || '',
-      iso_country: n.iso_country || country_code,
-      capabilities: {
-        voice: n.capabilities?.voice || false,
-        sms: n.capabilities?.sms || false,
-        mms: n.capabilities?.mms || false,
-        fax: n.capabilities?.fax || false,
-      },
-      beta: n.beta || false,
-      address_requirements: n.address_requirements || 'none',
-    }));
+    console.warn('[searchNumbers] Twilio returned no results');
+    return Response.json({ success: true, data: [], provider: 'twilio' });
 
-    return Response.json({
-      numbers,
-      count: numbers.length,
-      query: { country_code, area_code, contains: containsPattern, number_type, in_region, in_postal_code },
-    });
   } catch (error) {
-    console.error('[searchNumbers] Error:', error);
-    return Response.json({ error: error.message || 'Internal server error' }, { status: 500 });
+    console.error('[searchNumbers] Error:', error.message);
+    return Response.json({ success: false, message: 'Failed to search numbers', error: error.message }, { status: 500 });
   }
 });

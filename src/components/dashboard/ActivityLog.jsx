@@ -1,58 +1,50 @@
-import React, { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
-import { LogIn, Wifi, Settings, Lock, CreditCard, Smartphone, Clock } from 'lucide-react';
+import React from "react";
+import { Phone, MessageSquare, Download, Upload } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
 
 const activityIcons = {
-  login: LogIn,
-  vpn_connect: Wifi,
-  vpn_disconnect: Wifi,
-  settings_updated: Settings,
-  payment: CreditCard,
-  '2fa_enabled': Lock,
-  device_added: Smartphone,
+  call: Phone,
+  sms: MessageSquare,
+  inbound: Download,
+  outbound: Upload,
 };
 
-export default function ActivityLog() {
-  const [activities, setActivities] = useState([]);
-  const [loading, setLoading] = useState(true);
+export default function ActivityLog({ messages = [], maxItems = 8 }) {
+  const recentActivity = messages.slice(0, maxItems);
 
-  useEffect(() => {
-    loadActivities();
-  }, []);
-
-  const loadActivities = async () => {
-    try {
-      const res = await base44.functions.invoke('getActivityLog', {});
-      setActivities(res.data?.activities || []);
-    } catch (err) {
-      console.error('Failed to load activity log:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) return <div className="text-slate-500">Loading activity log...</div>;
+  if (recentActivity.length === 0) {
+    return (
+      <div className="bg-gray-950/60 border border-gray-800/60 rounded-xl p-6">
+        <h3 className="text-white font-bold mb-6">Recent Activity</h3>
+        <p className="text-gray-500 text-center py-8">No activity yet</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-2xl font-bold text-white">Account Activity</h2>
-      <div className="space-y-2">
-        {activities.map((activity, i) => {
-          const Icon = activityIcons[activity.type] || Clock;
+    <div className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-6">
+      <h3 className="text-white font-bold mb-6">Recent Activity</h3>
+      <div className="space-y-4">
+        {recentActivity.map((item, idx) => {
+          const Icon = activityIcons[item.direction] || MessageSquare;
+          const isInbound = item.direction === "inbound";
+          
           return (
-            <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10">
-              <div className="flex-shrink-0 mt-1">
-                <Icon size={18} className="text-cyan-400" />
+            <div key={idx} className="flex items-center gap-4 pb-4 border-b border-gray-800/50 last:border-0 last:pb-0">
+              <div className={`p-2.5 rounded-lg ${isInbound ? "bg-green-500/10" : "bg-blue-500/10"}`}>
+                <Icon className={`w-4 h-4 ${isInbound ? "text-green-400" : "text-blue-400"}`} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-white font-semibold text-sm">{activity.description}</p>
-                <p className="text-slate-500 text-xs">
-                  {activity.device} • IP: {activity.ip}
+                <p className="text-white text-sm font-semibold truncate">
+                  {isInbound ? "Received" : "Sent"}: {item.body || "Message"}
+                </p>
+                <p className="text-gray-500 text-xs">
+                  {item.from_number} → {item.to_number}
                 </p>
               </div>
-              <p className="text-slate-500 text-xs flex-shrink-0">
-                {new Date(activity.timestamp).toLocaleDateString()}
-              </p>
+              <span className="text-gray-600 text-xs whitespace-nowrap">
+                {item.created_date ? formatDistanceToNow(new Date(item.created_date), { addSuffix: true }) : "Now"}
+              </span>
             </div>
           );
         })}

@@ -28,5 +28,4 @@ dist-ssr
 *.sw?
 
 .env
-.vite
 base44/.app.jsonc

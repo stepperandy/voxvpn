@@ -1,0 +1,27 @@
+{
+  "name": "VoxDigits",
+  "short_name": "VoxDigits",
+  "description": "Global Virtual Numbers & eSIM Data Plans",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a1628",
+  "theme_color": "#0d2137",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69b202c06dc5b1988efe9645/452fad501_984d42e9-6e04-4f28-ae7f-79413d1fa755.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69b202c06dc5b1988efe9645/452fad501_984d42e9-6e04-4f28-ae7f-79413d1fa755.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["communication", "utilities"],
+  "lang": "en",
+  "scope": "/"
+}

@@ -1,0 +1,58 @@
+name: Auto Deploy to App Stores
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'src/**'
+      - 'package.json'
+      - 'app.json'
+      - '.github/workflows/deploy-eas.yml'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EAS_TOKEN }}
+
+      - name: Build iOS
+        run: eas build --platform ios --non-interactive
+
+      - name: Build Android
+        run: eas build --platform android --non-interactive
+
+      - name: Submit to App Store Connect (iOS)
+        run: eas submit --platform ios --non-interactive
+        env:
+          EAS_TOKEN: ${{ secrets.EAS_TOKEN }}
+
+      - name: Submit to Google Play (Android)
+        run: eas submit --platform android --non-interactive
+        env:
+          EAS_TOKEN: ${{ secrets.EAS_TOKEN }}
+
+      - name: Notify deployment success
+        if: success()
+        run: echo "✅ iOS & Android builds deployed successfully!"
+
+      - name: Notify deployment failure
+        if: failure()
+        run: echo "❌ Deployment failed - check logs"

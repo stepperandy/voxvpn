@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VoxDigits Backup Dialer</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #0a1628 0%, #1a2847 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      padding: 20px;
+    }
+
+    .container {
+      background: rgba(13, 33, 55, 0.8);
+      border: 1px solid rgba(34, 197, 255, 0.2);
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 14px;
+      margin-bottom: 30px;
+    }
+
+    .status {
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .status.idle {
+      background: rgba(148, 163, 184, 0.1);
+      color: #94a3b8;
+    }
+
+    .status.ready {
+      background: rgba(34, 197, 102, 0.1);
+      color: #22c566;
+    }
+
+    .status.error {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 8px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 16px;
+      font-family: monospace;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: rgba(34, 197, 255, 0.5);
+      background: rgba(34, 197, 255, 0.05);
+    }
+
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    .button-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 12px 16px;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: #22c566;
+      color: #000;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #1fb25f;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: #fff;
+    }
+
+    .btn-danger:hover:not(:disabled) {
+      background: #dc2626;
+    }
+
+    .call-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .call-controls button {
+      padding: 16px;
+      border-radius: 12px;
+    }
+
+    .duration {
+      text-align: center;
+      font-family: monospace;
+      font-size: 20px;
+      font-weight: 600;
+      margin: 15px 0;
+    }
+
+    .error-message {
+      background: rgba(239, 68, 68, 0.1);
+      color: #fca5a5;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      margin-bottom: 20px;
+    }
+
+    .info {
+      background: rgba(34, 197, 255, 0.05);
+      border: 1px solid rgba(34, 197, 255, 0.2);
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.8);
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>VoxDigits Dialer</h1>
+    <p class="subtitle">Backup HTML Dialer</p>
+
+    <div class="status idle" id="status">Initializing...</div>
+
+    <div id="errorMessage" style="display: none;" class="error-message"></div>
+
+    <div class="input-group">
+      <label>Phone Number to Call</label>
+      <input 
+        type="tel" 
+        id="phoneNumber" 
+        placeholder="+1 (555) 123-4567"
+        disabled
+      >
+    </div>
+
+    <div class="button-group">
+      <button id="registerBtn" class="btn-primary" onclick="registerDevice()">
+        Initialize Device
+      </button>
+      <button id="clearBtn" class="btn-secondary" onclick="clearNumber()" disabled>
+        Clear
+      </button>
+    </div>
+
+    <div id="callActive" style="display: none;">
+      <div class="duration" id="duration">00:00</div>
+      <div class="call-controls">
+        <button id="muteBtn" class="btn-secondary" onclick="toggleMute()" disabled>
+          🔊 Mute
+        </button>
+        <button id="hangupBtn" class="btn-danger" onclick="hangup()" disabled>
+          ☎️ Hangup
+        </button>
+      </div>
+      <button id="callBtn" class="btn-primary" style="width: 100%;" onclick="makeCall()" disabled>
+        📞 Call
+      </button>
+    </div>
+
+    <div class="info">
+      ℹ️ This is a backup dialer. Use the main app for full features. Make sure microphone permissions are enabled.
+    </div>
+  </div>
+
+  <script src="https://sdk.twilio.com/js/voice/releases/2.10.0/twilio.min.js"></script>
+  <script>
+    let device = null;
+    let activeCall = null;
+    let callDuration = 0;
+    let callTimer = null;
+
+    function setStatus(text, type = 'idle') {
+      const statusEl = document.getElementById('status');
+      statusEl.textContent = text;
+      statusEl.className = `status ${type}`;
+    }
+
+    function showError(msg) {
+      const errorEl = document.getElementById('errorMessage');
+      errorEl.textContent = msg;
+      errorEl.style.display = 'block';
+      setStatus('Error: ' + msg, 'error');
+    }
+
+    function hideError() {
+      document.getElementById('errorMessage').style.display = 'none';
+    }
+
+    async function registerDevice() {
+      try {
+        hideError();
+        setStatus('Requesting microphone...', 'idle');
+
+        await navigator.mediaDevices.getUserMedia({ audio: true });
+
+        setStatus('Fetching token...', 'idle');
+        const res = await fetch('/functions/getTwilioToken');
+        const data = await res.json();
+
+        if (!data.token) {
+          throw new Error(data.error || 'No token returned');
+        }
+
+        setStatus('Registering device...', 'idle');
+        device = new Twilio.Device(data.token, { logLevel: 1 });
+
+        device.on('registered', () => {
+          setStatus('Ready', 'ready');
+          document.getElementById('phoneNumber').disabled = false;
+          document.getElementById('clearBtn').disabled = false;
+          document.getElementById('callBtn').disabled = false;
+          document.getElementById('registerBtn').disabled = true;
+          document.getElementById('callActive').style.display = 'block';
+        });
+
+        device.on('incoming', (call) => {
+          activeCall = call;
+          setStatus('Incoming call...', 'idle');
+          call.accept();
+          startCallTimer();
+        });
+
+        device.on('error', (err) => {
+          showError(err.message || 'Device error');
+        });
+
+        await device.register();
+      } catch (err) {
+        showError(err.message);
+      }
+    }
+
+    async function makeCall() {
+      if (!device) {
+        showError('Device not ready');
+        return;
+      }
+
+      const number = document.getElementById('phoneNumber').value.trim();
+      if (!number) {
+        showError('Enter a phone number');
+        return;
+      }
+
+      try {
+        hideError();
+        setStatus('Calling...', 'idle');
+        document.getElementById('callBtn').disabled = true;
+
+        activeCall = await device.connect({
+          params: { To: number }
+        });
+
+        setStatus('Connected', 'ready');
+        startCallTimer();
+
+        activeCall.on('disconnect', () => {
+          setStatus('Ready', 'ready');
+          stopCallTimer();
+          activeCall = null;
+          document.getElementById('callBtn').disabled = false;
+        });
+
+        activeCall.on('error', (err) => {
+          showError(err.message);
+          document.getElementById('callBtn').disabled = false;
+        });
+      } catch (err) {
+        showError(err.message);
+        document.getElementById('callBtn').disabled = false;
+      }
+    }
+
+    function hangup() {
+      if (activeCall) {
+        activeCall.disconnect();
+        stopCallTimer();
+      }
+    }
+
+    function toggleMute() {
+      if (!activeCall) return;
+      const btn = document.getElementById('muteBtn');
+      const isMuted = btn.textContent.includes('Unmute');
+      activeCall.mute(!isMuted);
+      btn.textContent = isMuted ? '🔊 Mute' : '🔇 Unmute';
+    }
+
+    function clearNumber() {
+      document.getElementById('phoneNumber').value = '';
+    }
+
+    function startCallTimer() {
+      callDuration = 0;
+      callTimer = setInterval(() => {
+        callDuration++;
+        const min = Math.floor(callDuration / 60).toString().padStart(2, '0');
+        const sec = (callDuration % 60).toString().padStart(2, '0');
+        document.getElementById('duration').textContent = `${min}:${sec}`;
+      }, 1000);
+      document.getElementById('muteBtn').disabled = false;
+      document.getElementById('hangupBtn').disabled = false;
+    }
+
+    function stopCallTimer() {
+      if (callTimer) clearInterval(callTimer);
+      document.getElementById('muteBtn').disabled = true;
+      document.getElementById('hangupBtn').disabled = true;
+      document.getElementById('muteBtn').textContent = '🔊 Mute';
+    }
+
+    setStatus('Click "Initialize Device" to start', 'idle');
+  </script>
+</body>
+</html>

@@ -1,232 +1,153 @@
-import { Link } from 'react-router-dom';
-import Navbar from '@/components/landing/Navbar';
-import Footer from '@/components/landing/Footer';
+import React from "react";
+import { Link } from "react-router-dom";
+import { ArrowLeft, Calendar, Clock, ChevronRight } from "lucide-react";
 
-const posts = [
+const ARTICLES = [
   {
-    slug: 'what-is-a-vpn-and-why-you-need-one',
-    category: 'Beginner Guide',
-    title: 'What Is a VPN and Why You Need One in 2026',
-    excerpt: 'VPNs are no longer just for tech experts. Learn how a VPN protects your privacy, encrypts your traffic, and lets you access content from anywhere.',
-    date: 'April 28, 2026',
-    readTime: '5 min read',
-    emoji: '🔒',
+    title: "Why Use a Virtual Phone Number? 10 Benefits for Businesses",
+    category: "Virtual Numbers",
+    date: "Jul 5, 2026",
+    readTime: "5 min",
+    excerpt: "Virtual phone numbers offer flexibility, privacy, and cost savings. Here's why every business should consider using one for their communication needs.",
   },
   {
-    slug: 'best-vpn-for-streaming',
-    category: 'Streaming',
-    title: 'Best VPN for Streaming Netflix, Disney+, and More in 2026',
-    excerpt: 'Geo-restrictions block your favorite shows. We break down which VPN servers work best for Netflix, Disney+, Hulu, BBC iPlayer, and HBO Max.',
-    date: 'April 25, 2026',
-    readTime: '7 min read',
-    emoji: '🎬',
+    title: "Public Wi-Fi Security: How to Stay Safe on Untrusted Networks",
+    category: "Security",
+    date: "Jul 2, 2026",
+    readTime: "7 min",
+    excerpt: "Public Wi-Fi is convenient but risky. Learn the risks and discover practical steps to protect your data when connecting to untrusted networks.",
   },
   {
-    slug: 'vpn-for-remote-work',
-    category: 'Business',
-    title: 'Why Every Remote Worker Needs a VPN in 2026',
-    excerpt: 'Working from coffee shops, hotels, or home? Public Wi-Fi is a hacker\'s playground. Here\'s how a VPN keeps your company data safe.',
-    date: 'April 22, 2026',
-    readTime: '6 min read',
-    emoji: '💼',
+    title: "What Is AES-256 Encryption? A Beginner's Guide",
+    category: "Security",
+    date: "Jun 28, 2026",
+    readTime: "6 min",
+    excerpt: "AES-256 is the gold standard for encryption, used by banks and governments. Here's a simple explanation of how it works and why it matters.",
   },
   {
-    slug: 'wireguard-vs-openvpn',
-    category: 'Technology',
-    title: 'WireGuard vs OpenVPN: Which Protocol Is Better?',
-    excerpt: 'WireGuard is the new kid on the block, but OpenVPN has years of battle-testing. We compare speed, security, and compatibility.',
-    date: 'April 18, 2026',
-    readTime: '8 min read',
-    emoji: '⚡',
+    title: "OpenVPN vs WireGuard: Which Protocol Should You Use?",
+    category: "Security",
+    date: "Jun 25, 2026",
+    readTime: "8 min",
+    excerpt: "Both OpenVPN and WireGuard are popular VPN protocols, but they have different strengths. We compare speed, security, and use cases.",
   },
   {
-    slug: 'how-to-bypass-censorship',
-    category: 'Privacy',
-    title: 'How to Bypass Internet Censorship with a VPN',
-    excerpt: 'Traveling to a country with heavy internet censorship? A VPN can help you access blocked sites and maintain your online freedom.',
-    date: 'April 15, 2026',
-    readTime: '6 min read',
-    emoji: '🌐',
+    title: "Online Privacy in 2026: What's Changed and What Hasn't",
+    category: "Privacy",
+    date: "Jun 20, 2026",
+    readTime: "10 min",
+    excerpt: "Privacy regulations have evolved, but so have threats. Here's the state of online privacy in 2026 and what you can do to protect yourself.",
   },
   {
-    slug: 'vpn-kill-switch-explained',
-    category: 'Features',
-    title: 'VPN Kill Switch Explained: Why It Matters for Your Privacy',
-    excerpt: 'If your VPN drops unexpectedly, your real IP gets exposed. A kill switch prevents that. Here\'s everything you need to know.',
-    date: 'April 10, 2026',
-    readTime: '4 min read',
-    emoji: '🛡️',
+    title: "Streaming with a VPN: Unlock Global Content Safely",
+    category: "Guides",
+    date: "Jun 15, 2026",
+    readTime: "6 min",
+    excerpt: "Geo-restrictions limit what you can watch. Learn how a VPN lets you access global streaming libraries while keeping your connection secure.",
   },
   {
-    slug: 'best-vpn-for-gaming',
-    category: 'Gaming',
-    title: 'Best VPN for Gaming: Reduce Lag, Block DDoS, and More',
-    excerpt: 'A VPN can actually improve your gaming experience by reducing lag on some routes, stopping DDoS attacks, and letting you access region-locked games.',
-    date: 'April 6, 2026',
-    readTime: '5 min read',
-    emoji: '🎮',
+    title: "Remote Work Security: Best Practices for Distributed Teams",
+    category: "Business",
+    date: "Jun 10, 2026",
+    readTime: "9 min",
+    excerpt: "Remote work introduces unique security challenges. From secure connections to device management, here's how to keep your team safe.",
   },
   {
-    slug: 'dns-leak-test-guide',
-    category: 'Security',
-    title: 'DNS Leak Test: Is Your VPN Actually Protecting You?',
-    excerpt: 'Many VPN users don\'t realize their DNS queries are leaking outside the VPN tunnel. Here\'s how to test for leaks and fix them.',
-    date: 'April 1, 2026',
-    readTime: '5 min read',
-    emoji: '🕵️',
+    title: "DNS Leak Protection Explained: Why It Matters",
+    category: "Security",
+    date: "Jun 5, 2026",
+    readTime: "5 min",
+    excerpt: "DNS leaks can expose your browsing activity even when using a VPN. Learn what DNS leaks are and how to prevent them.",
   },
   {
-    slug: 'vpn-for-torrenting',
-    category: 'Torrenting',
-    title: 'How to Torrent Safely and Anonymously with a VPN',
-    excerpt: 'Torrenting without a VPN puts you at risk of DMCA notices, ISP throttling, and data surveillance. Here\'s how to stay anonymous.',
-    date: 'March 28, 2026',
-    readTime: '6 min read',
-    emoji: '⬇️',
+    title: "Kill Switch Explained: Your Last Line of Defense",
+    category: "Security",
+    date: "Jun 1, 2026",
+    readTime: "4 min",
+    excerpt: "A VPN kill switch blocks all internet traffic if your VPN connection drops. Here's why this feature is essential for your privacy.",
   },
   {
-    slug: 'aes-256-encryption-explained',
-    category: 'Security',
-    title: 'AES-256 Encryption: The Military-Grade Standard Explained',
-    excerpt: 'AES-256 is used by governments, banks, and VPNs worldwide. But what does it actually mean? We break it down in plain English.',
-    date: 'March 24, 2026',
-    readTime: '5 min read',
-    emoji: '🔐',
-  },
-  {
-    slug: 'vpn-for-travel',
-    category: 'Travel',
-    title: 'VPN for Travel: Stay Safe on Hotel and Airport Wi-Fi',
-    excerpt: 'Hotel and airport Wi-Fi networks are notoriously insecure. A VPN encrypts your connection and keeps hackers out while you travel.',
-    date: 'March 20, 2026',
-    readTime: '4 min read',
-    emoji: '✈️',
-  },
-  {
-    slug: 'no-logs-vpn-explained',
-    category: 'Privacy',
-    title: 'No-Logs VPN: What It Means and Why It Matters',
-    excerpt: 'Not all VPNs are created equal. A true no-logs policy means your provider has nothing to hand over to authorities — even if asked.',
-    date: 'March 15, 2026',
-    readTime: '5 min read',
-    emoji: '📋',
-  },
-  {
-    slug: 'public-wifi-security-guide',
-    category: 'Security',
-    title: 'Public Wi-Fi Security: How to Stay Safe on Untrusted Networks',
-    excerpt: 'Coffee shops, airports, hotels — public Wi-Fi is everywhere, and so are the risks. Learn how to protect yourself on any network.',
-    date: 'March 10, 2026',
-    readTime: '6 min read',
-    emoji: '📡',
-  },
-  {
-    slug: 'online-privacy-2026',
-    category: 'Privacy',
-    title: 'Online Privacy in 2026: What\'s Changed and What You Need to Know',
-    excerpt: 'From new data laws to AI-powered surveillance, privacy landscape is shifting fast. Here\'s what matters most in 2026.',
-    date: 'March 5, 2026',
-    readTime: '7 min read',
-    emoji: '👁️',
-  },
-  {
-    slug: 'choosing-the-right-vpn',
-    category: 'Beginner Guide',
-    title: 'How to Choose the Right VPN: 10 Questions to Ask Before You Buy',
-    excerpt: 'Not sure which VPN to trust? Use this checklist of 10 critical questions to evaluate any VPN provider before signing up.',
-    date: 'February 28, 2026',
-    readTime: '8 min read',
-    emoji: '✅',
-  },
-  {
-    slug: 'remote-work-security-best-practices',
-    category: 'Business',
-    title: 'Remote Work Security: Best Practices for Teams and Individuals',
-    excerpt: 'Remote work is here to stay. Here\'s how to secure your home office, protect company data, and avoid common security pitfalls.',
-    date: 'February 20, 2026',
-    readTime: '7 min read',
-    emoji: '🏠',
+    title: "Choosing a VPN: 10 Questions to Ask Before You Buy",
+    category: "Guides",
+    date: "May 28, 2026",
+    readTime: "8 min",
+    excerpt: "Not all VPNs are created equal. Before you commit, ask these 10 critical questions about logging, speed, jurisdiction, and transparency.",
   },
 ];
 
-const categoryColors = {
-  'Beginner Guide': 'bg-emerald-500/10 text-emerald-400',
-  'Streaming': 'bg-purple-500/10 text-purple-400',
-  'Business': 'bg-blue-500/10 text-blue-400',
-  'Technology': 'bg-orange-500/10 text-orange-400',
-  'Privacy': 'bg-cyan-500/10 text-cyan-400',
-  'Features': 'bg-violet-500/10 text-violet-400',
-  'Gaming': 'bg-red-500/10 text-red-400',
-  'Security': 'bg-yellow-500/10 text-yellow-400',
-  'Torrenting': 'bg-slate-500/10 text-slate-400',
-  'Travel': 'bg-pink-500/10 text-pink-400',
-};
-
 export default function Blog() {
-  const [featured, ...rest] = posts;
-
   return (
-    <div className="min-h-screen bg-[#080c18]">
-      <Navbar />
-      <div className="pt-28 pb-20 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+    <div className="min-h-screen bg-[#060f1a] text-white">
+      <div className="max-w-5xl mx-auto px-6 pt-8">
+        <Link to="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm mb-8">
+          <ArrowLeft className="w-4 h-4" /> Back to Home
+        </Link>
+      </div>
 
-        {/* Header */}
-        <div className="text-center mb-14">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/5 text-cyan-400 text-xs font-medium mb-4">
-            📝 VoxVPN Blog
-          </div>
-          <h1 className="text-4xl sm:text-5xl font-black text-white mb-4">
-            Privacy Guides & VPN <span className="text-cyan-400">Insights</span>
+      {/* Hero */}
+      <section className="relative overflow-hidden py-16 px-6">
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-transparent to-blue-600/10 pointer-events-none" />
+        <div className="max-w-4xl mx-auto text-center relative">
+          <h1 className="text-4xl md:text-5xl font-extrabold leading-tight mb-6">
+            The <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">VoxDigits Blog</span>
           </h1>
-          <p className="text-slate-400 text-base max-w-xl mx-auto">
-            Expert guides on VPN technology, online privacy, cybersecurity, and staying safe in a digital world.
+          <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">
+            Insights, guides, and news on privacy, security, virtual numbers, and global communication.
           </p>
         </div>
+      </section>
 
-        {/* Featured post */}
-        <Link to={`/blog/${featured.slug}`} className="block mb-12 group">
-          <div className="rounded-2xl border border-white/5 bg-gradient-to-br from-[#0d1a20] to-[#0a1020] p-8 md:p-10 hover:border-cyan-500/20 transition-all">
-            <div className="flex items-center gap-3 mb-4">
-              <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${categoryColors[featured.category] || 'bg-slate-500/10 text-slate-400'}`}>
-                {featured.category}
-              </span>
-              <span className="text-slate-600 text-xs">Featured</span>
-            </div>
-            <div className="flex items-start gap-4">
-              <span className="text-5xl">{featured.emoji}</span>
-              <div>
-                <h2 className="text-2xl md:text-3xl font-bold text-white mb-3 group-hover:text-cyan-400 transition-colors">{featured.title}</h2>
-                <p className="text-slate-400 text-sm leading-relaxed mb-4">{featured.excerpt}</p>
-                <div className="flex items-center gap-4 text-xs text-slate-600">
-                  <span>{featured.date}</span>
-                  <span>·</span>
-                  <span>{featured.readTime}</span>
-                </div>
+      {/* Articles */}
+      <section className="py-12 px-6">
+        <div className="max-w-5xl mx-auto">
+          {/* Featured Article */}
+          <div className="mb-12 rounded-2xl border border-white/10 bg-gradient-to-br from-cyan-500/5 to-blue-500/5 overflow-hidden">
+            <div className="p-8 md:p-10">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-cyan-500/15 text-cyan-400 border border-cyan-500/20">Featured</span>
+                <span className="text-xs text-gray-500">{ARTICLES[0].category}</span>
               </div>
+              <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">{ARTICLES[0].title}</h2>
+              <p className="text-gray-400 leading-relaxed mb-4">{ARTICLES[0].excerpt}</p>
+              <div className="flex items-center gap-4 text-xs text-gray-500 mb-6">
+                <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> {ARTICLES[0].date}</span>
+                <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {ARTICLES[0].readTime} read</span>
+              </div>
+              <button className="inline-flex items-center gap-1 text-cyan-400 hover:text-cyan-300 font-semibold text-sm">
+                Read Article <ChevronRight className="w-4 h-4" />
+              </button>
             </div>
           </div>
-        </Link>
 
-        {/* Post grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {rest.map((post) => (
-            <Link key={post.slug} to={`/blog/${post.slug}`} className="group block rounded-2xl border border-white/5 bg-[#0d1120] p-6 hover:border-cyan-500/20 transition-all">
-              <span className="text-3xl mb-4 block">{post.emoji}</span>
-              <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${categoryColors[post.category] || 'bg-slate-500/10 text-slate-400'}`}>
-                {post.category}
-              </span>
-              <h3 className="text-white font-bold text-base mt-3 mb-2 group-hover:text-cyan-400 transition-colors leading-snug">{post.title}</h3>
-              <p className="text-slate-500 text-xs leading-relaxed mb-4">{post.excerpt}</p>
-              <div className="flex items-center gap-3 text-xs text-slate-600">
-                <span>{post.date}</span>
-                <span>·</span>
-                <span>{post.readTime}</span>
+          {/* Article Grid */}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {ARTICLES.slice(1).map(article => (
+              <div key={article.title} className="p-6 rounded-2xl border border-white/10 bg-white/[0.03] hover:border-cyan-500/30 transition-colors cursor-pointer">
+                <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-cyan-500/10 text-cyan-400 mb-3">
+                  {article.category}
+                </span>
+                <h3 className="font-semibold text-white text-sm mb-2 leading-snug">{article.title}</h3>
+                <p className="text-gray-500 text-xs leading-relaxed mb-4 line-clamp-3">{article.excerpt}</p>
+                <div className="flex items-center gap-3 text-xs text-gray-600">
+                  <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {article.date}</span>
+                  <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {article.readTime}</span>
+                </div>
               </div>
-            </Link>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
-      <Footer />
+      </section>
+
+      {/* Newsletter CTA */}
+      <section className="py-16 px-6 bg-white/[0.02] border-t border-white/5">
+        <div className="max-w-2xl mx-auto text-center">
+          <h2 className="text-2xl font-bold mb-4">Stay Updated</h2>
+          <p className="text-gray-400 mb-6">Subscribe to get the latest articles and updates from VoxDigits.</p>
+          <Link to="/Contact" className="inline-flex items-center gap-2 px-6 py-3 bg-cyan-500 hover:bg-cyan-400 text-gray-950 font-bold rounded-xl transition-colors">
+            Subscribe
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }

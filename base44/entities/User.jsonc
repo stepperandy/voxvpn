@@ -2,97 +2,47 @@
   "name": "User",
   "type": "object",
   "properties": {
-    "role": {
+    "identity": {
       "type": "string",
-      "description": "The role of the user in the app",
-      "enum": [
-        "super_admin",
-        "agency_admin",
-        "client_admin",
-        "team_member",
-        "admin",
-        "user"
-      ],
-      "default": "user"
+      "description": "Twilio Voice identity (sanitized email)"
     },
-    "agency_id": {
+    "primaryNumber": {
       "type": "string",
-      "description": "Reference to the Agency this user belongs to (agency_admin, client_admin, team_member)"
+      "description": "Primary virtual number for outbound calls"
     },
-    "client_id": {
-      "type": "string",
-      "description": "Reference to the Client this user belongs to (client_admin, team_member)"
-    },
-    "phone": {
-      "type": "string",
-      "description": "Phone number"
-    },
-    "job_title": {
-      "type": "string",
-      "description": "Job title or role description"
-    },
-    "is_active": {
+    "activated": {
       "type": "boolean",
-      "default": true,
-      "description": "Whether this user account is active"
+      "description": "Whether the user account has been activated by an admin",
+      "default": true
     },
-    "last_login": {
+    "bypass_verification": {
+      "type": "boolean",
+      "description": "If true, admin has granted this user permission to skip email verification",
+      "default": false
+    },
+    "credits": {
+      "type": "number",
+      "description": "Service credit balance in USD",
+      "default": 0
+    },
+    "stripe_customer_id": {
       "type": "string",
-      "format": "date-time",
-      "description": "Last login timestamp"
+      "description": "Stripe customer ID for saved payment methods"
+    },
+    "auto_recharge_enabled": {
+      "type": "boolean",
+      "description": "Whether auto-recharge is enabled",
+      "default": false
+    },
+    "auto_recharge_amount": {
+      "type": "number",
+      "description": "Amount to auto-recharge when balance drops below $2",
+      "default": 25
+    },
+    "referral_code": {
+      "type": "string",
+      "description": "Unique referral code for the user"
     }
   },
-  "required": [
-    "role"
-  ],
-  "rls": {
-    "read": {
-      "$or": [
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        },
-        {
-          "user_condition": {
-            "role": "super_admin"
-          }
-        },
-        {
-          "data.id": "{{user.id}}"
-        }
-      ]
-    },
-    "update": {
-      "$or": [
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        },
-        {
-          "user_condition": {
-            "role": "super_admin"
-          }
-        },
-        {
-          "data.id": "{{user.id}}"
-        }
-      ]
-    },
-    "delete": {
-      "$or": [
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        },
-        {
-          "user_condition": {
-            "role": "super_admin"
-          }
-        }
-      ]
-    }
-  }
+  "required": []
 }

@@ -1,109 +1,108 @@
-import Navbar from '@/components/landing/Navbar.jsx';
-import Footer from '@/components/landing/Footer.jsx';
-import { motion } from 'framer-motion';
-import { Briefcase, MapPin, Clock, ArrowRight, Heart, Zap, Globe, Shield, Mail } from 'lucide-react';
+import React from "react";
+import { Link } from "react-router-dom";
+import { ArrowLeft, Briefcase, MapPin, Clock, Heart, Zap, Globe, Users } from "lucide-react";
 
-const OPEN_ROLES = [
-  { title: 'Senior Backend Engineer', dept: 'Engineering', location: 'Remote', type: 'Full-time' },
-  { title: 'Mobile Developer (Android/iOS)', dept: 'Engineering', location: 'Remote', type: 'Full-time' },
-  { title: 'Security Researcher', dept: 'Security', location: 'Remote', type: 'Full-time' },
-  { title: 'Customer Success Specialist', dept: 'Support', location: 'Remote', type: 'Full-time' },
-  { title: 'Growth Marketing Manager', dept: 'Marketing', location: 'Remote', type: 'Full-time' },
-  { title: 'DevOps Engineer', dept: 'Infrastructure', location: 'Remote', type: 'Full-time' },
+const POSITIONS = [
+  { title: "Senior Backend Engineer (Node.js/Deno)", dept: "Engineering", location: "Remote (Global)", type: "Full-time" },
+  { title: "Mobile App Developer (React Native)", dept: "Engineering", location: "Remote (Global)", type: "Full-time" },
+  { title: "DevOps / Infrastructure Engineer", dept: "Engineering", location: "Remote (Global)", type: "Full-time" },
+  { title: "Telecom Integration Specialist", dept: "Product", location: "Remote (EU/US)", type: "Full-time" },
+  { title: "Customer Success Manager", dept: "Support", location: "Remote (Global)", type: "Full-time" },
+  { title: "Digital Marketing Specialist", dept: "Marketing", location: "Remote (Global)", type: "Contract" },
 ];
 
-const VALUES = [
-  { icon: Shield, title: 'Privacy First', desc: 'We build everything with user privacy as the non-negotiable foundation.' },
-  { icon: Zap, title: 'Move Fast', desc: 'We ship quickly, iterate based on user feedback, and never stop improving.' },
-  { icon: Globe, title: 'Global Impact', desc: 'Our work protects millions of users across 60+ countries every day.' },
-  { icon: Heart, title: 'User Obsessed', desc: 'Every decision starts with what is best for the people who trust us.' },
+const CULTURE = [
+  { icon: Globe, title: "100% Remote", desc: "Work from anywhere in the world. We are a fully distributed team across multiple time zones." },
+  { icon: Zap, title: "Fast-Paced & Autonomous", desc: "We move quickly and trust our team to make decisions. You'll have real ownership from day one." },
+  { icon: Heart, title: "Work-Life Balance", desc: "Flexible hours, unlimited PTO, and a culture that respects your personal time and wellbeing." },
+  { icon: Users, title: "Collaborative & Inclusive", desc: "Diverse team from 15+ countries. We value different perspectives and create an inclusive environment." },
 ];
 
 export default function Careers() {
   return (
-    <div className="bg-[#080c18] min-h-screen">
-      <Navbar />
-      <div className="pt-36 pb-20 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-6"
-            style={{ background: 'rgba(0,212,255,0.08)', border: '1px solid rgba(0,212,255,0.2)' }}>
-            <Briefcase size={28} className="text-cyan-400" />
+    <div className="min-h-screen bg-[#060f1a] text-white">
+      <div className="max-w-5xl mx-auto px-6 pt-8">
+        <Link to="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm mb-8">
+          <ArrowLeft className="w-4 h-4" /> Back to Home
+        </Link>
+      </div>
+
+      {/* Hero */}
+      <section className="relative overflow-hidden py-16 px-6">
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-transparent to-blue-600/10 pointer-events-none" />
+        <div className="max-w-4xl mx-auto text-center relative">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 mb-6">
+            <Briefcase className="w-3.5 h-3.5" /> Careers
           </div>
-          <h1 className="text-4xl sm:text-5xl font-black text-white mb-4">Join <span className="text-cyan-400">VoxVPN</span></h1>
-          <p className="text-slate-400 text-lg max-w-2xl mx-auto">Help us build a more private, secure, and open internet. We're a fully remote team passionate about protecting digital freedom.</p>
-        </motion.div>
-
-        {/* Values */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12">
-          {VALUES.map((val, i) => {
-            const Icon = val.icon;
-            return (
-              <motion.div key={i} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
-                className="p-6 rounded-2xl border border-white/5 bg-[#0d1120]">
-                <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mb-4">
-                  <Icon size={18} className="text-cyan-400" />
-                </div>
-                <h3 className="text-white font-bold text-base mb-2">{val.title}</h3>
-                <p className="text-slate-400 text-sm leading-relaxed">{val.desc}</p>
-              </motion.div>
-            );
-          })}
+          <h1 className="text-4xl md:text-5xl font-extrabold leading-tight mb-6">
+            Build the Future of <br />
+            <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Global Communication</span>
+          </h1>
+          <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">
+            Join a fully remote team building telecom infrastructure that connects people across borders. We're looking for passionate people who want to make global communication accessible to everyone.
+          </p>
         </div>
+      </section>
 
-        {/* Benefits */}
-        <div className="rounded-2xl border border-white/5 bg-[#0d1120] p-8 mb-12">
-          <h2 className="text-white font-bold text-lg mb-6">Benefits & Perks</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {[
-              'Fully remote — work from anywhere',
-              'Competitive salary & equity',
-              'Flexible working hours',
-              'Unlimited PTO policy',
-              'Health, dental & vision insurance',
-              'Home office stipend',
-              'Annual learning & development budget',
-              'Conference attendance support',
-            ].map((benefit, i) => (
-              <div key={i} className="flex items-center gap-2 text-slate-400 text-sm">
-                <span className="text-cyan-400">✓</span>
-                <span>{benefit}</span>
+      {/* Culture */}
+      <section className="py-12 px-6">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-2xl font-bold text-center mb-12">Our Culture</h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {CULTURE.map(({ icon: Icon, title, desc }) => (
+              <div key={title} className="p-6 rounded-2xl border border-white/10 bg-white/[0.03]">
+                <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mb-4">
+                  <Icon className="w-5 h-5 text-cyan-400" />
+                </div>
+                <h3 className="font-semibold text-white mb-2 text-sm">{title}</h3>
+                <p className="text-gray-500 text-xs leading-relaxed">{desc}</p>
               </div>
             ))}
           </div>
         </div>
+      </section>
 
-        {/* Open roles */}
-        <div className="mb-8">
-          <h2 className="text-white font-bold text-xl mb-6">Open Positions</h2>
+      {/* Open Positions */}
+      <section className="py-12 px-6 bg-white/[0.02] border-y border-white/5">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold mb-2">Open Positions</h2>
+          <p className="text-gray-500 text-sm mb-8">All positions are remote unless otherwise noted.</p>
           <div className="space-y-3">
-            {OPEN_ROLES.map((role, i) => (
-              <motion.a key={i} href={`mailto:info@voxdigits.com?subject=Application: ${role.title}`}
-                initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
-                className="flex items-center justify-between p-5 rounded-xl border border-white/5 bg-[#0d1120] hover:border-cyan-500/20 transition-all group">
-                <div className="min-w-0">
-                  <h3 className="text-white font-semibold text-sm mb-1">{role.title}</h3>
-                  <div className="flex items-center gap-3 text-xs text-slate-500 flex-wrap">
-                    <span>{role.dept}</span>
-                    <span className="flex items-center gap-1"><MapPin size={10} /> {role.location}</span>
-                    <span className="flex items-center gap-1"><Clock size={10} /> {role.type}</span>
+            {POSITIONS.map(pos => (
+              <a
+                key={pos.title}
+                href="mailto:careers@voxtelefony.com"
+                className="block p-5 rounded-xl border border-white/10 bg-white/[0.03] hover:border-cyan-500/30 transition-colors"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <h3 className="font-semibold text-white text-sm mb-1">{pos.title}</h3>
+                    <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
+                      <span className="text-cyan-400">{pos.dept}</span>
+                      <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {pos.location}</span>
+                      <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {pos.type}</span>
+                    </div>
                   </div>
+                  <span className="text-xs text-cyan-400 font-semibold whitespace-nowrap">Apply →</span>
                 </div>
-                <ArrowRight size={16} className="text-slate-600 group-hover:text-cyan-400 transition-colors flex-shrink-0" />
-              </motion.a>
+              </a>
             ))}
           </div>
         </div>
+      </section>
 
-        {/* CTA */}
-        <div className="rounded-2xl p-8 text-center" style={{ background: 'linear-gradient(135deg, rgba(0,212,255,0.08), rgba(0,212,255,0.02))', border: '1px solid rgba(0,212,255,0.2)' }}>
-          <h3 className="text-white font-bold text-lg mb-2">Don't see the right role?</h3>
-          <p className="text-slate-400 text-sm mb-6">Send us your resume and tell us how you'd like to contribute. We're always looking for exceptional talent.</p>
-          <a href="mailto:info@voxdigits.com" className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-black font-bold transition-all text-sm">
-            <Mail size={16} /> info@voxdigits.com
-          </a>
+      {/* CTA */}
+      <section className="py-16 px-6">
+        <div className="max-w-2xl mx-auto text-center">
+          <h2 className="text-2xl font-bold mb-4">Don't See Your Role?</h2>
+          <p className="text-gray-400 mb-8">
+            We're always looking for talented people. Send your CV to <a href="mailto:careers@voxtelefony.com" className="text-cyan-400 hover:text-cyan-300">careers@voxtelefony.com</a> and tell us how you'd contribute to VoxDigits.
+          </p>
+          <Link to="/Company" className="inline-flex items-center gap-2 px-6 py-3 bg-cyan-500 hover:bg-cyan-400 text-gray-950 font-bold rounded-xl transition-colors">
+            Learn More About Us
+          </Link>
         </div>
-      </div>
-      <Footer />
+      </section>
     </div>
   );
 }

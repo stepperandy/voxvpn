@@ -1,18 +1,55 @@
+# VoxDigits — robots.txt
+# Allow crawling of public/marketing pages, block private app/dashboard pages
+
 User-agent: *
 Allow: /
-Disallow: /admin
-Disallow: /customer-dashboard
-Disallow: /dashboard
-Disallow: /vpn-dashboard
-Disallow: /account-settings
-Disallow: /profile
-Disallow: /renew
-Disallow: /affiliate-dashboard
-Disallow: /referral-dashboard
-Disallow: /app
-Disallow: /play-review
-Disallow: /review
-Disallow: /payment-success
-Disallow: /payment-failed
 
-Sitemap: https://voxvpn.net/sitemap.xml
+# Private/app-only pages — no SEO value, require auth
+Disallow: /AdminPanel
+Disallow: /AdminMarketing
+Disallow: /AdminCallLogs
+Disallow: /AdminNumberRouting
+Disallow: /AdminWebhookConfig
+Disallow: /AdminIOSSettings
+Disallow: /AdminAndroidSettings
+Disallow: /AdminTickets
+Disallow: /Dashboard
+Disallow: /Dialer
+Disallow: /SMSInbox
+Disallow: /Inbox
+Disallow: /Contacts
+Disallow: /Preferences
+Disallow: /Settings
+Disallow: /Billing
+Disallow: /BuyCredits
+Disallow: /Credits
+Disallow: /ESimDashboard
+Disallow: /ServicesDashboard
+Disallow: /SubscriptionManager
+Disallow: /UsageDashboard
+Disallow: /CallForwarding
+Disallow: /NumberSettings
+Disallow: /DeleteAccount
+Disallow: /KYCVerification
+Disallow: /WalletTransactions
+Disallow: /LoyaltyProgram
+Disallow: /MultiMessenger
+Disallow: /ReferralDashboard
+Disallow: /SupportTickets
+Disallow: /UserTickets
+Disallow: /PortingRequest
+Disallow: /PhoneNumberPorting
+Disallow: /ClientOnboarding
+Disallow: /ResellerDashboard
+Disallow: /ChatSupport
+Disallow: /AIAssistant
+Disallow: /TermsAgreement
+Disallow: /Account
+Disallow: /Numbers
+Disallow: /Messages
+Disallow: /eSIM
+Disallow: /esim
+Disallow: /Usage
+
+# Sitemap
+Sitemap: https://voxtelefony.com/sitemap.xml
