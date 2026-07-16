@@ -18,6 +18,7 @@ export default function BusinessLayout({ activeTab, onTabChange, children }) {
   const location = useLocation();
   const [user, setUser] = useState(null);
   const [client, setClient] = useState(null);
+  const [hasActiveSubscription, setHasActiveSubscription] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -28,13 +29,13 @@ export default function BusinessLayout({ activeTab, onTabChange, children }) {
         navigate('/business'); return;
       }
       setUser(u);
-      // Fetch client info
-      if (u.client_id) {
-        try {
-          const res = await base44.functions.invoke('getTeamData', {});
-          if (res.data?.client) setClient(res.data.client);
-        } catch { /* non-fatal */ }
-      }
+      // Fetch client info + subscription status
+      try {
+        const res = await base44.functions.invoke('getTeamData', {});
+        if (res.data?.client) setClient(res.data.client);
+        // Payment must be confirmed (active subscription) before installer access
+        setHasActiveSubscription((res.data?.subscriptions || []).some(s => s.status === 'active'));
+      } catch { /* non-fatal */ }
       setLoading(false);
     }).catch(() => navigate('/auth-login?next=/business/dashboard'));
   }, []);
@@ -67,7 +68,11 @@ export default function BusinessLayout({ activeTab, onTabChange, children }) {
         </div>
 
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {navItems.map(item => {
+          {navItems.filter(item => {
+            // Hide the Installer tab until payment is confirmed (admins always see it)
+            if (item.tab === 'installer' && !hasActiveSubscription && user?.role !== 'admin' && user?.role !== 'super_admin') return false;
+            return true;
+          }).map(item => {
             const Icon = item.icon;
             const active = activeTab === item.tab;
             return (

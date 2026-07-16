@@ -39,9 +39,9 @@ export default function InstallerTab({ client, subscriptions }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const detectedPlatform = detectPlatform();
 
-  // Downloads are unlocked only once the business has an active (paid) subscription.
-  // Trial / pending_payment / no subscription = locked behind a subscribe CTA.
-  const hasActiveSubscription = (subscriptions || []).some(s => s.status === 'active' || s.status === 'trial');
+  // Downloads are unlocked only once payment is successfully confirmed (status 'active').
+  // Trial / pending_payment / expired / no subscription = locked behind a subscribe CTA.
+  const hasActiveSubscription = (subscriptions || []).some(s => s.status === 'active');
 
   useEffect(() => {
     const init = async () => {
