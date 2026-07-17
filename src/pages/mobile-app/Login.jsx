@@ -6,7 +6,7 @@ import { base44 } from '@/api/base44Client';
 function getDeviceId() {
   let id = localStorage.getItem('voxvpn_device_id');
   if (!id) {
-    id = 'android-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    id = 'ios-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
     localStorage.setItem('voxvpn_device_id', id);
   }
   return id;
@@ -20,7 +20,6 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Clear any cached SDK auth state on mount — force fresh login every time
   useEffect(() => {
     localStorage.removeItem('voxvpn_device_id');
     localStorage.removeItem('vpn_token');
@@ -37,20 +36,17 @@ export default function Login() {
         email,
         password,
         device_id: getDeviceId(),
-        device_name: 'Android App',
-        device_type: 'android',
+        device_name: 'VoxVPN iOS App',
+        device_type: 'ios',
       });
       const data = response?.data || response;
 
-      // Strict client-side verification: backend must return success AND an active subscription.
-      // This is a second layer of defense on top of the backend's database checks.
       if (data?.success === true && data?.subscription) {
         const subStatus = data.subscription.status;
         if (subStatus !== 'active' && subStatus !== 'trial') {
           setError('Your subscription is not active. Please choose a plan at voxvpn.net to access VoxVPN.');
           return;
         }
-        // Subscription verified — set up SDK auth state and grant access
         await base44.auth.loginViaEmailPassword(email, password);
         if (data.token) localStorage.setItem('vpn_token', data.token);
         localStorage.setItem('subscription', JSON.stringify(data.subscription));
@@ -60,7 +56,6 @@ export default function Login() {
         setError(data?.message || 'Access denied. No active subscription found.');
       }
     } catch (err) {
-      // Extract the actual backend error message (e.g. "No active subscription found")
       const backendMsg = err?.response?.data?.message || err?.message || 'Login failed.';
       setError(backendMsg);
     } finally {
@@ -99,7 +94,7 @@ export default function Login() {
             className="w-20 h-20 mx-auto mb-3"
           />
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Welcome to VoxVPN</h1>
-          <p className="text-gray-500 text-sm">Sign in to continue</p>
+          <p className="text-gray-500 text-sm">Sign in to manage your account</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4">
@@ -170,34 +165,6 @@ export default function Login() {
             </button>
           </div>
         </div>
-
-        {/* Debug button — proves backend rejects fake emails */}
-        <button
-          type="button"
-          onClick={async () => {
-            setLoading(true);
-            setError('');
-            try {
-              const res = await base44.functions.invoke('authLogin', {
-                email: 'fakegmail_notexist_99999@gmail.com',
-                password: 'FakePass123',
-              });
-              const data = res?.data || res;
-              if (data?.success) {
-                setError('BUG: Fake email was accepted!');
-              } else {
-                alert('Backend correctly rejected fake email: ' + data?.message);
-              }
-            } catch (err) {
-              alert('Backend rejected fake email (correct behavior): ' + err.message);
-            } finally {
-              setLoading(false);
-            }
-          }}
-          className="mt-4 w-full py-2 border border-red-300 text-red-600 text-xs rounded"
-        >
-          TEST: Try fake gmail login
-        </button>
       </div>
     </div>
   );
