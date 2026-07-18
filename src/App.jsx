@@ -123,6 +123,7 @@ const TransparencyReport = lazy(() => import('./pages/TransparencyReport.jsx'));
 const Careers = lazy(() => import('./pages/Careers.jsx'));
 const MediaKit = lazy(() => import('./pages/MediaKit.jsx'));
 const HelpCenter = lazy(() => import('./pages/HelpCenter.jsx'));
+const Support = lazy(() => import('./pages/Support.jsx'));
 const AcceptableUsePolicy = lazy(() => import('./pages/legal/AcceptableUsePolicy.jsx'));
 const SecurityPage = lazy(() => import('./pages/SecurityPage.jsx'));
 const VoxShieldLayout = lazy(() => import('./components/voxshield/VoxShieldLayout.jsx'));
@@ -258,6 +259,7 @@ const AuthenticatedApp = ({ isMobileDevice }) => {
           <Route path="/careers" element={<PageTransition><Careers /></PageTransition>} />
           <Route path="/media-kit" element={<PageTransition><MediaKit /></PageTransition>} />
           <Route path="/help-center" element={<PageTransition><HelpCenter /></PageTransition>} />
+          <Route path="/support" element={<PageTransition><Support /></PageTransition>} />
           <Route path="/acceptable-use-policy" element={<PageTransition><AcceptableUsePolicy /></PageTransition>} />
           <Route path="/security" element={<PageTransition><SecurityPage /></PageTransition>} />
           <Route path="/shield" element={<VoxShieldLayout />}>
