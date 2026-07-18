@@ -1,301 +1,102 @@
-import { Menu, X, LogOut, Shield, Globe } from 'lucide-react';
-import { useState, useEffect, useContext } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
-import { LanguageContext } from '@/lib/LanguageContext';
-
-const navLinks = [
-  { label: 'Home', href: '/' },
-  { label: 'Features', href: '#features' },
-  { label: 'Servers', href: '#servers' },
-  { label: 'Pricing', href: '/pricing' },
-  { label: 'eSIM', href: 'https://www.voxtelefony.com', external: true },
-  { label: 'Virtual Numbers', href: 'https://www.voxtelefony.com', external: true },
-  { label: 'Support', href: '/contact' },
-  { label: 'Buy VPN', href: '/pricing' },
-];
-
-const LANGUAGES = [
-  { code: 'en', label: 'English', flag: '🇬🇧' },
-  { code: 'es', label: 'Español', flag: '🇪🇸' },
-  { code: 'fr', label: 'Français', flag: '🇫🇷' },
-  { code: 'de', label: 'Deutsch', flag: '🇩🇪' },
-  { code: 'zh', label: '中文', flag: '🇨🇳' },
-  { code: 'ja', label: '日本語', flag: '🇯🇵' },
-  { code: 'ru', label: 'Русский', flag: '🇷🇺' },
-  { code: 'ar', label: 'العربية', flag: '🇸🇦' },
-];
+import React, { useState, useEffect } from "react";
+import { Signal, Menu, X, LogIn, LogOut } from "lucide-react";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+import { base44 } from "@/api/base44Client";
 
 export default function Navbar() {
-  const { language, changeLanguage } = useContext(LanguageContext);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [user, setUser] = useState(null);
-  const [activeHash, setActiveHash] = useState('');
-  const [announcementVisible, setAnnouncementVisible] = useState(true);
-  const [langDropdownOpen, setLangDropdownOpen] = useState(false);
-  const location = useLocation();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    base44.auth.me().then(setUser).catch(() => {});
+    base44.auth.me().then(user => {
+      setIsAuthenticated(!!user);
+    }).catch(() => {
+      setIsAuthenticated(false);
+    });
   }, []);
 
-  useEffect(() => {
-    const onHash = () => setActiveHash(window.location.hash);
-    window.addEventListener('hashchange', onHash);
-    setActiveHash(window.location.hash);
-    return () => window.removeEventListener('hashchange', onHash);
-  }, []);
-
-  const isActive = (href) => {
-    if (href === '/') return location.pathname === '/' && !activeHash;
-    if (href.startsWith('#')) return activeHash === href;
-    if (href.startsWith('/') && !href.startsWith('//')) return location.pathname === href;
-    return false;
-  };
-
-  const handleNavClick = (href) => {
-    setMobileOpen(false);
-    if (href.startsWith('#')) {
-      if (location.pathname === '/') {
-        const el = document.querySelector(href);
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-      } else {
-        window.location.assign('/' + href);
-      }
+  const handleLogout = async () => {
+    setIsLoading(true);
+    try {
+      await base44.auth.logout();
+      setIsAuthenticated(false);
+    } catch (err) {
+      console.error('Logout failed:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const isAdmin = user?.role === 'admin';
+  const handleLogin = () => {
+    setIsLoading(true);
+    try {
+      base44.auth.redirectToLogin(window.location.href);
+    } catch (err) {
+      console.error('Login redirect failed:', err);
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <header className="fixed top-0 w-full z-50">
-      {/* Main nav */}
-      <nav className="bg-[#080c18]/95 backdrop-blur-md border-b border-white/5">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10">
-          <div className="flex items-center h-[88px] gap-4">
-            {/* Logo — 100% bigger */}
-            <Link to="/" className="flex-shrink-0">
-              <img
-                src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/13431de73_VoxICON.png"
-                alt="VoxVPN"
-                className="h-20 w-auto"
-              />
-            </Link>
+    <nav className="flex items-center justify-between px-6 md:px-10 py-4 max-w-7xl mx-auto relative z-50">
+      <div className="flex items-center flex-1">
+        <img src="https://media.base44.com/images/public/69b202c06dc5b1988efe9645/e6163c0d6_TELLOGO11.png" alt="VoxDigits" style={{height: "72px", width: "auto"}} />
+      </div>
 
-            {/* Desktop nav — centered */}
-            <div className="hidden md:flex items-center justify-center gap-1 flex-1">
-              {navLinks.map((link) => {
-                const active = isActive(link.href);
-                const cls = `px-2.5 py-1.5 text-xs font-medium transition-all whitespace-nowrap ${
-                  active ? 'text-white' : 'text-slate-400 hover:text-white'
-                }`;
-                if (link.external) {
-                  return (
-                    <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" className={cls}>
-                      {link.label}
-                    </a>
-                  );
-                }
-                if (link.href.startsWith('/')) {
-                  return <Link key={link.label} to={link.href} className={cls}>{link.label}</Link>;
-                }
-                return (
-                  <a key={link.label} href={link.href} onClick={() => handleNavClick(link.href)} className={cls}>
-                    {link.label}
-                  </a>
-                );
-              })}
-              {/* Admin link — only for admins */}
-              {isAdmin && (
-                <Link to="/admin" className={`px-3 py-1.5 text-sm font-medium transition-all ${isActive('/admin') ? 'text-cyan-400' : 'text-violet-400 hover:text-violet-300'}`}>
-                  Admin
-                </Link>
-              )}
+      <div className="hidden md:flex space-x-8 font-semibold text-sm tracking-widest uppercase">
+         <Link to={createPageUrl("Home")} className="text-purple-400 hover:text-purple-300 transition-colors">Home</Link>
+         <Link to="/Services" className="text-white/80 hover:text-white transition-colors">Services</Link>
+         <Link to="/AboutUs" className="text-white/80 hover:text-white transition-colors">About</Link>
+         <Link to="/Contact" className="text-white/80 hover:text-white transition-colors">Contact</Link>
+         <a href="#pricing" className="text-white/80 hover:text-white transition-colors" onClick={(e) => { e.preventDefault(); document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }); }}>Pricing</a>
+         <a href="https://voxvpn.net" target="_blank" rel="noopener noreferrer" className="text-green-400 hover:text-green-300 transition-colors">VoxVPN</a>
+       </div>
 
-              {/* Language dropdown */}
-              <div className="relative">
-                <button
-                  onClick={() => setLangDropdownOpen(!langDropdownOpen)}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-slate-400 hover:text-white transition-all"
-                >
-                  <Globe size={14} /> {language.toUpperCase()}
-                </button>
-                {langDropdownOpen && (
-                  <div className="absolute top-full right-0 mt-1 bg-[#0d1120] border border-white/10 rounded-lg shadow-lg z-50 min-w-40">
-                    {LANGUAGES.map((lang) => (
-                      <button
-                        key={lang.code}
-                        onClick={() => {
-                          changeLanguage(lang.code);
-                          setLangDropdownOpen(false);
-                        }}
-                        className={`w-full flex items-center gap-2 px-4 py-2 text-sm transition-colors ${
-                          language === lang.code
-                            ? 'bg-cyan-500/10 text-cyan-400 border-l-2 border-cyan-400'
-                            : 'text-slate-400 hover:bg-white/5 hover:text-white'
-                        }`}
-                      >
-                        <span>{lang.flag}</span> {lang.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* CTA buttons */}
-            <div className="hidden md:flex items-center gap-1.5 ml-auto flex-shrink-0">
-              {user && (
-                <Link
-                  to="/dashboard"
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-cyan-500/10 border border-cyan-500/30 hover:bg-cyan-500/20 text-cyan-400 text-xs font-bold rounded-full transition-all"
-                >
-                  <Shield size={14} /> My Dashboard
-                </Link>
-              )}
-              {user ? (
-                <>
-                  <span className="text-slate-400 text-xs hidden lg:block">{user.full_name}</span>
-                  <button
-                    onClick={() => base44.auth.logout('/')}
-                    className="flex items-center gap-1.5 px-2 py-1.5 text-slate-400 hover:text-white text-xs transition-colors"
-                  >
-                    <LogOut size={14} /> Log Out
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link
-                    to="/vpn-login"
-                    className="px-3 py-1.5 text-slate-300 hover:text-white text-xs font-medium transition-colors border border-white/10 hover:border-white/20 rounded-full"
-                  >
-                    Log In
-                  </Link>
-                  <Link
-                    to="/vpn-signup"
-                    className="px-3 py-1.5 bg-white/10 hover:bg-white/15 text-white text-xs font-semibold rounded-full transition-all border border-white/10"
-                  >
-                    Sign Up
-                  </Link>
-                </>
-              )}
-              <Link
-                to="/business/login"
-                className="px-3 py-1.5 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 text-xs font-semibold rounded-full transition-all whitespace-nowrap"
-              >
-                Business Login
-              </Link>
-              <Link
-                to="/business"
-                className="px-3 py-1.5 bg-cyan-400 hover:bg-cyan-300 text-black text-xs font-bold rounded-full transition-all shadow-lg shadow-cyan-500/20 whitespace-nowrap"
-              >
-                Business Sign Up
-              </Link>
-              <Link
-                to="/pricing"
-                className="px-4 py-1.5 bg-white/10 hover:bg-white/15 text-white text-xs font-semibold rounded-full transition-all border border-white/10"
-              >
-                Choose a Plan
-              </Link>
-            </div>
-
-            {/* Mobile toggle */}
-            <button className="md:hidden text-white ml-auto" onClick={() => setMobileOpen(!mobileOpen)}>
-              {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-            </button>
-          </div>
-
-          {/* Mobile menu */}
-          {mobileOpen && (
-            <div className="md:hidden pb-4 space-y-1 pt-2 border-t border-white/10">
-              {navLinks.map((link) => {
-                const active = isActive(link.href);
-                const cls = `block px-3 py-2 rounded text-sm font-medium transition-colors ${active ? 'text-cyan-400' : 'text-slate-300 hover:text-white'}`;
-                if (link.external) {
-                  return <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" className={cls}>{link.label}</a>;
-                }
-                if (link.href.startsWith('/')) {
-                  return <Link key={link.label} to={link.href} onClick={() => setMobileOpen(false)} className={cls}>{link.label}</Link>;
-                }
-                return <a key={link.label} href={link.href} onClick={() => handleNavClick(link.href)} className={cls}>{link.label}</a>;
-              })}
-              {isAdmin && (
-                <Link to="/admin" onClick={() => setMobileOpen(false)} className="block px-3 py-2 rounded text-sm font-medium text-violet-400 hover:text-violet-300 transition-colors">
-                  Admin Panel
-                </Link>
-              )}
-              
-              {/* Language dropdown mobile */}
-              <div className="px-3 py-2">
-                <p className="text-slate-500 text-xs uppercase tracking-wider mb-2">Language</p>
-                <div className="space-y-1">
-                  {LANGUAGES.map((lang) => (
-                    <button
-                      key={lang.code}
-                      onClick={() => {
-                        changeLanguage(lang.code);
-                        setMobileOpen(false);
-                      }}
-                      className={`w-full flex items-center gap-2 px-3 py-1.5 rounded text-sm transition-colors ${
-                        language === lang.code
-                          ? 'bg-cyan-500/10 text-cyan-400'
-                          : 'text-slate-400 hover:bg-white/5 hover:text-white'
-                      }`}
-                    >
-                      <span>{lang.flag}</span> {lang.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {user && (
-                <Link
-                  to="/dashboard"
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-2 px-3 py-2 rounded text-sm font-bold text-cyan-400"
-                >
-                  <Shield size={15} /> My Dashboard
-                </Link>
-              )}
-              <div className="flex gap-2 pt-2">
-                {user ? (
-                  <button onClick={() => base44.auth.logout('/')} className="flex-1 py-2 border border-white/10 text-slate-300 text-sm font-medium rounded-full">Log Out</button>
-                ) : (
-                  <>
-                    <Link to="/vpn-login" onClick={() => setMobileOpen(false)} className="flex-1 py-2 text-center border border-white/10 text-slate-300 text-sm font-medium rounded-full">Log In</Link>
-                    <Link to="/vpn-signup" onClick={() => setMobileOpen(false)} className="flex-1 py-2 text-center bg-white/10 text-white text-sm font-semibold rounded-full">Sign Up</Link>
-                  </>
-                )}
-              </div>
-              <Link to="/business/login" onClick={() => setMobileOpen(false)} className="block py-2 text-center border border-cyan-500/30 text-cyan-400 text-sm font-semibold rounded-full">
-                Business Login
-              </Link>
-              <Link to="/business" onClick={() => setMobileOpen(false)} className="block py-2 text-center bg-cyan-400 text-black text-sm font-bold rounded-full">
-                Business Sign Up
-              </Link>
-              <Link to="/pricing" onClick={() => setMobileOpen(false)} className="block mt-1 py-2 text-center bg-white/10 text-white text-sm font-semibold rounded-full border border-white/10">
-                Choose a Plan
-              </Link>
-            </div>
-          )}
-        </div>
-      </nav>
-
-      {/* Announcement bar */}
-      {announcementVisible && (
-        <div className="bg-[#0a1a1f] border-b border-cyan-500/20 py-1.5 px-3 sm:px-4 flex items-center justify-center gap-1.5 text-[9px] sm:text-xs text-slate-300 relative text-center">
-          <span className="leading-tight">🌐 📱 <span className="text-white font-semibold">Global Communication, Simplified</span>{' '}·{' '}
-            <a href="https://www.voxtelefony.com" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline font-medium">Get eSIM</a>{' '}and{' '}
-            <a href="https://www.voxtelefony.com" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline font-medium">Virtual Numbers</a>
-          </span>
+      <div className="hidden sm:flex items-center space-x-3">
+        {isAuthenticated ? (
           <button
-            onClick={() => setAnnouncementVisible(false)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors text-lg leading-none"
+            onClick={handleLogout}
+            disabled={isLoading}
+            className="flex items-center gap-2 px-4 py-2 text-red-500 hover:text-red-400 font-medium text-sm rounded-full border border-red-500/40 hover:border-red-500/60 transition-colors disabled:opacity-50"
           >
-            ×
+            <LogOut className="w-4 h-4" />
+            {isLoading ? 'Logging out...' : 'Logout'}
           </button>
+        ) : (
+          <button
+            onClick={handleLogin}
+            disabled={isLoading}
+            className="flex items-center gap-2 px-4 py-2 text-cyan-500 hover:text-cyan-400 font-medium text-sm rounded-full border border-cyan-500/40 hover:border-cyan-500/60 transition-colors disabled:opacity-50"
+          >
+            <LogIn className="w-4 h-4" />
+            {isLoading ? 'Logging in...' : 'Login'}
+          </button>
+        )}
+        <Link to={createPageUrl("Dashboard")} className="text-white/80 hover:text-white transition-colors font-medium text-sm px-4 py-2 rounded-full border border-white/20 hover:border-white/40">Dashboard</Link>
+        <Link to={createPageUrl("NumberSearch")} className="bg-orange-500 hover:bg-orange-400 text-white px-5 py-2 rounded-full font-bold text-sm transition-all duration-200 shadow-lg shadow-orange-500/30">
+          Get Started
+        </Link>
+      </div>
+
+      <button className="sm:hidden text-white" onClick={() => setMobileOpen(!mobileOpen)}>
+        {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+      </button>
+
+      {mobileOpen && (
+        <div className="absolute top-full left-0 right-0 bg-purple-900 border-t border-purple-700 p-6 flex flex-col space-y-4 sm:hidden z-50">
+          <Link to="/Services" className="text-white/80 hover:text-white font-medium">Services</Link>
+          <Link to="/AboutUs" className="text-white/80 hover:text-white font-medium">About Us</Link>
+          <Link to="/Contact" className="text-white/80 hover:text-white font-medium">Contact</Link>
+          <a href="#pricing" className="text-white/80 hover:text-white font-medium" onClick={(e) => { e.preventDefault(); document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }); }}>Pricing</a>
+          <a href="#faq" className="text-white/80 hover:text-white font-medium" onClick={(e) => { e.preventDefault(); document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' }); }}>FAQ</a>
+          <a href="https://voxvpn.net" target="_blank" rel="noopener noreferrer" className="text-green-400 hover:text-green-300 font-medium">VoxVPN</a>
+          <hr className="border-purple-700" />
+          <Link to={createPageUrl("Dashboard")} className="text-white/80 hover:text-white font-medium">Dashboard</Link>
+          <Link to={createPageUrl("NumberSearch")} className="bg-orange-500 hover:bg-orange-400 text-white px-6 py-2.5 rounded-full font-bold w-fit">Get Started</Link>
         </div>
       )}
-    </header>
+    </nav>
   );
 }

@@ -1,19 +1,14 @@
 {
-  "appId": "com.base69c84f61d5543b54fe26e1e5.app",
+  "appId": "com.voxvpn.app",
   "appName": "VoxVPN",
   "webDir": "dist",
-  "server": {
-    "androidScheme": "https"
-  },
-  "ios": {
-    "version": "2.124641.4",
-    "buildNumber": "4",
-    "scheme": "App"
-  },
   "plugins": {
     "SplashScreen": {
-      "launchShowDuration": 0,
+      "launchShowDuration": 3000,
       "backgroundColor": "#1a1a2e"
     }
+  },
+  "server": {
+    "androidScheme": "https"
   }
 }

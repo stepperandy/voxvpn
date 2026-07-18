@@ -1,8 +1,7 @@
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import BusinessAlerts from '@/components/business/BusinessAlerts';
-import SubscriptionStatusBadge from '@/components/business/SubscriptionStatusBadge';
 import { Shield, LayoutDashboard, Users, Monitor, Lock, Download, CreditCard, LogOut, Home, Building2, Menu, X } from 'lucide-react';
 
 const navItems = [
@@ -19,19 +18,8 @@ export default function BusinessLayout({ activeTab, onTabChange, children }) {
   const location = useLocation();
   const [user, setUser] = useState(null);
   const [client, setClient] = useState(null);
-  const [hasActiveSubscription, setHasActiveSubscription] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
-
-  // Re-fetches team data (client + subscription status). Called on mount and on real-time
-  // VPNSubscription changes so the status badge + installer gate update the instant payment is confirmed.
-  const loadData = useCallback(async (u) => {
-    try {
-      const res = await base44.functions.invoke('getTeamData', {});
-      if (res.data?.client) setClient(res.data.client);
-      setHasActiveSubscription((res.data?.subscriptions || []).some(s => s.status === 'active'));
-    } catch { /* non-fatal */ }
-  }, []);
 
   useEffect(() => {
     base44.auth.me().then(async (u) => {
@@ -40,10 +28,16 @@ export default function BusinessLayout({ activeTab, onTabChange, children }) {
         navigate('/business'); return;
       }
       setUser(u);
-      await loadData(u);
+      // Fetch client info
+      if (u.client_id) {
+        try {
+          const res = await base44.functions.invoke('getTeamData', {});
+          if (res.data?.client) setClient(res.data.client);
+        } catch { /* non-fatal */ }
+      }
       setLoading(false);
     }).catch(() => navigate('/auth-login?next=/business/dashboard'));
-  }, [loadData, navigate]);
+  }, []);
 
   if (loading) {
     return (
@@ -73,11 +67,7 @@ export default function BusinessLayout({ activeTab, onTabChange, children }) {
         </div>
 
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {navItems.filter(item => {
-            // Hide the Installer tab until payment is confirmed (admins always see it)
-            if (item.tab === 'installer' && !hasActiveSubscription && user?.role !== 'admin' && user?.role !== 'super_admin') return false;
-            return true;
-          }).map(item => {
+          {navItems.map(item => {
             const Icon = item.icon;
             const active = activeTab === item.tab;
             return (
@@ -117,7 +107,6 @@ export default function BusinessLayout({ activeTab, onTabChange, children }) {
           </div>
           {user && (
             <div className="flex items-center gap-3">
-              <SubscriptionStatusBadge active={hasActiveSubscription} onRefresh={() => loadData(user)} />
               <BusinessAlerts />
               <span className="text-slate-400 text-xs hidden sm:block">{user.full_name || user.email}</span>
               <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">

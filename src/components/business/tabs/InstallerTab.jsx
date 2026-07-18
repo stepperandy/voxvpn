@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
-import { Download, Monitor, Bug, Shield, Loader2, CheckCircle2, Terminal, Copy, Users, Lock, Tag, Zap } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Download, Monitor, Bug, Shield, Loader2, CheckCircle2, Terminal, Copy, Users, Lock, Tag } from 'lucide-react';
 import { FaWindows, FaAndroid } from 'react-icons/fa';
 
 
@@ -30,7 +29,7 @@ function detectPlatform() {
 // Display-only rename: Firebase mirror installers shown as "VoxFire Mirror"
 const displayLabel = (text) => (text ? text.replace(/firebase\s*mirror/gi, 'VoxFire mirror').replace(/firebase/gi, 'VoxFire') : text);
 
-export default function InstallerTab({ client, subscriptions }) {
+export default function InstallerTab({ client }) {
   const [downloading, setDownloading] = useState(null);
   const [copied, setCopied] = useState(false);
   const [installers, setInstallers] = useState([]);
@@ -38,10 +37,6 @@ export default function InstallerTab({ client, subscriptions }) {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const detectedPlatform = detectPlatform();
-
-  // Downloads are unlocked only once payment is successfully confirmed (status 'active').
-  // Trial / pending_payment / expired / no subscription = locked behind a subscribe CTA.
-  const hasActiveSubscription = (subscriptions || []).some(s => s.status === 'active');
 
   useEffect(() => {
     const init = async () => {
@@ -104,25 +99,6 @@ export default function InstallerTab({ client, subscriptions }) {
         </p>
       )}
 
-      {/* Subscription gate — downloads require an active subscription */}
-      {!hasActiveSubscription && !isAdmin ? (
-        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-8 text-center">
-          <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-4">
-            <Lock size={26} className="text-amber-400" />
-          </div>
-          <h3 className="text-white font-bold text-base mb-1">Subscribe to Download</h3>
-          <p className="text-slate-400 text-xs mb-5 max-w-md mx-auto leading-relaxed">
-            Team installer downloads are unlocked once your business has an active subscription.
-            Choose a plan to activate VPN, antivirus, and DNS filtering for your whole team.
-          </p>
-          <Link to="/pricing"
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm text-black transition-all"
-            style={{ background: 'linear-gradient(135deg, #00d4ff, #00b8e6)', boxShadow: '0 8px 30px rgba(0,212,255,0.3)' }}>
-            <Zap size={16} /> Upgrade Now
-          </Link>
-        </div>
-      ) : (
-      <>
       {/* Installer cards */}
       {loading ? (
         <div className="flex items-center justify-center py-12 gap-2 text-slate-400">
@@ -225,8 +201,6 @@ export default function InstallerTab({ client, subscriptions }) {
           </div>
         </div>
       </div>
-      </>
-      )}
 
       {/* What's included */}
       <div className="rounded-2xl border border-white/5 bg-[#0d1420] p-6">

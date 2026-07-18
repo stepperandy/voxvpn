@@ -42,7 +42,8 @@
         "ENVIRONMENT": "production"
       },
       "ios": {
-        "resourceClass": "m1"
+        "resourceClass": "m1",
+        "enterpriseProvisioning": "universal"
       },
       "android": {
         "buildType": "app-bundle"

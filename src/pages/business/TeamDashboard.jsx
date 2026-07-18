@@ -78,7 +78,7 @@ export default function TeamDashboard() {
           {activeTab === 'devices' && <DevicesTab data={teamData} />}
           {activeTab === 'security' && <SecurityTab client={teamData?.client} onRefresh={loadData} />}
           {activeTab === 'billing' && <BillingTab data={teamData} />}
-          {activeTab === 'installer' && <InstallerTab client={teamData?.client} subscriptions={teamData?.subscriptions} />}
+          {activeTab === 'installer' && <InstallerTab client={teamData?.client} />}
         </motion.div>
       )}
     </BusinessLayout>

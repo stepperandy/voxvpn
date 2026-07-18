@@ -19,6 +19,8 @@ export default function Splash() {
     timerRef.current = setTimeout(() => {
       // Always require fresh login — authLogin backend function enforces the database
       // pre-check (only registered users with active subscriptions get through).
+      // Never trust cached tokens — the SDK's auth state can be stale or belong to a
+      // different account than the one in localStorage.
       localStorage.removeItem('vpn_token');
       localStorage.removeItem('vpn_email');
       localStorage.removeItem('subscription');
@@ -57,6 +59,7 @@ export default function Splash() {
 
       {/* Logo orb */}
       <div className="relative flex items-center justify-center z-10 mb-10">
+        {/* Outer rings */}
         {[160, 120, 88].map((size, i) => (
           <div
             key={size}
@@ -70,6 +73,7 @@ export default function Splash() {
           />
         ))}
 
+        {/* Core orb */}
         <div
           className="relative w-24 h-24 rounded-full flex items-center justify-center transition-all duration-700"
           style={{
@@ -108,7 +112,7 @@ export default function Splash() {
           className="text-[11px] font-bold tracking-[0.35em] uppercase mt-1.5 transition-all duration-700"
           style={{ color: phase >= 1 ? '#00d4ff' : '#1e3a4f' }}
         >
-          Account &amp; Config Manager
+          Military-Grade Privacy
         </p>
       </div>
 
@@ -126,7 +130,7 @@ export default function Splash() {
           />
         </div>
         <p className="text-[10px] text-slate-700 tracking-widest uppercase">
-          {phase < 2 ? 'Loading…' : 'Ready'}
+          {phase < 2 ? 'Initializing secure tunnel…' : 'Ready'}
         </p>
       </div>
 

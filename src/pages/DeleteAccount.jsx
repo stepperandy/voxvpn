@@ -1,144 +1,69 @@
-import { useState } from 'react';
-import { base44 } from '@/api/base44Client';
-import { AlertTriangle, Trash2, ShieldOff, ArrowLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Mail, ArrowRight } from "lucide-react";
 
 export default function DeleteAccount() {
-  const [step, setStep] = useState(1); // 1=info, 2=confirm, 3=done
-  const [confirmation, setConfirmation] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const handleDelete = async () => {
-    if (confirmation !== 'DELETE') return;
-    setLoading(true);
-    setError('');
-    try {
-      await base44.functions.invoke('deleteUserAccount', {});
-      setStep(3);
-    } catch (err) {
-      setError(err.message || 'Something went wrong. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-[#080c18] flex items-center justify-center px-4 py-16">
-      <div className="w-full max-w-md">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <img
-            src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/e4e826602_f43645b8-7e9b-46cb-9b95-1fc45590f65b.png"
-            alt="VoxVPN"
-            className="h-10 w-auto mx-auto mb-6"
-          />
-        </div>
+    <div className="min-h-screen bg-gray-950 p-4 md:p-8 flex items-center justify-center">
+      <div className="max-w-2xl w-full">
+        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 md:p-12 space-y-8">
+          {/* Header */}
+          <div className="text-center space-y-2">
+            <h1 className="text-3xl font-bold text-white">Delete Your Account</h1>
+            <p className="text-gray-400">To delete your VoxDigits account, please contact our support team.</p>
+          </div>
 
-        {step === 3 ? (
-          /* Success state */
-          <div className="bg-[#0d1120] border border-white/5 rounded-2xl p-8 text-center">
-            <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-5">
-              <ShieldOff size={28} className="text-emerald-400" />
-            </div>
-            <h1 className="text-white text-2xl font-black mb-3">Account Deleted</h1>
-            <p className="text-slate-400 text-sm leading-relaxed mb-6">
-              Your account and all associated data have been permanently deleted. We're sorry to see you go.
-            </p>
-            <p className="text-slate-500 text-xs mb-8">
-              If you'd like to come back, you can always create a new account at voxvpn.net.
-            </p>
-            <Link
-              to="/"
-              className="inline-block px-6 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-full text-sm transition-all"
+          {/* Instructions */}
+          <div className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-6 space-y-4">
+            <p className="text-white font-semibold text-lg">Email us at:</p>
+            
+            <a
+              href="mailto:support@voxtelefony.com?subject=Delete%20my%20VoxDigits%20account"
+              className="flex items-center gap-3 p-4 bg-cyan-500/10 border border-cyan-500/30 hover:border-cyan-500/50 rounded-lg transition-colors group"
             >
-              Back to Home
-            </Link>
-          </div>
-        ) : step === 1 ? (
-          /* Info step */
-          <div className="bg-[#0d1120] border border-white/5 rounded-2xl p-8">
-            <div className="w-16 h-16 rounded-full bg-rose-500/10 flex items-center justify-center mx-auto mb-5">
-              <AlertTriangle size={28} className="text-rose-400" />
+              <div className="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
+                <Mail className="w-5 h-5 text-cyan-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-cyan-400 font-semibold">support@voxtelefony.com</p>
+                <p className="text-gray-500 text-sm">Click to open your email client</p>
+              </div>
+              <ArrowRight className="w-4 h-4 text-gray-600 group-hover:text-gray-400 flex-shrink-0" />
+            </a>
+
+            <div className="space-y-3 pt-4 border-t border-gray-700">
+              <p className="text-white text-sm font-semibold">Include in your email:</p>
+              <ul className="space-y-2">
+                <li className="flex items-start gap-3">
+                  <span className="text-cyan-400 font-semibold flex-shrink-0">Subject:</span>
+                  <span className="text-gray-300">Delete my VoxDigits account</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-cyan-400 font-semibold flex-shrink-0">Include:</span>
+                  <span className="text-gray-300">Your registered phone number or email address</span>
+                </li>
+              </ul>
             </div>
-            <h1 className="text-white text-2xl font-black text-center mb-2">Delete Account</h1>
-            <p className="text-slate-400 text-sm text-center mb-8">
-              This action is permanent and cannot be undone.
+          </div>
+
+          {/* Timeline */}
+          <div className="bg-blue-500/10 border border-blue-500/25 rounded-xl p-6 space-y-4">
+            <p className="text-blue-400 font-semibold flex items-center gap-2">
+              <span className="inline-block w-2 h-2 rounded-full bg-blue-400" />
+              What happens next
             </p>
-
-            <div className="space-y-4 mb-8">
-              {[
-                'All your subscription data will be removed',
-                'All linked devices and VPN configs will be deleted',
-                'Your account cannot be recovered after deletion',
-                'Any active subscription will be cancelled',
-              ].map((item, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-rose-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-rose-400" />
-                  </div>
-                  <p className="text-slate-400 text-sm">{item}</p>
-                </div>
-              ))}
-            </div>
-
-            <div className="space-y-3">
-              <button
-                onClick={() => setStep(2)}
-                className="w-full py-3 bg-rose-500 hover:bg-rose-400 text-white font-bold rounded-xl text-sm transition-all"
-              >
-                Continue to Delete
-              </button>
-              <Link
-                to="/"
-                className="flex items-center justify-center gap-2 w-full py-3 border border-white/10 hover:border-white/20 text-slate-400 hover:text-white font-semibold rounded-xl text-sm transition-all"
-              >
-                <ArrowLeft size={16} />
-                Cancel, keep my account
-              </Link>
+            <div className="space-y-3 text-sm">
+              <p className="text-gray-300">Your account and personal data will be deleted within <span className="font-semibold text-white">7 days</span>.</p>
+              <p className="text-gray-400">Some transaction logs may be retained for security and legal compliance.</p>
             </div>
           </div>
-        ) : (
-          /* Confirm step */
-          <div className="bg-[#0d1120] border border-rose-500/20 rounded-2xl p-8">
-            <div className="w-16 h-16 rounded-full bg-rose-500/10 flex items-center justify-center mx-auto mb-5">
-              <Trash2 size={28} className="text-rose-400" />
-            </div>
-            <h1 className="text-white text-2xl font-black text-center mb-2">Are you sure?</h1>
-            <p className="text-slate-400 text-sm text-center mb-8">
-              Type <span className="text-rose-400 font-bold">DELETE</span> to permanently delete your account.
+
+          {/* Contact note */}
+          <div className="bg-gray-800/30 rounded-lg p-4">
+            <p className="text-gray-400 text-sm">
+              Our support team will confirm the deletion and answer any questions you may have.
             </p>
-
-            <input
-              type="text"
-              value={confirmation}
-              onChange={(e) => setConfirmation(e.target.value)}
-              placeholder="Type DELETE to confirm"
-              className="w-full bg-[#091523] border border-white/10 focus:border-rose-500/50 rounded-xl px-4 py-3 text-white text-sm outline-none mb-4 placeholder:text-slate-600"
-            />
-
-            {error && (
-              <p className="text-rose-400 text-xs mb-4 text-center">{error}</p>
-            )}
-
-            <div className="space-y-3">
-              <button
-                onClick={handleDelete}
-                disabled={confirmation !== 'DELETE' || loading}
-                className="w-full py-3 bg-rose-500 hover:bg-rose-400 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold rounded-xl text-sm transition-all"
-              >
-                {loading ? 'Deleting...' : 'Permanently Delete My Account'}
-              </button>
-              <button
-                onClick={() => setStep(1)}
-                className="flex items-center justify-center gap-2 w-full py-3 border border-white/10 hover:border-white/20 text-slate-400 hover:text-white font-semibold rounded-xl text-sm transition-all"
-              >
-                <ArrowLeft size={16} />
-                Go Back
-              </button>
-            </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

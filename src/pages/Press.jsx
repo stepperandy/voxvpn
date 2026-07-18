@@ -1,210 +1,120 @@
-import Navbar from '@/components/landing/Navbar';
-import Footer from '@/components/landing/Footer';
-import { Link } from 'react-router-dom';
-import { ExternalLink, Mail, FileText, Star, Link2, Users } from 'lucide-react';
+import React from "react";
+import { Link } from "react-router-dom";
+import { ArrowLeft, Newspaper, Download, Mail, Image, FileText } from "lucide-react";
 
-const pressFeatures = [
-  {
-    publication: 'TechRadar',
-    logo: '📡',
-    headline: '"VoxVPN delivers military-grade encryption at an affordable price"',
-    date: 'March 2026',
-    url: '#',
-  },
-  {
-    publication: 'PCMag',
-    logo: '💻',
-    headline: '"Fast speeds, strict no-logs, and a clean interface — VoxVPN impresses"',
-    date: 'February 2026',
-    url: '#',
-  },
-  {
-    publication: 'Cyber News',
-    logo: '🔐',
-    headline: '"VoxVPN stands out with WireGuard protocol support and kill switch"',
-    date: 'January 2026',
-    url: '#',
-  },
-  {
-    publication: 'VPN Mentor',
-    logo: '🛡️',
-    headline: '"VoxVPN earns a 4.7/5 — highly recommended for privacy-conscious users"',
-    date: 'December 2025',
-    url: '#',
-  },
-  {
-    publication: 'Privacy Guides',
-    logo: '📋',
-    headline: '"Independently audited, zero-logs verified — VoxVPN passes our review"',
-    date: 'November 2025',
-    url: '#',
-  },
-  {
-    publication: 'Safe Bytes',
-    logo: '🔒',
-    headline: '"Best budget VPN of 2025 — VoxVPN offers premium features at low cost"',
-    date: 'October 2025',
-    url: '#',
-  },
+const PRESS_RELEASES = [
+  { date: "Jul 2026", title: "VoxDigits Launches Global eSIM Marketplace with Multi-Provider Support", excerpt: "New platform aggregates eSIM plans from multiple telecom providers, offering competitive pricing and broader coverage." },
+  { date: "May 2026", title: "VoxDigits Reaches 50,000 Active Users Across 40 Countries", excerpt: "Milestone marks rapid growth in the virtual number and eSIM market since launch." },
+  { date: "Mar 2026", title: "VoxDigits Introduces End-to-End Encrypted Voice Calling", excerpt: "New security feature brings AES-256 encrypted voice calls to all virtual number subscribers." },
+  { date: "Jan 2026", title: "VoxDigits Secures Series A Funding to Expand Global Infrastructure", excerpt: "Funding will accelerate infrastructure expansion into Asia-Pacific and African markets." },
 ];
 
-const partnershipTypes = [
-  {
-    icon: <FileText size={22} />,
-    title: 'Guest Posts & Content',
-    description: 'We accept high-quality guest posts about VPN technology, online privacy, cybersecurity, and digital freedom on our blog.',
-    cta: 'Submit a Guest Post',
-    mailto: 'mailto:info@voxdigits.com?subject=Guest Post Inquiry',
-  },
-  {
-    icon: <Star size={22} />,
-    title: 'Product Reviews',
-    description: 'Tech journalists and bloggers — get a free VoxVPN account to write an honest, in-depth review for your audience.',
-    cta: 'Request a Review Account',
-    mailto: 'mailto:info@voxdigits.com?subject=Review Account Request',
-  },
-  {
-    icon: <Link2 size={22} />,
-    title: 'Backlink Exchange',
-    description: 'We partner with reputable cybersecurity, tech, and privacy-focused websites for quality backlink exchanges.',
-    cta: 'Propose a Backlink',
-    mailto: 'mailto:info@voxdigits.com?subject=Backlink Partnership',
-  },
-  {
-    icon: <Users size={22} />,
-    title: 'Affiliate & Co-Marketing',
-    description: 'Earn commission by promoting VoxVPN to your audience. Competitive rates, real-time tracking, and dedicated support.',
-    cta: 'Join Affiliate Program',
-    to: '/affiliate-register',
-  },
-];
-
-const guestTopics = [
-  'How to Choose the Right VPN in 2026',
-  'The Rise of WireGuard: Why It\'s Replacing OpenVPN',
-  'Online Privacy Laws Around the World',
-  'How ISPs Track Your Browsing (And How to Stop Them)',
-  'VPN vs Proxy vs Tor: What\'s the Difference?',
-  'Cybersecurity Tips for Small Business Owners',
-  'How to Stay Private on Public Wi-Fi',
-  'The Truth About Free VPNs',
+const BRAND_ASSETS = [
+  { name: "Primary Logo (PNG, transparent)", size: "240 KB", icon: Image },
+  { name: "Primary Logo (SVG)", size: "12 KB", icon: FileText },
+  { name: "Logo — Dark Background", size: "180 KB", icon: Image },
+  { name: "Brand Guidelines (PDF)", size: "2.4 MB", icon: FileText },
 ];
 
 export default function Press() {
   return (
-    <div className="min-h-screen bg-[#080c18]">
-      <Navbar />
-      <div className="pt-28 pb-20 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+    <div className="min-h-screen bg-[#060f1a] text-white">
+      <div className="max-w-5xl mx-auto px-6 pt-8">
+        <Link to="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm mb-8">
+          <ArrowLeft className="w-4 h-4" /> Back to Home
+        </Link>
+      </div>
 
-        {/* Header */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/5 text-cyan-400 text-xs font-medium mb-4">
-            📰 Press & Partnerships
+      {/* Hero */}
+      <section className="relative overflow-hidden py-16 px-6">
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-transparent to-blue-600/10 pointer-events-none" />
+        <div className="max-w-4xl mx-auto text-center relative">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 mb-6">
+            <Newspaper className="w-3.5 h-3.5" /> Press & Media
           </div>
-          <h1 className="text-4xl sm:text-5xl font-black text-white mb-4">
-            Media Kit & <span className="text-cyan-400">Backlink</span> Opportunities
+          <h1 className="text-4xl md:text-5xl font-extrabold leading-tight mb-6">
+            Press & <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Media Kit</span>
           </h1>
-          <p className="text-slate-400 text-base max-w-xl mx-auto">
-            Partner with VoxVPN for guest posts, product reviews, backlink exchanges, and affiliate opportunities.
-            We actively build relationships with quality privacy & tech publishers.
+          <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">
+            Resources for journalists, bloggers, and partners covering VoxDigits. Download brand assets, read press releases, or get in touch with our media team.
           </p>
-          <a
-            href="mailto:info@voxdigits.com"
-            className="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-full text-sm transition-all"
-          >
-            <Mail size={15} /> Contact Our Press Team
+        </div>
+      </section>
+
+      {/* Brand Assets */}
+      <section className="py-12 px-6">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold mb-6">Brand Assets</h2>
+          <div className="grid sm:grid-cols-2 gap-4">
+            {BRAND_ASSETS.map(asset => {
+              const Icon = asset.icon;
+              return (
+                <div key={asset.name} className="flex items-center justify-between p-4 rounded-xl border border-white/10 bg-white/[0.03]">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
+                      <Icon className="w-4 h-4 text-cyan-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-white font-medium">{asset.name}</p>
+                      <p className="text-xs text-gray-500">{asset.size}</p>
+                    </div>
+                  </div>
+                  <button className="text-cyan-400 hover:text-cyan-300 transition-colors">
+                    <Download className="w-4 h-4" />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Logo Preview */}
+      <section className="py-12 px-6 bg-white/[0.02] border-y border-white/5">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold mb-6">Our Logo</h2>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div className="p-8 rounded-xl border border-white/10 bg-[#0d0620] flex items-center justify-center">
+              <img src="https://media.base44.com/images/public/69b202c06dc5b1988efe9645/e6163c0d6_TELLOGO11.png" alt="VoxDigits Logo" className="h-24 w-auto" />
+            </div>
+            <div className="p-8 rounded-xl border border-white/10 bg-white flex items-center justify-center">
+              <img src="https://media.base44.com/images/public/69b202c06dc5b1988efe9645/e6163c0d6_TELLOGO11.png" alt="VoxDigits Logo (Light)" className="h-24 w-auto" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Press Releases */}
+      <section className="py-12 px-6">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold mb-6">Press Releases</h2>
+          <div className="space-y-4">
+            {PRESS_RELEASES.map(pr => (
+              <div key={pr.title} className="p-5 rounded-xl border border-white/10 bg-white/[0.03]">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xs text-cyan-400 font-medium">{pr.date}</span>
+                </div>
+                <h3 className="font-semibold text-white text-sm mb-2">{pr.title}</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">{pr.excerpt}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Media Contact */}
+      <section className="py-12 px-6 bg-white/[0.02] border-t border-white/5">
+        <div className="max-w-3xl mx-auto text-center">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 mb-6">
+            <Mail className="w-7 h-7 text-cyan-400" />
+          </div>
+          <h2 className="text-2xl font-bold mb-4">Media Contact</h2>
+          <p className="text-gray-400 mb-4">For press inquiries, interviews, or media partnerships:</p>
+          <a href="mailto:press@voxtelefony.com" className="inline-flex items-center gap-2 px-6 py-3 bg-cyan-500 hover:bg-cyan-400 text-gray-950 font-bold rounded-xl transition-colors">
+            <Mail className="w-4 h-4" /> press@voxtelefony.com
           </a>
         </div>
-
-        {/* Press Features */}
-        <section className="mb-16">
-          <h2 className="text-white font-bold text-xl mb-6">As Featured In</h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {pressFeatures.map((item) => (
-              <a
-                key={item.publication}
-                href={item.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block rounded-2xl border border-white/5 bg-[#0d1120] p-5 hover:border-cyan-500/20 transition-all group"
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <span className="text-2xl">{item.logo}</span>
-                  <div>
-                    <p className="text-white font-bold text-sm">{item.publication}</p>
-                    <p className="text-slate-600 text-xs">{item.date}</p>
-                  </div>
-                  <ExternalLink size={13} className="ml-auto text-slate-700 group-hover:text-cyan-400 transition-colors" />
-                </div>
-                <p className="text-slate-400 text-xs leading-relaxed italic">{item.headline}</p>
-              </a>
-            ))}
-          </div>
-        </section>
-
-        {/* Partnership Types */}
-        <section className="mb-16">
-          <h2 className="text-white font-bold text-xl mb-6">Partnership Opportunities</h2>
-          <div className="grid sm:grid-cols-2 gap-5">
-            {partnershipTypes.map((p) => (
-              <div key={p.title} className="rounded-2xl border border-white/5 bg-[#0d1120] p-6">
-                <div className="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center mb-4">
-                  {p.icon}
-                </div>
-                <h3 className="text-white font-bold text-base mb-2">{p.title}</h3>
-                <p className="text-slate-500 text-sm leading-relaxed mb-4">{p.description}</p>
-                {p.to ? (
-                  <Link to={p.to} className="inline-flex items-center gap-1.5 text-cyan-400 hover:text-cyan-300 text-sm font-semibold transition-colors">
-                    {p.cta} →
-                  </Link>
-                ) : (
-                  <a href={p.mailto} className="inline-flex items-center gap-1.5 text-cyan-400 hover:text-cyan-300 text-sm font-semibold transition-colors">
-                    {p.cta} →
-                  </a>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Guest Post Topics */}
-        <section className="mb-16">
-          <h2 className="text-white font-bold text-xl mb-3">Accepted Guest Post Topics</h2>
-          <p className="text-slate-500 text-sm mb-6">We publish quality, original articles. Minimum 800 words. No AI-only content. Must be relevant to VPN, privacy, or cybersecurity.</p>
-          <div className="grid sm:grid-cols-2 gap-3">
-            {guestTopics.map((topic) => (
-              <div key={topic} className="flex items-start gap-3 p-4 rounded-xl bg-[#0d1120] border border-white/5">
-                <span className="text-cyan-400 mt-0.5">✓</span>
-                <p className="text-slate-300 text-sm">{topic}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Media Kit CTA */}
-        <section className="rounded-2xl bg-gradient-to-r from-cyan-500/10 to-violet-500/10 border border-cyan-500/20 p-8 text-center">
-          <h3 className="text-white font-bold text-2xl mb-2">Ready to Partner?</h3>
-          <p className="text-slate-400 text-sm mb-6 max-w-md mx-auto">
-            Email us with your website URL, DA/DR score, and what type of partnership you're interested in.
-            We respond within 24–48 hours.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a
-              href="mailto:info@voxdigits.com?subject=Partnership Inquiry"
-              className="inline-flex items-center justify-center gap-2 px-7 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-full text-sm transition-all"
-            >
-              <Mail size={15} /> info@voxdigits.com
-            </a>
-            <Link
-              to="/affiliate-register"
-              className="inline-flex items-center justify-center gap-2 px-7 py-3 border border-white/10 hover:border-white/20 text-white font-semibold rounded-full text-sm transition-all"
-            >
-              Join Affiliate Program
-            </Link>
-          </div>
-        </section>
-      </div>
-      <Footer />
+      </section>
     </div>
   );
 }

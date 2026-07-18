@@ -4,70 +4,76 @@
   "properties": {
     "referrer_email": {
       "type": "string",
-      "description": "Email of the user who shared the referral link"
+      "description": "Email of the referring user"
     },
-    "referee_email": {
+    "referrer_user_id": {
       "type": "string",
-      "description": "Email of the user who signed up via the referral link"
+      "description": "User ID of the referrer"
+    },
+    "referred_email": {
+      "type": "string",
+      "description": "Email of the referred user"
+    },
+    "referred_user_id": {
+      "type": "string",
+      "description": "User ID of the referred user"
     },
     "referral_code": {
       "type": "string",
-      "description": "Unique referral code belonging to the referrer"
+      "description": "The referral code used"
     },
     "status": {
       "type": "string",
       "enum": [
-        "pending",
-        "completed",
-        "rewarded"
+        "pending_verification",
+        "verified",
+        "activated",
+        "fraud_flagged"
       ],
-      "default": "pending",
-      "description": "pending = signed up but not paid, completed = paid, rewarded = free month granted"
+      "default": "pending_verification",
+      "description": "Current status of the referral"
     },
-    "reward_granted_at": {
+    "device_fingerprint": {
       "type": "string",
-      "format": "date-time",
-      "description": "When the free month reward was applied"
+      "description": "SHA-256 hash of device characteristics for fraud detection"
+    },
+    "identity_hash": {
+      "type": "string",
+      "description": "SHA-256 hash of identity data for duplicate detection"
+    },
+    "payment_method_hash": {
+      "type": "string",
+      "description": "Hash of payment method for fraud detection"
+    },
+    "fraud_flags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of fraud indicators detected"
+    },
+    "verified_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "activated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "milestone_credited": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the $5 milestone credit was applied for this referral"
     },
     "description": {
       "type": "string",
-      "description": "Optional notes or description for this referral (up to 1000 characters)"
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
     }
   },
   "required": [
     "referrer_email",
+    "referred_email",
     "referral_code"
-  ],
-  "rls": {
-    "create": {
-      "user_condition": {
-        "role": "admin"
-      }
-    },
-    "read": {
-      "$or": [
-        {
-          "data.referrer_email": "{{user.email}}"
-        },
-        {
-          "data.referee_email": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
-    },
-    "update": {
-      "user_condition": {
-        "role": "admin"
-      }
-    },
-    "delete": {
-      "user_condition": {
-        "role": "admin"
-      }
-    }
-  }
+  ]
 }

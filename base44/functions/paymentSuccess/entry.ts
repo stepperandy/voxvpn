@@ -44,39 +44,6 @@ Deno.serve(async (req) => {
       await base44.asServiceRole.entities.VPNSubscription.create({ user_email: email, ...subData });
     }
 
-    // ── Renewal-confirmation email ──
-    // Sent only when an existing subscription is renewed (not a first-time trial activation).
-    // Covers business clients who renew through the explicit payment-success path.
-    const isRenewal = existingSub && !isFirstPaymentOnTrial;
-    if (isRenewal) {
-      const appUrl = Deno.env.get('APP_URL') || 'https://voxvpn.net';
-      const cycleLabel = billingCycle === 'yearly' ? '1 year' : '1 month';
-      try {
-        await base44.asServiceRole.integrations.Core.SendEmail({
-          to: email,
-          subject: '✅ Your VoxShield subscription has been renewed',
-          body: `Hello,
-
-Your VoxShield ${plan} plan has been successfully renewed. Your team's VPN, antivirus, and DNS filtering protection continue without interruption.
-
-Plan: ${plan}
-Billing cycle: ${billingCycle === 'yearly' ? 'Yearly' : 'Monthly'}
-Next renewal: in ${cycleLabel}
-
-👉 Manage your team: ${appUrl}/business/dashboard
-
-If you have any questions, contact support@voxdigits.com.
-
-Thank you for protecting your team with VoxShield,
-
-The VoxShield Team`,
-        });
-        console.log(`Renewal confirmation email sent to ${email}`);
-      } catch (emailErr) {
-        console.error('Renewal email failed:', emailErr.message);
-      }
-    }
-
     return Response.json({ success: true, message: 'User activated', plan });
 
   } catch (error) {

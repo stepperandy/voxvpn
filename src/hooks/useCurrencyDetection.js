@@ -43,8 +43,14 @@ function detectChinaFromLocale() {
 
 // Returns the set of payment methods available for a given country code
 export function getPaymentMethods(countryCode) {
-  // Stripe (cards, Apple Pay, Google Pay), Hubtel (Mobile Money), WeChat Pay & Alipay (China) are always available
-  const methods = ['stripe', 'hubtel', 'wechat_pay', 'alipay'];
+  const methods = ['stripe']; // Stripe (cards, Apple Pay, Google Pay) is always available
+
+  if (countryCode === 'CN') {
+    methods.push('wechat_pay', 'alipay');
+  }
+  if (countryCode === 'GH') {
+    methods.push('hubtel');
+  }
 
   return methods;
 }
