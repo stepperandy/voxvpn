@@ -70,7 +70,7 @@ Return the post content, hashtags array, CTA, post type, and an image generation
           image_prompt: llmResult.image_prompt || "",
           post_type: llmResult.post_type || "promotional",
           scheduled_date: scheduledDate.toISOString().split('T')[0],
-          status: "draft"
+          status: "scheduled"
         });
 
         totalGenerated++;
