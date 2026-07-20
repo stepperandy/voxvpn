@@ -1,0 +1,90 @@
+{
+  "name": "AppStoreListing",
+  "type": "object",
+  "properties": {
+    "platform": {
+      "type": "string",
+      "enum": [
+        "ios",
+        "android"
+      ],
+      "description": "Which app store this listing is for"
+    },
+    "locale": {
+      "type": "string",
+      "default": "en-US",
+      "description": "Listing locale (e.g. en-US, en-GB)"
+    },
+    "app_title": {
+      "type": "string",
+      "description": "App title (iOS: 30 chars, Android: 50 chars)"
+    },
+    "subtitle": {
+      "type": "string",
+      "description": "App subtitle / short description (iOS: 30 chars, Android: 80 chars)"
+    },
+    "keywords_field": {
+      "type": "string",
+      "description": "iOS keywords field (100 chars, comma-separated). Android has no keywords field."
+    },
+    "short_description": {
+      "type": "string",
+      "description": "Play Store short description (80 chars max)"
+    },
+    "full_description": {
+      "type": "string",
+      "description": "Full app store description"
+    },
+    "promotional_text": {
+      "type": "string",
+      "description": "iOS promotional text (170 chars, can update without new review)"
+    },
+    "primary_category": {
+      "type": "string",
+      "description": "Primary App Store / Play Store category"
+    },
+    "secondary_category": {
+      "type": "string",
+      "description": "Secondary category (if applicable)"
+    },
+    "target_keywords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of target keywords being tracked"
+    },
+    "current_rankings": {
+      "type": "string",
+      "description": "JSON snapshot of keyword:rank pairs"
+    },
+    "version": {
+      "type": "string",
+      "description": "App version this listing applies to"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "in_review",
+        "live",
+        "rejected"
+      ],
+      "default": "draft",
+      "description": "Listing submission status"
+    },
+    "last_updated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this listing was last updated"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Internal notes about this listing variant"
+    }
+  },
+  "required": [
+    "platform",
+    "app_title"
+  ]
+}
