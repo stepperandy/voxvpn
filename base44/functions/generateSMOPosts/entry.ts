@@ -42,7 +42,11 @@ Create ONE compelling ${platform} post that:
 - Has a clear, compelling call-to-action
 - Feels native to ${platform} (not generic)
 
-Also generate a short video prompt (5-10 seconds) that could accompany this post as a promo clip. The video should be cinematic, visually engaging, and on-brand.
+Also generate a short video prompt (6 seconds) for a promotional video clip that specifically showcases our virtual number plans (US, UK, Canada, Australia numbers). The video should:
+- Visually highlight a phone screen showing a local number from one of these countries (e.g. +1, +44, +1-CA, +61)
+- Convey privacy, international reach, and instant activation
+- Be cinematic, modern, and visually engaging (dynamic motion, clean UI aesthetics, vibrant accents)
+- End with a subtle brand moment (logo glow or tagline text)
 
 Return the post content, hashtags array, CTA, post type, an image generation prompt, and a video generation prompt.`,
   response_json_schema: {
