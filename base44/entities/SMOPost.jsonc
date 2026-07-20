@@ -1,0 +1,102 @@
+{
+  "name": "SMOPost",
+  "type": "object",
+  "properties": {
+    "campaign_id": {
+      "type": "string",
+      "description": "Reference to the SMOCampaign this post belongs to"
+    },
+    "campaign_name": {
+      "type": "string",
+      "description": "Name of the parent campaign (denormalized for display)"
+    },
+    "platform": {
+      "type": "string",
+      "enum": [
+        "Facebook",
+        "Instagram",
+        "LinkedIn",
+        "Twitter",
+        "TikTok"
+      ],
+      "description": "Target social media platform"
+    },
+    "content": {
+      "type": "string",
+      "description": "Post caption / body text"
+    },
+    "hashtags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Hashtags for the post"
+    },
+    "cta": {
+      "type": "string",
+      "description": "Call-to-action text"
+    },
+    "image_prompt": {
+      "type": "string",
+      "description": "AI image generation prompt for accompanying visual"
+    },
+    "post_type": {
+      "type": "string",
+      "enum": [
+        "promotional",
+        "educational",
+        "engagement",
+        "announcement",
+        "testimonial"
+      ],
+      "default": "promotional",
+      "description": "Content category"
+    },
+    "scheduled_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date this post is scheduled to go live"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "scheduled",
+        "posted",
+        "archived"
+      ],
+      "default": "draft",
+      "description": "Post lifecycle status"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Internal notes"
+    }
+  },
+  "required": [
+    "platform",
+    "content"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

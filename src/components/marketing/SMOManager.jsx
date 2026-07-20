@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, Edit2, Trash2, Share2, Sparkles, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import SMOPostList from "./SMOPostList";
 
 const PLATFORMS = ["Facebook", "Instagram", "LinkedIn", "Twitter", "TikTok"];
 
@@ -38,6 +39,20 @@ export default function SMOManager() {
   });
 
   const [aiLoading, setAiLoading] = useState(false);
+  const [generating, setGenerating] = useState(false);
+
+  const handleGeneratePosts = async () => {
+    setGenerating(true);
+    try {
+      const response = await base44.functions.invoke('generateSMOPosts', {});
+      if (response.data?.success) {
+        loadCampaigns();
+      }
+    } catch (e) {
+      console.error("Post generation failed", e);
+    }
+    setGenerating(false);
+  };
 
   useEffect(() => {
     loadCampaigns();
@@ -271,6 +286,10 @@ export default function SMOManager() {
           </AnimatePresence>
         </div>
       )}
+
+      <div className="mt-8 pt-6 border-t border-slate-700">
+        <SMOPostList onGenerate={handleGeneratePosts} generating={generating} />
+      </div>
     </div>
   );
 }
