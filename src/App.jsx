@@ -141,6 +141,7 @@ import SitemapXml from './pages/SitemapXml.jsx';
 import ClientOnboarding from './pages/ClientOnboarding.jsx';
 import ASOManager from './pages/ASOManager.jsx';
 import Support from './pages/Support.jsx';
+import PromoLanding from './pages/PromoLanding.jsx';
 import USVirtualNumber from './pages/countries/USVirtualNumber';
 import CanadaVirtualNumber from './pages/countries/CanadaVirtualNumber';
 import UKVirtualNumber from './pages/countries/UKVirtualNumber';
@@ -265,6 +266,7 @@ const AnimatedRoutes = () => {
       <Route path="/ClientOnboarding" element={<RequireAuth><LayoutWrapper currentPageName="ClientOnboarding"><ClientOnboarding /></LayoutWrapper></RequireAuth>} />
       <Route path="/ASOManager" element={<RequireAuth><LayoutWrapper currentPageName="ASOManager"><ASOManager /></LayoutWrapper></RequireAuth>} />
       <Route path="/support" element={<LayoutWrapper currentPageName="Support"><Support /></LayoutWrapper>} />
+      <Route path="/PromoLanding" element={<LayoutWrapper currentPageName="PromoLanding"><PromoLanding /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
         </Routes>
       </motion.div>
