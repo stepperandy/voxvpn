@@ -1,0 +1,110 @@
+{
+  "name": "DiscountCode",
+  "type": "object",
+  "properties": {
+    "code": {
+      "type": "string",
+      "description": "Discount code string (uppercase, alphanumeric)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Internal description of the discount"
+    },
+    "discount_type": {
+      "type": "string",
+      "enum": [
+        "percentage",
+        "fixed_amount"
+      ],
+      "default": "percentage",
+      "description": "Whether discount is a percentage off or a fixed dollar amount"
+    },
+    "discount_value": {
+      "type": "number",
+      "description": "Discount value (percentage: 10 = 10% off, fixed: 5.00 = $5 off)"
+    },
+    "duration": {
+      "type": "string",
+      "enum": [
+        "once",
+        "repeating",
+        "forever"
+      ],
+      "default": "once",
+      "description": "How long the discount applies (once = first payment only, repeating = multiple months, forever = all payments)"
+    },
+    "duration_months": {
+      "type": "integer",
+      "description": "Number of months the discount repeats (only for repeating duration)"
+    },
+    "max_uses": {
+      "type": "integer",
+      "description": "Maximum total redemptions (null/0 = unlimited)"
+    },
+    "used_count": {
+      "type": "integer",
+      "default": 0,
+      "description": "How many times this code has been redeemed"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether this code can be redeemed"
+    },
+    "valid_from": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the code becomes valid"
+    },
+    "valid_until": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the code expires (null = no expiry)"
+    },
+    "applicable_countries": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Country codes this discount applies to (empty = all countries)"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Internal admin notes"
+    }
+  },
+  "required": [
+    "code",
+    "discount_type",
+    "discount_value"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "data.is_active": true
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

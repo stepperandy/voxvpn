@@ -1,0 +1,43 @@
+{
+  "name": "CampaignEnrollment",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email of the enrolled subscriber"
+    },
+    "enrolled_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the subscriber was enrolled in the drip campaign"
+    },
+    "tips_sent_count": {
+      "type": "integer",
+      "default": 0,
+      "description": "Number of tips sent to this subscriber so far"
+    },
+    "last_tip_sent_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of the last tip sent"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "completed",
+        "unsubscribed"
+      ],
+      "default": "active",
+      "description": "Enrollment status"
+    },
+    "source": {
+      "type": "string",
+      "default": "subscription",
+      "description": "How the subscriber was enrolled"
+    }
+  },
+  "required": [
+    "user_email"
+  ]
+}
