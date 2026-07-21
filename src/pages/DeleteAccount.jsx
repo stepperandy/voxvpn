@@ -17,14 +17,14 @@ export default function DeleteAccount() {
             <p className="text-white font-semibold text-lg">Email us at:</p>
             
             <a
-              href="mailto:support@voxtelefony.com?subject=Delete%20my%20VoxDigits%20account"
+              href="mailto:support@voxdigits.com?subject=Delete%20my%20VoxDigits%20account"
               className="flex items-center gap-3 p-4 bg-cyan-500/10 border border-cyan-500/30 hover:border-cyan-500/50 rounded-lg transition-colors group"
             >
               <div className="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
                 <Mail className="w-5 h-5 text-cyan-400" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-cyan-400 font-semibold">support@voxtelefony.com</p>
+                <p className="text-cyan-400 font-semibold">support@voxdigits.com</p>
                 <p className="text-gray-500 text-sm">Click to open your email client</p>
               </div>
               <ArrowRight className="w-4 h-4 text-gray-600 group-hover:text-gray-400 flex-shrink-0" />

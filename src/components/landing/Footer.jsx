@@ -32,7 +32,7 @@ const navigationLinks = {
 };
 
 const CONTACT_EMAILS = [
-  { label: "Support", email: "support@voxtelefony.com" },
+  { label: "Support", email: "support@voxdigits.com" },
   { label: "Admin", email: "admin@voxtelefony.com" },
   { label: "Privacy", email: "privacy@voxtelefony.com" },
   { label: "Billing", email: "billing@voxtelefony.com" },

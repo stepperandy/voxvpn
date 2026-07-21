@@ -162,7 +162,7 @@ Message and data rates may apply from your mobile carrier.
 Opt Out: Reply STOP to any message to opt out at any time.
 Help: Reply HELP for help.
 
-Support: support@voxtelefony.com or +1 207 387 1513.
+Support: support@voxdigits.com or +1 207 387 1513.
 
 Data Privacy: Your mobile opt-in and consent data is not sold or shared with third parties for their marketing purposes.
 
@@ -171,7 +171,7 @@ Data Privacy: Your mobile opt-in and consent data is not sold or shared with thi
 If you have any questions or concerns, contact us:
 
 VoxDigits Communications LLC
-Email: support@voxtelefony.com
+Email: support@voxdigits.com
 Phone: +1 207 387 1513
 Website: https://voxtelefony.com
 
@@ -234,13 +234,13 @@ To the maximum extent permitted by law, VoxTelefony will not be liable for indir
 
 10. SMS Messaging Program
 
-VoxTelefony offers an optional SMS messaging program. By opting in, you agree to receive account notifications, verification codes, customer-care messages, and messages you initiate through VoxTelefony. Message frequency varies. Message and data rates may apply. Reply STOP to opt out and HELP for help. Consent is not a condition of purchase. Support: support@voxtelefony.com or +1 207 387 1513.
+VoxTelefony offers an optional SMS messaging program. By opting in, you agree to receive account notifications, verification codes, customer-care messages, and messages you initiate through VoxTelefony. Message frequency varies. Message and data rates may apply. Reply STOP to opt out and HELP for help. Consent is not a condition of purchase. Support: support@voxdigits.com or +1 207 387 1513.
 
 Your mobile opt-in and consent data is not sold or shared with third parties for their marketing purposes.
 
 11. Contact
 
-For service and legal inquiries, contact: support@voxtelefony.com`,
+For service and legal inquiries, contact: support@voxdigits.com`,
 
     aup: `VoxDigits Communications LLC — Acceptable Use Policy
 
@@ -484,8 +484,8 @@ Address: 16809 Capon Tree Ln, Woodbridge, VA 22191, USA`
           <div className="space-y-4 text-gray-300 text-sm">
             <div>
               <p className="text-gray-400 mb-1">Email</p>
-              <a href="mailto:support@voxtelefony.com" className="text-purple-400 hover:text-purple-300 transition-colors">
-                support@voxtelefony.com
+              <a href="mailto:support@voxdigits.com" className="text-purple-400 hover:text-purple-300 transition-colors">
+                support@voxdigits.com
               </a>
             </div>
             <div>

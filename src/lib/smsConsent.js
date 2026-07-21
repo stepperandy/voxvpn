@@ -10,5 +10,5 @@ export const SMS_CONSENT_TEXT = `I agree to receive account notifications, verif
 
 export const SMS_PRIVACY_POLICY_URL = 'https://voxtelefony.com/privacypolicy';
 export const SMS_TERMS_OF_SERVICE_URL = 'https://voxtelefony.com/termsofservice';
-export const SMS_SUPPORT_EMAIL = 'support@voxtelefony.com';
+export const SMS_SUPPORT_EMAIL = 'support@voxdigits.com';
 export const SMS_SUPPORT_PHONE = '+12073871513';

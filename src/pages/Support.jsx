@@ -8,7 +8,7 @@ import {
 const SUPPORT_EMAILS = [
   {
     label: "General Support",
-    email: "support@voxtelefony.com",
+    email: "support@voxdigits.com",
     icon: LifeBuoy,
     description: "Technical issues, account help, product questions, and general assistance.",
     gradient: "from-cyan-500 to-blue-600",

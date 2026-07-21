@@ -6,10 +6,10 @@ const CONTACT_CHANNELS = [
   {
     icon: Mail,
     label: "Email",
-    value: "support@voxtelefony.com",
+    value: "support@voxdigits.com",
     sub: "Partnership, support & business inquiries",
     color: "cyan",
-    href: "mailto:support@voxtelefony.com",
+    href: "mailto:support@voxdigits.com",
   },
   {
     icon: Phone,
@@ -44,7 +44,7 @@ export default function Contact() {
     setError(null);
     try {
       await base44.integrations.Core.SendEmail({
-        to: "support@voxtelefony.com",
+        to: "support@voxdigits.com",
         subject: `[${form.topic || "Contact Form"}] Message from ${form.name}`,
         body: `Name: ${form.name}\nEmail: ${form.email}\nTopic: ${form.topic}\n\n${form.message}`,
         from_name: "VoxTelefony Contact Form",
@@ -194,7 +194,7 @@ export default function Contact() {
               <div className="space-y-3 text-sm text-gray-300">
                 <div className="flex items-center gap-2">
                   <Mail className="w-4 h-4 text-cyan-400 flex-shrink-0" />
-                  <a href="mailto:support@voxtelefony.com" className="text-cyan-300 hover:text-cyan-200 transition-colors">support@voxtelefony.com</a>
+                  <a href="mailto:support@voxdigits.com" className="text-cyan-300 hover:text-cyan-200 transition-colors">support@voxdigits.com</a>
                 </div>
                 <div className="flex items-center gap-2">
                   <Phone className="w-4 h-4 text-blue-400 flex-shrink-0" />
