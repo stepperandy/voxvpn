@@ -3,6 +3,8 @@ import { ArrowLeft, CheckCircle2, AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { createPageUrl } from "@/utils";
+import SmsConsentCheckbox from "@/components/SmsConsentCheckbox";
+import { SMS_CONSENT_TEXT, SMS_CONSENT_VERSION } from "@/lib/smsConsent";
 
 const COUNTRIES = [
   "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Argentina", "Armenia", "Australia",
@@ -42,6 +44,7 @@ export default function ApplicationForm() {
     useCase: "",
     accountType: "standard",
     agreeToTerms: false,
+    smsConsent: false,
   });
 
   const [loading, setLoading] = useState(false);
@@ -89,6 +92,22 @@ export default function ApplicationForm() {
         `
       });
 
+      // Record SMS consent if the user opted in (unchecked = not enrolled)
+      if (formData.smsConsent) {
+        try {
+          await base44.functions.invoke("recordSmsConsent", {
+            user_email: formData.email,
+            phone_number: formData.phone,
+            consent_given: true,
+            consent_text: SMS_CONSENT_TEXT,
+            consent_version: SMS_CONSENT_VERSION,
+            source_url: window.location.href,
+          });
+        } catch (consentErr) {
+          console.error("SMS consent recording failed:", consentErr);
+        }
+      }
+
       setSuccess(true);
       setFormData({
         firstName: "",
@@ -100,6 +119,7 @@ export default function ApplicationForm() {
         useCase: "",
         accountType: "standard",
         agreeToTerms: false,
+        smsConsent: false,
       });
     } catch (err) {
       setError("Failed to submit application. Please try again.");
@@ -266,6 +286,11 @@ export default function ApplicationForm() {
                 placeholder="How do you plan to use our service?"
                 className="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-orange-500 resize-none h-24"
               />
+            </div>
+
+            {/* SMS Consent (optional, unchecked) */}
+            <div className="border-t border-white/10 pt-4">
+              <SmsConsentCheckbox checked={formData.smsConsent} onChange={(checked) => setFormData(prev => ({ ...prev, smsConsent: checked }))} />
             </div>
 
             {/* Terms Checkbox */}

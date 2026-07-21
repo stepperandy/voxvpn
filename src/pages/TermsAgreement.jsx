@@ -2,11 +2,14 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Shield, FileText, CheckCircle, AlertCircle } from "lucide-react";
+import SmsConsentCheckbox from "@/components/SmsConsentCheckbox";
+import { SMS_CONSENT_TEXT, SMS_CONSENT_VERSION } from "@/lib/smsConsent";
 
 export default function TermsAgreement() {
   const [agreed, setAgreed] = useState(false);
   const [privacyAgreed, setPrivacyAgreed] = useState(false);
   const [ageConfirmed, setAgeConfirmed] = useState(false);
+  const [smsConsent, setSmsConsent] = useState(false);
   const [referralCode, setReferralCode] = useState("");
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -37,6 +40,12 @@ export default function TermsAgreement() {
     setError(null);
     // Store agreement in localStorage so we remember this user agreed
     localStorage.setItem("terms_agreed_v1", "true");
+    // Store SMS consent state — persisted to SmsConsent entity after login if opted in
+    localStorage.setItem("sms_consent_opt_in", smsConsent ? "true" : "false");
+    localStorage.setItem("sms_consent_timestamp", new Date().toISOString());
+    localStorage.setItem("sms_consent_source_url", window.location.href);
+    localStorage.setItem("sms_consent_version", SMS_CONSENT_VERSION);
+    localStorage.setItem("sms_consent_text", SMS_CONSENT_TEXT);
     if (referralCode.trim()) {
       localStorage.setItem("pending_referral_code", referralCode.trim());
     }
@@ -184,6 +193,14 @@ export default function TermsAgreement() {
                 </Link>
               </span>
             </label>
+
+            {/* SMS Consent (optional, unchecked) */}
+            <div className="border-t border-white/10 pt-4">
+              <div className="mb-2">
+                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Optional: SMS Notifications</span>
+              </div>
+              <SmsConsentCheckbox checked={smsConsent} onChange={setSmsConsent} />
+            </div>
 
             {/* Referral Code (optional) */}
             <div>

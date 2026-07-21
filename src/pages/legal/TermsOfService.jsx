@@ -66,7 +66,7 @@ const sections = [
     title: '9. Limitation of Liability',
     text: 'VoxVPN is provided on an "as is" and "as available" basis. To the maximum extent permitted by law:',
     list: [
-      'VoxTelefony Communications LLC shall not be liable for indirect, incidental, special, or consequential damages.',
+      'VoxDigits Communications LLC shall not be liable for indirect, incidental, special, or consequential damages.',
       'Our total liability shall not exceed the amount paid by the user in the 12 months preceding the claim.',
       'We are not liable for data loss, service interruption, or unauthorized access to your account.',
       'We are not liable for any content accessed through the VPN service.',
@@ -75,11 +75,11 @@ const sections = [
   },
   {
     title: '10. Governing Law',
-    text: 'These Terms are governed by the laws of the Commonwealth of Virginia, United States of America, without regard to conflict of law principles. Any disputes shall be resolved in the state or federal courts located in Virginia. VoxVPN is operated by VoxTelefony Communications LLC, registered at 16809 Capon Tree Ln, Woodbridge, VA 22191, USA.',
+    text: 'These Terms are governed by the laws of the Commonwealth of Virginia, United States of America, without regard to conflict of law principles. Any disputes shall be resolved in the state or federal courts located in Virginia. VoxVPN is operated by VoxDigits Communications LLC, registered at 16809 Capon Tree Ln, Woodbridge, VA 22191, USA.',
   },
   {
     title: '11. Intellectual Property',
-    text: 'VoxVPN, its logo, website, software, and content are the property of VoxTelefony Communications LLC. Users may not copy, modify, or distribute VoxVPN intellectual property without written permission.',
+    text: 'VoxVPN, its logo, website, software, and content are the property of VoxDigits Communications LLC. Users may not copy, modify, or distribute VoxVPN intellectual property without written permission.',
   },
   {
     title: '12. Modifications',
@@ -140,7 +140,7 @@ export default function TermsOfService() {
           <div className="rounded-2xl p-8 mt-8 text-center"
             style={{ background: 'linear-gradient(135deg, rgba(0,212,255,0.08), rgba(0,212,255,0.02))', border: '1px solid rgba(0,212,255,0.2)' }}>
             <h2 className="text-white text-lg font-bold mb-2">13. Contact</h2>
-            <p className="text-slate-300 text-sm font-semibold mb-1">VoxTelefony Communications LLC</p>
+            <p className="text-slate-300 text-sm font-semibold mb-1">VoxDigits Communications LLC</p>
             <p className="text-slate-500 text-xs mb-1">16809 Capon Tree Ln, Woodbridge, VA 22191, USA</p>
             <p className="text-slate-500 text-xs mb-4">Registration No. 11986542</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

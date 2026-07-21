@@ -146,12 +146,33 @@ Your data may be processed in countries outside your residence, including jurisd
 We may update this Privacy Policy from time to time.
 Changes will be posted with an updated "Last Updated" date.
 
-12. CONTACT US
+12. SMS MESSAGING PROGRAM
+
+VoxTelefony operates an SMS messaging program for account holders who opt in. By opting in, you agree to receive the following types of messages:
+
+• Account notifications (e.g., payment confirmations, service updates)
+• Verification codes (e.g., for account authentication)
+• Customer-care messages (e.g., support responses)
+• Messages you initiate through VoxTelefony (e.g., replies to your virtual number)
+
+Message frequency varies based on your account activity and usage.
+
+Message and data rates may apply from your mobile carrier.
+
+Opt Out: Reply STOP to any message to opt out at any time.
+Help: Reply HELP for help.
+
+Support: support@voxtelefony.com or +1 207 387 1513.
+
+Data Privacy: Your mobile opt-in and consent data is not sold or shared with third parties for their marketing purposes.
+
+13. CONTACT US
 
 If you have any questions or concerns, contact us:
 
-VoxTelefony
-Email: info@voxtelefony.com
+VoxDigits Communications LLC
+Email: support@voxtelefony.com
+Phone: +1 207 387 1513
 Website: https://voxtelefony.com
 
 13. COMPLIANCE STATEMENT
@@ -164,7 +185,7 @@ This Privacy Policy is designed to comply with:
 
 By using VoxTelefony, you acknowledge that you have read and understood this Privacy Policy.`,
 
-    terms: `VoxTelefony Communication LLC — Terms of Service
+    terms: `VoxDigits Communications LLC — Terms of Service
 
 Effective Date: March 2026
 
@@ -211,11 +232,17 @@ We aim for reliable service but do not guarantee uninterrupted or error-free ope
 
 To the maximum extent permitted by law, VoxTelefony will not be liable for indirect, incidental, special, or consequential damages.
 
-10. Contact
+10. SMS Messaging Program
 
-For service and legal inquiries, contact: info@voxtelefony.com`,
+VoxTelefony offers an optional SMS messaging program. By opting in, you agree to receive account notifications, verification codes, customer-care messages, and messages you initiate through VoxTelefony. Message frequency varies. Message and data rates may apply. Reply STOP to opt out and HELP for help. Consent is not a condition of purchase. Support: support@voxtelefony.com or +1 207 387 1513.
 
-    aup: `VoxTelefony Communication LLC — Acceptable Use Policy
+Your mobile opt-in and consent data is not sold or shared with third parties for their marketing purposes.
+
+11. Contact
+
+For service and legal inquiries, contact: support@voxtelefony.com`,
+
+    aup: `VoxDigits Communications LLC — Acceptable Use Policy
 
 VoxTelefony services must be used responsibly and lawfully.
 
@@ -241,7 +268,7 @@ Contact
 
 For compliance questions: info@voxtelefony.com`,
 
-    refund: `VoxTelefony Communications LLC — Refund Policy
+    refund: `VoxDigits Communications LLC — Refund Policy
 
 Effective Date: March 2026
 
@@ -399,7 +426,7 @@ We may update this Cookie Policy periodically to reflect changes in technology, 
 
 If you have questions about our use of cookies, please contact:
 
-VoxDigits Support
+VoxDigits Communications LLC
 Email: privacy@voxtelefony.com
 Website: https://voxtelefony.com
 Address: 16809 Capon Tree Ln, Woodbridge, VA 22191, USA`
@@ -469,7 +496,7 @@ Address: 16809 Capon Tree Ln, Woodbridge, VA 22191, USA`
             </div>
             <div>
               <p className="text-gray-400 mb-1">Company</p>
-              <p>VoxTelefony Communication LLC</p>
+              <p>VoxDigits Communications LLC</p>
             </div>
           </div>
         </div>

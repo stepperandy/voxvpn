@@ -1,0 +1,95 @@
+{
+  "name": "SmsConsent",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "User's email address"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "User ID if authenticated (optional for public opt-in)"
+    },
+    "phone_number": {
+      "type": "string",
+      "description": "Phone number the user is opting in (E.164 if available)"
+    },
+    "consent_given": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the user gave SMS consent (true) or opted out (false)"
+    },
+    "consent_text": {
+      "type": "string",
+      "description": "Exact disclosure text shown to the user at time of consent"
+    },
+    "consent_version": {
+      "type": "string",
+      "description": "Version identifier of the consent text (e.g., v1.0)"
+    },
+    "source_url": {
+      "type": "string",
+      "description": "URL where consent was given (e.g., /sms-consent, /ApplicationForm)"
+    },
+    "consent_timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When consent was recorded"
+    },
+    "opt_out_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the user opted out (null if still active)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "opted_out"
+      ],
+      "default": "active",
+      "description": "Current consent status"
+    },
+    "ip_address": {
+      "type": "string",
+      "description": "Request IP for audit trail"
+    }
+  },
+  "required": [
+    "user_email",
+    "consent_given",
+    "consent_version"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.user_email": "{{user.email}}"
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.user_email": "{{user.email}}"
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

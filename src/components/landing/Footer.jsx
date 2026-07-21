@@ -48,7 +48,7 @@ export default function Footer() {
             <div className="mb-3">
               <img src="https://media.base44.com/images/public/69b202c06dc5b1988efe9645/e6163c0d6_TELLOGO11.png" alt="VoxTelefony" style={{height: "48px", width: "auto"}} />
             </div>
-            <p className="text-xs leading-relaxed text-gray-500 mb-4">VoxTelefony Communications LLC — Virtual phone numbers, eSIM connectivity, and cloud-based communication solutions for businesses and individuals.</p>
+            <p className="text-xs leading-relaxed text-gray-500 mb-4">VoxDigits Communications LLC — Virtual phone numbers, eSIM connectivity, and cloud-based communication solutions for businesses and individuals.</p>
             <div className="space-y-1">
               {CONTACT_EMAILS.map(({ label, email }) => (
                 <a key={email} href={`mailto:${email}`} className="block text-xs text-gray-500 hover:text-cyan-400 transition-colors">
@@ -120,7 +120,7 @@ export default function Footer() {
         {/* Company Identity */}
         <div className="border-t border-gray-800 pt-6 pb-4">
           <div className="text-center text-xs text-gray-600 space-y-1 mb-4">
-            <p>VoxTelefony Communications LLC</p>
+            <p>VoxDigits Communications LLC</p>
             <p>16809 Capon Tree Ln, Woodbridge, VA 22191, USA</p>
             <p>Registered in the United States of America · Company Registration No. 11986542</p>
           </div>
