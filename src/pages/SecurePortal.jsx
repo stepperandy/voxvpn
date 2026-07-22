@@ -73,8 +73,6 @@ Make the content feel premium, security-focused, and unique. Do not use generic 
             }
           }
         },
-        model: 'gemini_3_flash',
-        add_context_from_internet: true,
       });
       setContent(res);
     } catch {
