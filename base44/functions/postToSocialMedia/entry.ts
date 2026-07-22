@@ -50,6 +50,7 @@ Deno.serve(async (req) => {
           }
         }
 
+        const triggerSource = body.post_id ? "manual" : "bulk";
         let platformNote = "";
 
         if (post.platform === "Facebook") {
@@ -63,6 +64,17 @@ Deno.serve(async (req) => {
             ? await postReelToInstagram(base44, videoUrl, fullContent)
             : await postToInstagram(base44, post, fullContent);
         } else {
+          await base44.asServiceRole.entities.SMOSendLog.create({
+            post_id: post.id,
+            post_content_snapshot: fullContent.slice(0, 5000),
+            platform: post.platform,
+            campaign_name: post.campaign_name || "",
+            status: "skipped",
+            error_message: "Platform not supported for auto-posting",
+            sent_at: new Date().toISOString(),
+            sent_by: user.email || "system",
+            trigger_source: triggerSource,
+          });
           results.push({ id: post.id, platform: post.platform, status: "skipped", reason: "Platform not supported for auto-posting" });
           continue;
         }
@@ -72,8 +84,34 @@ Deno.serve(async (req) => {
           status: "posted",
           notes: `[Published ${new Date().toISOString()}] ${platformNote}`
         });
+
+        await base44.asServiceRole.entities.SMOSendLog.create({
+          post_id: post.id,
+          post_content_snapshot: fullContent.slice(0, 5000),
+          platform: post.platform,
+          campaign_name: post.campaign_name || "",
+          status: "posted",
+          platform_response: platformNote,
+          video_used: !!videoUrl,
+          video_url: videoUrl || "",
+          sent_at: new Date().toISOString(),
+          sent_by: user.email || "system",
+          trigger_source: triggerSource,
+        });
+
         results.push({ id: post.id, platform: post.platform, status: "posted", detail: platformNote, video: !!videoUrl });
       } catch (err) {
+        await base44.asServiceRole.entities.SMOSendLog.create({
+          post_id: post.id,
+          post_content_snapshot: (post.content || "").slice(0, 5000),
+          platform: post.platform,
+          campaign_name: post.campaign_name || "",
+          status: "failed",
+          error_message: err.message,
+          sent_at: new Date().toISOString(),
+          sent_by: user.email || "system",
+          trigger_source: body.post_id ? "manual" : "bulk",
+        });
         results.push({ id: post.id, platform: post.platform, status: "failed", error: err.message });
       }
     }

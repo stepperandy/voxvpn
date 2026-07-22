@@ -1,0 +1,99 @@
+{
+  "name": "SMOSendLog",
+  "type": "object",
+  "properties": {
+    "post_id": {
+      "type": "string",
+      "description": "Reference to the SMOPost that was sent"
+    },
+    "post_content_snapshot": {
+      "type": "string",
+      "description": "Snapshot of the post content at time of sending (for historical record)"
+    },
+    "platform": {
+      "type": "string",
+      "enum": [
+        "Facebook",
+        "Instagram",
+        "LinkedIn",
+        "Twitter",
+        "TikTok"
+      ],
+      "description": "Social media platform the post was sent to"
+    },
+    "campaign_name": {
+      "type": "string",
+      "description": "Name of the parent campaign (denormalized)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "posted",
+        "failed",
+        "skipped"
+      ],
+      "default": "posted",
+      "description": "Outcome of the send attempt"
+    },
+    "platform_response": {
+      "type": "string",
+      "description": "Platform response or post ID returned by the social media API"
+    },
+    "video_used": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether a video was included in this post"
+    },
+    "video_url": {
+      "type": "string",
+      "description": "URL of the video used (if applicable)"
+    },
+    "error_message": {
+      "type": "string",
+      "description": "Error message if the send failed"
+    },
+    "sent_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the send attempt occurred"
+    },
+    "sent_by": {
+      "type": "string",
+      "description": "Email of the admin who triggered the send"
+    },
+    "trigger_source": {
+      "type": "string",
+      "enum": [
+        "manual",
+        "automation",
+        "bulk"
+      ],
+      "default": "manual",
+      "description": "How the send was triggered (manual publish, automation, or bulk publish)"
+    }
+  },
+  "required": [
+    "post_id",
+    "platform",
+    "status",
+    "sent_at"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
