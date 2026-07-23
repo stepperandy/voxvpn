@@ -1,0 +1,65 @@
+name: Build macOS DMG
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Installer version"
+        required: true
+        default: "1.0.0"
+      desktop_app_dir:
+        description: "Path to the Electron desktop app directory"
+        required: true
+        default: "VoxTelefony-Desktop"
+      upload_to_firebase:
+        description: "Upload DMG to Firebase Storage"
+        required: true
+        type: boolean
+        default: false
+
+jobs:
+  build:
+    name: Build, sign, notarize, and package DMG
+    runs-on: macos-latest
+    timeout-minutes: 60
+
+    env:
+      APP_VERSION: ${{ inputs.version }}
+      DESKTOP_APP_DIR: ${{ inputs.desktop_app_dir }}
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+      APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      APPLE_SIGN_IDENTITY: ${{ secrets.APPLE_SIGN_IDENTITY }}
+      CSC_LINK: ${{ secrets.MACOS_CSC_LINK }}
+      CSC_KEY_PASSWORD: ${{ secrets.MACOS_CSC_KEY_PASSWORD }}
+      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+      FIREBASE_DOWNLOADS_COLLECTION: ${{ secrets.FIREBASE_DOWNLOADS_COLLECTION }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Build macOS DMG
+        run: |
+          chmod +x src/installer/macos/build-macos-prod.sh
+          src/installer/macos/build-macos-prod.sh
+
+      - name: Upload DMG artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: VoxTelefony-macOS-${{ inputs.version }}
+          path: src/installer/macos/output/*.dmg
+          if-no-files-found: error
+
+      - name: Upload to Firebase Storage
+        if: ${{ inputs.upload_to_firebase }}
+        run: |
+          npm install --no-save firebase-admin
+          node src/installer/macos/upload-macos-dmg-to-firebase.mjs
