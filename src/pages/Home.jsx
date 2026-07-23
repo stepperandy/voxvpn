@@ -15,6 +15,7 @@ import SearchSection from "../components/landing/SearchSection";
 import ESimBenefitsBanner from "../components/landing/ESimBenefitsBanner";
 import StatsTrustBadge from "../components/landing/StatsTrustBadge";
 import LaunchBanner from "../components/landing/LaunchBanner";
+import MacOSDownloadSection from "../components/landing/MacOSDownloadSection";
 
 
 export default function Home() {
@@ -34,6 +35,7 @@ export default function Home() {
       <ESimBenefitsBanner />
       <StayConnected />
       <UseCaseBanner />
+      <MacOSDownloadSection />
       <BusinessTestimonials />
       <SearchSection />
       <PricingSection />
