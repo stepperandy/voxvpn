@@ -101,7 +101,7 @@ export default function Footer() {
               />
             </a>
             <a
-              href="https://apps.apple.com/us/search?term=voxtelefony"
+              href="https://apps.apple.com/gh/app/voxtelefony-virtual-numbers/id6760922995"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:opacity-80 transition-opacity active:scale-95"
