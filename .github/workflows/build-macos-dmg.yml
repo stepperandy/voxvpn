@@ -46,10 +46,6 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Extract macOS installer source
-        run: |
-          tar -xzf src/installer/macos/VoxTelefony-macOS-installer-source.tar.gz
-
       - name: Build macOS DMG
         run: |
           chmod +x src/installer/macos/build-macos-prod.sh
